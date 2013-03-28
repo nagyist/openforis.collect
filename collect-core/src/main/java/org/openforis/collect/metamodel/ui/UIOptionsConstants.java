@@ -15,15 +15,26 @@ public interface UIOptionsConstants {
 
 	String AUTOCOMPLETE = "autocomplete";
 	String TAB_SET_NAME = "tabSet";
-	String TAB = "tab";
 	String LAYOUT = "layout";
 	String DIRECTION = "direction";
 	String COUNT = "count";
 	String SHOW_ROW_NUMBERS = "showRowNumbers";
 
 	String TAB_SET = "tabSet";
+	String TAB = "tab";
+	
+	String FORM_BUNDLE = "formBundle";
+	String FORM = "form";
+	String FORM_SECTION = "section";
+	String FIELD = "field";
+	String TABLE = "table";
+	String COLUMN = "column";
+	String COLUMN_GROUP = "columnGroup";
+	
 	String NAME = "name";
 	String TYPE = "type";
 	String LABEL = "label";
 	
+	String ENTITY_ID = "entityId";
+	String ATTRIBUTE_ID = "attributeId";
 }

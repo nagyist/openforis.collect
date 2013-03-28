@@ -79,6 +79,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	
 	private CollectSurvey survey;
 	private List<UITabSet> tabSets;
+	private List<FormBundle> formBundles;
 	
 	public UIOptions() {
 	}
@@ -143,6 +144,21 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return tab;
 	}
 
+	public FormBundle createFormBundle() {
+		return new FormBundle();
+	}
+	
+	public List<FormBundle> getFormBundles() {
+		return CollectionUtils.unmodifiableList(formBundles);
+	}
+	
+	public void addFormBundle(FormBundle formBundle) {
+		if ( formBundles == null ) {
+			formBundles = new ArrayList<FormBundle>();
+		}
+		formBundles.add(formBundle);
+	}
+	
 	protected void copyLabels(EntityDefinition nodeDefn, UITab tab) {
 		removeLabels(tab);
 		List<NodeLabel> labels = nodeDefn.getLabels();
