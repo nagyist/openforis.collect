@@ -22,6 +22,10 @@ public class Form extends FormContainer {
 		this.parent = parent;
 	}
 	
+	public FormSection createFormSection() {
+		return new FormSection(this);
+	}
+
 	public FormContainer getParent() {
 		return parent;
 	}

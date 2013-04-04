@@ -14,9 +14,10 @@ public class Field extends Component {
 	private static final long serialVersionUID = 1L;
 
 	private FormSection formSection;
+	private int attributeId; 
 	private AttributeDefinition attributeDefinition;
 
-	public Field(FormSection formSection) {
+	Field(FormSection formSection) {
 		super();
 		this.formSection = formSection;
 	}
@@ -31,6 +32,14 @@ public class Field extends Component {
 
 	public void setAttributeDefinition(AttributeDefinition attributeDefinition) {
 		this.attributeDefinition = attributeDefinition;
+	}
+
+	public int getAttributeId() {
+		return attributeId;
+	}
+
+	public void setAttributeId(int attributeId) {
+		this.attributeId = attributeId;
 	}
 	
 }

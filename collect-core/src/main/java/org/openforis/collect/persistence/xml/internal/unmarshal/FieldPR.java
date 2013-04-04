@@ -1,14 +1,12 @@
 package org.openforis.collect.persistence.xml.internal.unmarshal;
 
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.ATTRIBUTE_ID;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FIELD;
 
 import java.io.IOException;
 
 import org.openforis.collect.metamodel.ui.Field;
-import org.openforis.collect.metamodel.ui.FormSection;
-import org.openforis.collect.persistence.xml.UIOptionsBinder;
 import org.openforis.idm.metamodel.xml.XmlParseException;
-import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
 /**
@@ -16,24 +14,19 @@ import org.xmlpull.v1.XmlPullParserException;
  * @author S. Ricci
  *
  */
-class FieldPR extends UIModelPR {
+class FieldPR extends ComponentPR {
 	
-	private FormSection parentFormSection;
-	private Field field;
-	
-	public FieldPR(UIOptionsBinder binder) {
-		super(binder);
+	public FieldPR() {
+		super(FIELD);
 	}
 	
 	@Override
 	protected void onStartTag() throws XmlParseException, XmlPullParserException, IOException {
-		field = parentFormSection.createField();
-		XmlPullParser parser = getParser();
+		super.onStartTag();
+		component = parentFormSection.createField();
 		int attributeId = getIntegerAttribute(ATTRIBUTE_ID, true);
-		
+		Field field = (Field) component;
+		field.setAttributeId(attributeId);
 	}
-
-	public FormSection getParentFormSection() {
-		return parentFormSection;
-	}
+	
 }

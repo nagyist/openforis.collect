@@ -15,13 +15,22 @@ public abstract class FormContainer implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
+	private int entityDefinitionId;
 	private EntityDefinition entityDefinition;
 	private List<Form> forms;
 	
 	public Form createForm() {
 		return new Form(this);
 	}
-	
+
+	public int getEntityDefinitionId() {
+		return entityDefinitionId;
+	}
+
+	public void setEntityDefinitionId(int entityDefinitionId) {
+		this.entityDefinitionId = entityDefinitionId;
+	}
+
 	public EntityDefinition getEntityDefinition() {
 		return entityDefinition;
 	}

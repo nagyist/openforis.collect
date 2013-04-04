@@ -3,15 +3,13 @@
  */
 package org.openforis.collect.persistence.xml.internal.unmarshal;
 
-import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.ENTITY_ID;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM;
 
 import java.io.IOException;
 
 import org.openforis.collect.metamodel.ui.Form;
 import org.openforis.collect.metamodel.ui.FormContainer;
-import org.openforis.collect.metamodel.ui.UIOptions;
-import org.openforis.collect.persistence.xml.UIOptionsBinder;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.openforis.idm.metamodel.xml.internal.unmarshal.XmlPullReader;
 import org.xmlpull.v1.XmlPullParserException;
@@ -25,25 +23,26 @@ public class FormPR extends UIModelPR {
 	protected FormContainer parentFormContainer;
 	protected Form form;
 
-	public FormPR(UIOptionsBinder binder) {
+	public FormPR() {
 		super(FORM);
 		
 		addChildPullReaders(
-			new FormSectionPR(binder)
+			new FormSectionPR()
 		);
 	}
 	
 	@Override
 	protected void onStartTag() throws XmlParseException,
 			XmlPullParserException, IOException {
+		super.onStartTag();
 		form = parentFormContainer.createForm();
-		
-		Integer entityId = getIntegerAttribute(ENTITY_ID, true);
-		
+		int entityDefinitionId = getIntegerAttribute(ENTITY_ID, true);
+		form.setEntityDefinitionId(entityDefinitionId);
 	}
 	
 	@Override
 	protected void onEndTag() throws XmlParseException {
+		super.onEndTag();
 		parentFormContainer.addForm(form);
 	}
 	
