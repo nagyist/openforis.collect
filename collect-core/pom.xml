@@ -24,6 +24,7 @@
 				<version>1.0-alpha-2</version>
 				<configuration>
 					<files>
+                        <file>src/it/resources/default-dev.properties</file>
 						<file>dev.properties</file>
 					</files>
 					<quiet>true</quiet>
@@ -242,27 +243,27 @@
 										<ignore />
 									</action>
 								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>
-											org.codehaus.mojo
-										</groupId>
-										<artifactId>
-											build-helper-maven-plugin
-										</artifactId>
-										<versionRange>
-											[1.7,)
-										</versionRange>
-										<goals>
-											<goal>add-source</goal>
-											<goal>add-test-source</goal>
-											<goal>add-test-resource</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
+<!-- 								<pluginExecution> -->
+<!-- 									<pluginExecutionFilter> -->
+<!-- 										<groupId> -->
+<!-- 											org.codehaus.mojo -->
+<!-- 										</groupId> -->
+<!-- 										<artifactId> -->
+<!-- 											build-helper-maven-plugin -->
+<!-- 										</artifactId> -->
+<!-- 										<versionRange> -->
+<!-- 											[1.7,) -->
+<!-- 										</versionRange> -->
+<!-- 										<goals> -->
+<!-- 											<goal>add-source</goal> -->
+<!-- 											<goal>add-test-source</goal> -->
+<!-- 											<goal>add-test-resource</goal> -->
+<!-- 										</goals> -->
+<!-- 									</pluginExecutionFilter> -->
+<!-- 									<action> -->
+<!-- 										<ignore /> -->
+<!-- 									</action> -->
+<!-- 								</pluginExecution> -->
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
@@ -385,6 +386,12 @@
 			<groupId>net.sf.kxml</groupId>
 			<artifactId>kxml2</artifactId>
 			<version>2.3.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.xerial</groupId>
+			<artifactId>sqlite-jdbc</artifactId>
+			<version>3.7.2</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
