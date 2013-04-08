@@ -13,7 +13,7 @@ import org.openforis.idm.metamodel.xml.XmlParseException;
  */
 abstract class ComponentPR extends UIModelPR {
 
-	protected FormSection parentFormSection;
+	protected FormSection parent;
 	protected Component component;
 	
 	ComponentPR(String tagName) {
@@ -23,15 +23,15 @@ abstract class ComponentPR extends UIModelPR {
 	@Override
 	protected void onEndTag() throws XmlParseException {
 		super.onEndTag();
-		parentFormSection.addComponent(component);
+		parent.addComponent(component);
 	}
 
-	public FormSection getParentFormSection() {
-		return parentFormSection;
+	public FormSection getParent() {
+		return parent;
 	}
 
-	public void setParentFormSection(FormSection parentFormSection) {
-		this.parentFormSection = parentFormSection;
+	public void setParent(FormSection parentFormSection) {
+		this.parent = parentFormSection;
 	}
 	
 	

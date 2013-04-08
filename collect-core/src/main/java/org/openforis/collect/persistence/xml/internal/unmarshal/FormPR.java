@@ -5,11 +5,14 @@ package org.openforis.collect.persistence.xml.internal.unmarshal;
 
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.ENTITY_ID;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.ID;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.LABEL;
 
 import java.io.IOException;
 
 import org.openforis.collect.metamodel.ui.Form;
 import org.openforis.collect.metamodel.ui.FormContainer;
+import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.openforis.idm.metamodel.xml.internal.unmarshal.XmlPullReader;
 import org.xmlpull.v1.XmlPullParserException;
@@ -27,7 +30,9 @@ public class FormPR extends UIModelPR {
 		super(FORM);
 		
 		addChildPullReaders(
-			new FormSectionPR()
+			new LabelPR(),
+			new FormSectionPR(),
+			this
 		);
 	}
 	
@@ -35,9 +40,10 @@ public class FormPR extends UIModelPR {
 	protected void onStartTag() throws XmlParseException,
 			XmlPullParserException, IOException {
 		super.onStartTag();
-		form = parentFormContainer.createForm();
-		int entityDefinitionId = getIntegerAttribute(ENTITY_ID, true);
-		form.setEntityDefinitionId(entityDefinitionId);
+		int id = getIntegerAttribute(ID, true);
+		form = parentFormContainer.createForm(id);
+		int entityId = getIntegerAttribute(ENTITY_ID, true);
+		form.setEntityId(entityId);
 	}
 	
 	@Override
@@ -58,6 +64,10 @@ public class FormPR extends UIModelPR {
 			super.handleChildTag(childPR);
 			formpr.parentFormContainer = tmpParent;
 			formpr.form = tmpForm;
+		} else if ( childPR instanceof FormSectionPR ) {
+			FormSectionPR formSectionPR = (FormSectionPR) childPR;
+			formSectionPR.parent = form;
+			super.handleChildTag(childPR);
 		} else {
 			super.handleChildTag(childPR);
 		}
@@ -67,5 +77,16 @@ public class FormPR extends UIModelPR {
 		return form;
 	}
 
+	private class LabelPR extends LanguageSpecificTextPR {
+
+		public LabelPR() {
+			super(LABEL);
+		}
+		
+		@Override
+		protected void processText(LanguageSpecificText lst) {
+			((Form) form).addLabel(lst);
+		}
+	}
 }
 

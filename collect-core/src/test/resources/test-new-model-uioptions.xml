@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<formBundles 
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns="http://www.openforis.org/collect/3.0/ui"
+      xsi:schemaLocation="http://www.openforis.org/collect/3.0/ui ../../main/resources/idml3-new-ui.xsd">
+  <formBundle id="1" entityId="1">
+    <form id="2" entityId="1">
+	    <label xml:lang="en">Cluster</label>
+	    <section id="3" entityId="1">
+		    <label xml:lang="en">Cluster</label>
+	    	<table id="5" entityId="2">
+	    		<label xml:lang="en">Quality assurance field</label>
+	    		<column id="6" attributeId="3" />
+	    		<column id="7" attributeId="4" />
+	    		<column id="8" attributeId="5" />
+	    	</table>
+	    	<field id="9" attributeId="6" />
+	    </section>
+    </form>
+    <form id="200" entityId="22">
+	    <label xml:lang="en">Plot</label>
+	    <section id="201" entityId="22">
+		    <label xml:lang="en">Plot</label>
+	    	<field id="202" attributeId="23" />
+	    </section>
+    </form>
+  </formBundle>
+</formBundles>

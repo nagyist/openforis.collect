@@ -25,10 +25,14 @@ import org.openforis.collect.metamodel.ui.UITabSet;
  */
 public class UIOptionsBinderTest {
 
+	private static final String OLD_UIOPTIONS_TEST_XML = "test-uioptions.xml";
+	private static final String NEW_UIOPTIONS_TEST_XML = "test-new-model-uioptions.xml";
 	
+	private static final String EN_LANG_CODE = "en";
+
 	@Test
-	public void testUnmarshall() throws IOException {
-		String optionsBody = loadTestOptions();
+	public void testUnmarshallOldUIModel() throws IOException {
+		String optionsBody = loadOldUIModelTestOptions();
 		UIOptionsBinder binder = new UIOptionsBinder();
 		UIOptions uiOptions = binder.unmarshal(UIOptionsConstants.UI_TYPE, optionsBody);
 		assertNotNull(uiOptions);
@@ -40,7 +44,7 @@ public class UIOptionsBinderTest {
 		assertEquals(4, tabs.size());
 		UITab plotTab = tabs.get(1);
 		assertEquals("plot", plotTab.getName());
-		String label = plotTab.getLabel("en");
+		String label = plotTab.getLabel(EN_LANG_CODE);
 		assertEquals("Plot", label);
 		assertEquals(clusterRootTabSet, plotTab.getParent());
 		List<UITab> plotInnerTabs = plotTab.getTabs();
@@ -50,8 +54,26 @@ public class UIOptionsBinderTest {
 	}
 	
 	@Test
+	public void testUnmarshallUIModel() throws IOException {
+		String optionsBody = loadNewUIModelTestOptions();
+		UIOptionsBinder binder = new UIOptionsBinder();
+		UIOptions uiOptions = binder.unmarshal(UIOptionsConstants.UI_TYPE, optionsBody);
+		assertNotNull(uiOptions);
+	}
+	
+	@Test
 	public void roundTripMarshallingTest() throws IOException {
-		String optionsBody = loadTestOptions();
+		String optionsBody = loadNewUIModelTestOptions();
+		UIOptionsBinder binder = new UIOptionsBinder();
+		UIOptions uiOptions = binder.unmarshal(UIOptionsConstants.UI_TYPE, optionsBody);
+		String marshalled = binder.marshal(uiOptions);
+		UIOptions reloaded = binder.unmarshal(UIOptionsConstants.UI_TYPE, marshalled);
+		assertEquals(uiOptions, reloaded);
+	}
+	
+	@Test
+	public void roundTripOldModelMarshallingTest() throws IOException {
+		String optionsBody = loadOldUIModelTestOptions();
 		UIOptionsBinder binder = new UIOptionsBinder();
 		UIOptions uiOptions = binder.unmarshal(UIOptionsConstants.UI_TYPE, optionsBody);
 		new File("target/test/output").mkdirs();
@@ -61,9 +83,17 @@ public class UIOptionsBinderTest {
 		fos.flush();
 		fos.close();
 	}
+
+	private String loadOldUIModelTestOptions() throws IOException {
+		return loadTextResourceFile(OLD_UIOPTIONS_TEST_XML);
+	}
 	
-	private String loadTestOptions() throws IOException {
-		URL fileUrl = ClassLoader.getSystemResource("test-uioptions.xml");
+	private String loadNewUIModelTestOptions() throws IOException {
+		return loadTextResourceFile(NEW_UIOPTIONS_TEST_XML);
+	}
+
+	protected String loadTextResourceFile(String resourceName) throws IOException {
+		URL fileUrl = ClassLoader.getSystemResource(resourceName);
 		InputStream is = fileUrl.openStream();
 		StringWriter writer = new StringWriter();
 		IOUtils.copy(is, writer, "UTF-8");

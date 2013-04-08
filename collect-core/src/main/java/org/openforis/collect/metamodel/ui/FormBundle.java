@@ -10,5 +10,8 @@ public class FormBundle extends FormContainer {
 
 	private static final long serialVersionUID = 1L;
 	
-
+	FormBundle(UIOptions uiOptions, int id) {
+		super(uiOptions, id);
+	}
+	
 }

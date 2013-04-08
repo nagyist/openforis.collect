@@ -80,6 +80,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	private CollectSurvey survey;
 	private List<UITabSet> tabSets;
 	private List<FormBundle> formBundles;
+	private int lastId;
 	
 	public UIOptions() {
 	}
@@ -89,6 +90,11 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		this.survey = survey;
 	}
 
+	synchronized 
+	public int nextId() {
+		return ++lastId;
+	}
+	
 	@Override
 	public String getType() {
 		return UI_TYPE;
@@ -145,9 +151,13 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 
 	public FormBundle createFormBundle() {
-		return new FormBundle();
+		return createFormBundle(nextId());
 	}
 	
+	public FormBundle createFormBundle(int id) {
+		return new FormBundle(this, id);
+	}
+
 	public List<FormBundle> getFormBundles() {
 		return CollectionUtils.unmodifiableList(formBundles);
 	}
@@ -552,11 +562,15 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		tabSet.setName(newName);
 		return tabSet;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result
+				+ ((formBundles == null) ? 0 : formBundles.hashCode());
+		result = prime * result + lastId;
+		result = prime * result + ((survey == null) ? 0 : survey.hashCode());
 		result = prime * result + ((tabSets == null) ? 0 : tabSets.hashCode());
 		return result;
 	}
@@ -570,6 +584,18 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		UIOptions other = (UIOptions) obj;
+		if (formBundles == null) {
+			if (other.formBundles != null)
+				return false;
+		} else if (!formBundles.equals(other.formBundles))
+			return false;
+		if (lastId != other.lastId)
+			return false;
+		if (survey == null) {
+			if (other.survey != null)
+				return false;
+		} else if (!survey.equals(other.survey))
+			return false;
 		if (tabSets == null) {
 			if (other.tabSets != null)
 				return false;
@@ -577,5 +603,5 @@ public class UIOptions implements ApplicationOptions, Serializable {
 			return false;
 		return true;
 	}
-
+	
 }

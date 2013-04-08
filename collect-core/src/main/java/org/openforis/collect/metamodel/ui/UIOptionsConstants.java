@@ -12,6 +12,8 @@ public interface UIOptionsConstants {
 	String UI_PREFIX = "ui";
 	
 	String UI_TYPE = "ui";
+	
+	String ID = "id";
 
 	String AUTOCOMPLETE = "autocomplete";
 	String TAB_SET_NAME = "tabSet";
@@ -23,6 +25,7 @@ public interface UIOptionsConstants {
 	String TAB_SET = "tabSet";
 	String TAB = "tab";
 	
+	String FORM_BUNDLES = "formBundles";
 	String FORM_BUNDLE = "formBundle";
 	String FORM = "form";
 	String FORM_SECTION = "section";
