@@ -18,7 +18,7 @@ abstract class UIModelObject implements Serializable {
 	private UIOptions uiOptions;
 	private int id;
 
-	public UIModelObject(UIOptions uiOptions, int id) {
+	UIModelObject(UIOptions uiOptions, int id) {
 		super();
 		this.uiOptions = uiOptions;
 		this.id = id;

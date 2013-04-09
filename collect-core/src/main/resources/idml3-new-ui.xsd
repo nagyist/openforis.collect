@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema elementFormDefault="qualified" version="1.0"
+	xmlns="http://www.openforis.org/collect/3.0/ui" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	xmlns:idml="http://www.openforis.org/idml/3.0" targetNamespace="http://www.openforis.org/collect/3.0/ui">
+	<xs:annotation>
+		<xs:documentation xml:lang="en">
+			Inventory Data Modeling
+			Language 3.0 - Collect UI Options with new UI model
+			S. Ricci
+		</xs:documentation>
+	</xs:annotation>
+
+	<xs:import namespace="http://www.openforis.org/idml/3.0"
+		schemaLocation="https://raw.github.com/openforis/idm/master/idm-api/src/main/resources/idml3.xsd" />
+
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+	<!-- Types used throughout this schema -->
+	<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+	<xs:complexType name="formSets">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				Group of form sets
+			</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="formSet" type="formSet" minOccurs="1"
+				maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">
+						TO-DO
+					</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
+	<xs:complexType name="formSet">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				Set of forms
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="uiModelObject">
+				<xs:sequence>
+					<xs:element name="form" type="form" minOccurs="0"
+						maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">
+								TO-DO
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="form">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				Set of form sections or forms
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="uiModelObject">
+				<xs:sequence>
+					<xs:element name="section" type="section" minOccurs="1"
+						maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">
+								TO-DO
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="form" type="form" minOccurs="0"
+						maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">
+								TO-DO
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="section">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				TO-DO
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="uiModelObject">
+				<xs:sequence>
+					<xs:element name="label" minOccurs="1" maxOccurs="unbounded"
+						type="idml:unformattedText">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">
+								TO-DO
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="field" type="field" minOccurs="0"
+						maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">
+								TO-DO
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="table" type="table" minOccurs="0"
+						maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">
+								TO-DO
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="table">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				TO-DO
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="component">
+				<xs:sequence>
+					<xs:element name="column" type="column" minOccurs="0"
+						maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">
+								TO-DO
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="columnGroup" type="columnGroup"
+						minOccurs="0" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">
+								TO-DO
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+				<xs:attribute name="entityId" use="required" type="xs:int">
+					<xs:annotation>
+						<xs:documentation xml:lang="en">
+							TO-DO
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="columnGroup">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				TO-DO
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="uiModelObject">
+				<xs:sequence>
+					<xs:element name="label" minOccurs="1" maxOccurs="unbounded"
+						type="idml:unformattedText">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">
+								TO-DO
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+					<xs:element name="column" type="column" minOccurs="1"
+						maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation xml:lang="en">
+								TO-DO
+							</xs:documentation>
+						</xs:annotation>
+					</xs:element>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="field">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				TO-DO
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="component">
+				<xs:attribute name="attributeId" use="required" type="xs:int">
+					<xs:annotation>
+						<xs:documentation xml:lang="en">
+							TO-DO
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="column">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				TO-DO
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="uiModelObject">
+				<xs:attribute name="attributeId" use="required" type="xs:int">
+					<xs:annotation>
+						<xs:documentation xml:lang="en">
+							TO-DO
+						</xs:documentation>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="component">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				TO-DO
+			</xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="uiModelObject">
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="uiModelObject">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">
+				Group of tabs element.
+				Each root entity must be associated to a tabSet, using ui:tabSet
+				annotation
+			</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="id" type="xs:ID">
+			<xs:annotation>
+				<xs:documentation xml:lang="en">
+					Unique ID
+				</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+
+</xs:schema> 
+    

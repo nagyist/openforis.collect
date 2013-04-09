@@ -3,7 +3,7 @@
  */
 package org.openforis.collect.persistence.xml.internal.unmarshal;
 
-import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM_BUNDLES;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM_SETS;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class FormSetsPR extends UIModelPR {
 	private List<FormSet> formBundles;
 	
 	public FormSetsPR(UIOptionsBinder binder) {
-		super(FORM_BUNDLES);
+		super(FORM_SETS);
 		
 		addChildPullReaders(
 			new FormSetPR()

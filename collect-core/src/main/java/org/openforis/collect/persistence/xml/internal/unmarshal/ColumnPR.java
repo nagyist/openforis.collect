@@ -37,6 +37,6 @@ class ColumnPR extends UIModelPR {
 	@Override
 	protected void onEndTag() throws XmlParseException {
 		super.onEndTag();
-		parent.addColumn(column);
+		parent.addHeadingComponent(column);
 	}
 }

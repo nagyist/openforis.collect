@@ -618,7 +618,6 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		result = prime * result
 				+ ((formSets == null) ? 0 : formSets.hashCode());
 		result = prime * result + lastId;
-		result = prime * result + ((survey == null) ? 0 : survey.hashCode());
 		result = prime * result + ((tabSets == null) ? 0 : tabSets.hashCode());
 		return result;
 	}
@@ -638,11 +637,6 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		} else if (!formSets.equals(other.formSets))
 			return false;
 		if (lastId != other.lastId)
-			return false;
-		if (survey == null) {
-			if (other.survey != null)
-				return false;
-		} else if (!survey.equals(other.survey))
 			return false;
 		if (tabSets == null) {
 			if (other.tabSets != null)

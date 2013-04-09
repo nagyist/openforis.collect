@@ -71,6 +71,7 @@ public class UIOptionsBinder implements
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	protected void unmarshalTabSets(String body, XmlPullParser parser)
 			throws XmlPullParserException, IOException, XmlParseException {
 		uiOptions = new UIOptions();

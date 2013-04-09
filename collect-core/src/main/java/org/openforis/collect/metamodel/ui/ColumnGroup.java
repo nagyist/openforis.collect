@@ -15,36 +15,30 @@ import org.openforis.idm.metamodel.LanguageSpecificTextMap;
  * @author S. Ricci
  *
  */
-public class ColumnGroup extends UIModelObject {
+public class ColumnGroup extends TableHeadingComponent {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Table table;
-	private List<Column> columns;
+	private List<TableHeadingComponent> headingComponents;
 	private LanguageSpecificTextMap labels;
 
 	public ColumnGroup(Table table, int id) {
-		super(table.getUiOptions(), id);
-		this.table = table;
+		super(table, id);
 	}
 	
-	public Table getTable() {
-		return table;
+	public List<TableHeadingComponent> getHeadingComponents() {
+		return CollectionUtils.unmodifiableList(headingComponents);
 	}
 	
-	public List<Column> getColumns() {
-		return CollectionUtils.unmodifiableList(columns);
-	}
-	
-	public void addColumn(Column column) {
-		if ( columns == null ) {
-			columns = new ArrayList<Column>();
+	public void addHeadingComponent(TableHeadingComponent component) {
+		if ( headingComponents == null ) {
+			headingComponents = new ArrayList<TableHeadingComponent>();
 		}
-		columns.add(column);
+		headingComponents.add(component);
 	}
 	
-	public void removeColumn(Column column) {
-		columns.remove(column);
+	public void removeHeadingComponent(TableHeadingComponent component) {
+		headingComponents.remove(component);
 	}
 	
 	public List<LanguageSpecificText> getLabels() {
@@ -81,9 +75,8 @@ public class ColumnGroup extends UIModelObject {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((columns == null) ? 0 : columns.hashCode());
+		result = prime * result + ((headingComponents == null) ? 0 : headingComponents.hashCode());
 		result = prime * result + ((labels == null) ? 0 : labels.hashCode());
-		result = prime * result + ((table == null) ? 0 : table.hashCode());
 		return result;
 	}
 
@@ -96,22 +89,17 @@ public class ColumnGroup extends UIModelObject {
 		if (getClass() != obj.getClass())
 			return false;
 		ColumnGroup other = (ColumnGroup) obj;
-		if (columns == null) {
-			if (other.columns != null)
+		if (headingComponents == null) {
+			if (other.headingComponents != null)
 				return false;
-		} else if (!columns.equals(other.columns))
+		} else if (!headingComponents.equals(other.headingComponents))
 			return false;
 		if (labels == null) {
 			if (other.labels != null)
 				return false;
 		} else if (!labels.equals(other.labels))
 			return false;
-		if (table == null) {
-			if (other.table != null)
-				return false;
-		} else if (!table.equals(other.table))
-			return false;
 		return true;
 	}
-	
+
 }

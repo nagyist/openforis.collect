@@ -9,25 +9,20 @@ import org.openforis.idm.metamodel.AttributeDefinition;
  * @author S. Ricci
  *
  */
-public class Column extends UIModelObject {
+public class Column extends TableHeadingComponent {
 
 	private static final long serialVersionUID = 1L;
 	
-	private Table parent;
 	private int attributeId;
 	
-	Column(Table parent, int id) {
-		super(parent.getUiOptions(), id);
+	Column(Table table, int id) {
+		super(table, id);
 	}
 
 	public AttributeDefinition getAttributeDefinition() {
 		return (AttributeDefinition) getNodeDefinition(attributeId);
 	}
 
-	public Table getParent() {
-		return parent;
-	}
-	
 	public int getAttributeId() {
 		return attributeId;
 	}
@@ -41,7 +36,6 @@ public class Column extends UIModelObject {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + attributeId;
-		result = prime * result + ((parent == null) ? 0 : parent.hashCode());
 		return result;
 	}
 
@@ -56,12 +50,7 @@ public class Column extends UIModelObject {
 		Column other = (Column) obj;
 		if (attributeId != other.attributeId)
 			return false;
-		if (parent == null) {
-			if (other.parent != null)
-				return false;
-		} else if (!parent.equals(other.parent))
-			return false;
 		return true;
 	}
-	
+
 }

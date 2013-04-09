@@ -3,14 +3,14 @@ package org.openforis.collect.persistence.xml.internal.marshal;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.ATTRIBUTE_ID;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.AUTOCOMPLETE;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.COLUMN;
-import static org.openforis.collect.metamodel.ui.UIOptionsConstants.COUNT;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.COLUMN_GROUP;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.COUNT;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.ENTITY_ID;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FIELD;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM;
-import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM_SET;
-import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM_BUNDLES;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM_SECTION;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM_SET;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM_SETS;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.ID;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.LABEL;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.NAME;
@@ -30,9 +30,10 @@ import org.openforis.collect.metamodel.ui.ColumnGroup;
 import org.openforis.collect.metamodel.ui.Component;
 import org.openforis.collect.metamodel.ui.Field;
 import org.openforis.collect.metamodel.ui.Form;
-import org.openforis.collect.metamodel.ui.FormSet;
 import org.openforis.collect.metamodel.ui.FormSection;
+import org.openforis.collect.metamodel.ui.FormSet;
 import org.openforis.collect.metamodel.ui.Table;
+import org.openforis.collect.metamodel.ui.TableHeadingComponent;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
@@ -59,12 +60,12 @@ public class UIOptionsSerializer {
 //			for (UITabSet tabSet : tabSets) {
 //				writeTabSet(serializer, tabSet);
 //			}
-			serializer.startTag(UI_NAMESPACE_URI, FORM_BUNDLES);
+			serializer.startTag(UI_NAMESPACE_URI, FORM_SETS);
 			List<FormSet> formBundles = options.getFormSets();
 			for (FormSet formBundle : formBundles) {
 				write(serializer, formBundle);
 			}
-			serializer.endTag(UI_NAMESPACE_URI, FORM_BUNDLES);
+			serializer.endTag(UI_NAMESPACE_URI, FORM_SETS);
 			serializer.flush();
 		} catch ( Exception e ) {
 			throw new RuntimeException(e);
@@ -139,7 +140,9 @@ public class UIOptionsSerializer {
 		serializer.startTag(UI_NAMESPACE_URI, FIELD);
 		serializer.attribute(UI_NAMESPACE_URI, ID, Integer.toString(field.getId()));
 		serializer.attribute(UI_NAMESPACE_URI, ATTRIBUTE_ID, Integer.toString(field.getAttributeId()));
-		serializer.attribute(UI_NAMESPACE_URI, AUTOCOMPLETE, field.isAutocomplete() ? Boolean.TRUE.toString(): null);
+		if ( field.isAutocomplete() ) {
+			serializer.attribute(UI_NAMESPACE_URI, AUTOCOMPLETE, Boolean.TRUE.toString());
+		}
 		serializer.endTag(UI_NAMESPACE_URI, FIELD);
 	}
 
@@ -148,21 +151,32 @@ public class UIOptionsSerializer {
 		serializer.startTag(UI_NAMESPACE_URI, TABLE);
 		serializer.attribute(UI_NAMESPACE_URI, ID, Integer.toString(table.getId()));
 		serializer.attribute(UI_NAMESPACE_URI, ENTITY_ID, Integer.toString(table.getEntityId()));
-		serializer.attribute(UI_NAMESPACE_URI, COUNT, table.isCountInSummaryList() ? Boolean.TRUE.toString(): null);
-		serializer.attribute(UI_NAMESPACE_URI, SHOW_ROW_NUMBERS, table.isShowRowNumbers() ? Boolean.TRUE.toString(): null);
+		if ( table.isCountInSummaryList() ) {
+			serializer.attribute(UI_NAMESPACE_URI, COUNT, Boolean.TRUE.toString());
+		}
+		if ( table.isShowRowNumbers() ) {
+			serializer.attribute(UI_NAMESPACE_URI, SHOW_ROW_NUMBERS, Boolean.TRUE.toString());
+		}
 		List<LanguageSpecificText> labels = table.getLabels();
 		for (LanguageSpecificText label : labels) {
 			writeLabel(serializer, label);
 		}
-		List<Column> columns = table.getColumns();
-		for (Column column : columns) {
-			write(serializer, column);
-		}
-		List<ColumnGroup> columnGroups = table.getColumnGroups();
-		for (ColumnGroup columnGroup : columnGroups) {
-			write(serializer, columnGroup);
-		}
+		List<TableHeadingComponent> headingComponents = table.getHeadingComponents();
+		write(serializer, headingComponents);
 		serializer.endTag(UI_NAMESPACE_URI, TABLE);
+	}
+
+	protected void write(XmlSerializer serializer,
+			List<TableHeadingComponent> headingComponents) throws IOException {
+		for (TableHeadingComponent headingComponent : headingComponents) {
+			if ( headingComponent instanceof Column ) {
+				write(serializer, (Column) headingComponent);
+			} else if ( headingComponent instanceof ColumnGroup ) {
+				write(serializer, (ColumnGroup) headingComponent);
+			} else {
+				throw new UnsupportedOperationException("Table Heading Component not supported: " + headingComponent.getClass().getSimpleName());
+			}
+		}
 	}
 	
 	protected void write(XmlSerializer serializer, ColumnGroup columnGroup)
@@ -173,10 +187,8 @@ public class UIOptionsSerializer {
 		for (LanguageSpecificText label : labels) {
 			writeLabel(serializer, label);
 		}
-		List<Column> columns = columnGroup.getColumns();
-		for (Column column : columns) {
-			write(serializer, column);
-		}
+		List<TableHeadingComponent> headingComponents = columnGroup.getHeadingComponents();
+		write(serializer, headingComponents);
 		serializer.endTag(UI_NAMESPACE_URI, COLUMN_GROUP);
 	}
 	

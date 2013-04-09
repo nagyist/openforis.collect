@@ -20,8 +20,7 @@ public class Table extends Component {
 	private static final long serialVersionUID = 1L;
 
 	private int entityId;
-	private List<Column> columns;
-	private List<ColumnGroup> columnGroups;
+	private List<TableHeadingComponent> headingComponents;
 	private LanguageSpecificTextMap labels;
 	private boolean showRowNumbers;
 	private boolean countInSummaryList;
@@ -53,34 +52,19 @@ public class Table extends Component {
 		return (EntityDefinition) getNodeDefinition(entityId);
 	}
 
-	public List<Column> getColumns() {
-		return CollectionUtils.unmodifiableList(columns);
+	public List<TableHeadingComponent> getHeadingComponents() {
+		return CollectionUtils.unmodifiableList(headingComponents);
 	}
 	
-	public void addColumn(Column column) {
-		if ( columns == null ) {
-			columns = new ArrayList<Column>();
+	public void addHeadingComponent(TableHeadingComponent component) {
+		if ( headingComponents == null ) {
+			headingComponents = new ArrayList<TableHeadingComponent>();
 		}
-		columns.add(column);
+		headingComponents.add(component);
 	}
 	
-	public void removeColumn(Column column) {
-		columns.remove(column);
-	}
-
-	public List<ColumnGroup> getColumnGroups() {
-		return CollectionUtils.unmodifiableList(columnGroups);
-	}
-	
-	public void addColumnGroup(ColumnGroup columnGroup) {
-		if ( columnGroups == null ) {
-			columnGroups = new ArrayList<ColumnGroup>();
-		}
-		columnGroups.add(columnGroup);
-	}
-	
-	public void removeColumnGroup(ColumnGroup columnGroup) {
-		columnGroups.remove(columnGroup);
+	public void removeHeadingComponent(TableHeadingComponent component) {
+		headingComponents.remove(component);
 	}
 
 	public List<LanguageSpecificText> getLabels() {
@@ -150,8 +134,7 @@ public class Table extends Component {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result
-				+ ((columnGroups == null) ? 0 : columnGroups.hashCode());
-		result = prime * result + ((columns == null) ? 0 : columns.hashCode());
+				+ ((headingComponents == null) ? 0 : headingComponents.hashCode());
 		result = prime * result + (countInSummaryList ? 1231 : 1237);
 		result = prime * result
 				+ ((direction == null) ? 0 : direction.hashCode());
@@ -170,15 +153,10 @@ public class Table extends Component {
 		if (getClass() != obj.getClass())
 			return false;
 		Table other = (Table) obj;
-		if (columnGroups == null) {
-			if (other.columnGroups != null)
+		if (headingComponents == null) {
+			if (other.headingComponents != null)
 				return false;
-		} else if (!columnGroups.equals(other.columnGroups))
-			return false;
-		if (columns == null) {
-			if (other.columns != null)
-				return false;
-		} else if (!columns.equals(other.columns))
+		} else if (!headingComponents.equals(other.headingComponents))
 			return false;
 		if (countInSummaryList != other.countInSummaryList)
 			return false;

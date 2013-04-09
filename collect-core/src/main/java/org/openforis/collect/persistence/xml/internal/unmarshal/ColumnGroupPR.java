@@ -38,6 +38,6 @@ class ColumnGroupPR extends UIModelPR {
 	@Override
 	protected void onEndTag() throws XmlParseException {
 		super.onEndTag();
-		parent.addColumnGroup(columnGroup);
+		parent.addHeadingComponent(columnGroup);
 	}
 }
