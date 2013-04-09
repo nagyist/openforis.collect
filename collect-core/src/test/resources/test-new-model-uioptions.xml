@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<formBundles 
+<formSets 
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns="http://www.openforis.org/collect/3.0/ui"
       xsi:schemaLocation="http://www.openforis.org/collect/3.0/ui ../../main/resources/idml3-new-ui.xsd">
-  <formBundle id="1" entityId="1">
+  <formSet id="1" entityId="1">
     <form id="2" entityId="1">
 	    <label xml:lang="en">Cluster</label>
 	    <section id="3" entityId="1">
@@ -24,5 +24,5 @@
 	    	<field id="202" attributeId="23" />
 	    </section>
     </form>
-  </formBundle>
-</formBundles>
+  </formSet>
+</formSets>

@@ -10,13 +10,13 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.util.List;
 
-import org.openforis.collect.metamodel.ui.FormBundle;
+import org.openforis.collect.metamodel.ui.FormSet;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.persistence.DataInconsistencyException;
 import org.openforis.collect.persistence.xml.internal.marshal.UIOptionsSerializer;
-import org.openforis.collect.persistence.xml.internal.unmarshal.FormBundlesPR;
+import org.openforis.collect.persistence.xml.internal.unmarshal.FormSetsPR;
 import org.openforis.collect.persistence.xml.internal.unmarshal.UITabSetPR;
 import org.openforis.idm.metamodel.xml.ApplicationOptionsBinder;
 import org.openforis.idm.metamodel.xml.XmlParseException;
@@ -43,7 +43,7 @@ public class UIOptionsBinder implements
 			
 			unmarshal(body, parser);
 			
-			if ( uiOptions == null || uiOptions.getFormBundles().isEmpty() ) {
+			if ( uiOptions == null || uiOptions.getFormSets().isEmpty() ) {
 				//backwards compatibility
 				unmarshalTabSets(body, parser);
 				//TODO convert to new ui model...
@@ -60,7 +60,7 @@ public class UIOptionsBinder implements
 			uiOptions = new UIOptions();
 			Reader reader = new StringReader(body);
 			parser.setInput(reader);
-			unmarshalFormBundle(parser, uiOptions);
+			unmarshalFormSet(parser, uiOptions);
 		} catch ( Exception e ) {
 			if ( UIOptionsConstants.TAB_SET.equals(parser.getName()) && 
 					UIOptionsConstants.UI_NAMESPACE_URI.equals(parser.getNamespace()) ) {
@@ -98,13 +98,13 @@ public class UIOptionsBinder implements
 		}
 	}
 
-	protected void unmarshalFormBundle(XmlPullParser parser, UIOptions uiOptions) throws IOException, XmlPullParserException, XmlParseException {
+	protected void unmarshalFormSet(XmlPullParser parser, UIOptions uiOptions) throws IOException, XmlPullParserException, XmlParseException {
 		try {
-			FormBundlesPR reader = new FormBundlesPR(this);
+			FormSetsPR reader = new FormSetsPR(this);
 			reader.parse(parser);
-			List<FormBundle> formBundles = reader.getFormBundles();
-			for (FormBundle formBundle : formBundles) {
-				uiOptions.addFormBundle(formBundle);
+			List<FormSet> formSets = reader.getFormBundles();
+			for (FormSet formSet : formSets) {
+				uiOptions.addFormSet(formSet);
 			}
 		} catch ( XmlParseException e) {
 			if ( parser != null && parser.getEventType() != XmlPullParser.END_DOCUMENT ) {

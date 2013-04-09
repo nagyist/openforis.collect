@@ -79,7 +79,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	
 	private CollectSurvey survey;
 	private List<UITabSet> tabSets;
-	private List<FormBundle> formBundles;
+	private List<FormSet> formSets;
 	private int lastId;
 	
 	public UIOptions() {
@@ -108,30 +108,36 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		this.survey = survey;
 	}
 	
+	@Deprecated
 	public List<UITabSet> getTabSets() {
 		return CollectionUtils.unmodifiableList(tabSets);
 	}
 	
+	@Deprecated
 	public UITabSet createTabSet() {
 		return createTabSet(TABSET_NAME_PREFIX + survey.nextId());
 	}
 	
+	@Deprecated
 	public UITabSet createTabSet(String name) {
 		UITabSet result = new UITabSet(this);
 		result.setName(name);
 		return result;
 	}
 	
+	@Deprecated
 	public UITab createTab() {
 		return createTab(TAB_NAME_PREFIX + survey.nextId());
 	}
 
+	@Deprecated
 	public UITab createTab(String name) {
 		UITab result = new UITab(this);
 		result.setName(name);
 		return result;
 	}
 	
+	@Deprecated
 	public UITabSet createRootTabSet(EntityDefinition rootEntity) {
 		UIOptions uiOpts = survey.getUIOptions();
 		UITabSet tabSet = uiOpts.createTabSet();
@@ -142,6 +148,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return tabSet;
 	}
 
+	@Deprecated
 	protected UITab createMainTab(EntityDefinition nodeDefn,
 			UITabSet tabSet) {
 		UITab tab = createTab();
@@ -150,25 +157,26 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return tab;
 	}
 
-	public FormBundle createFormBundle() {
-		return createFormBundle(nextId());
+	public FormSet createFormSet() {
+		return createFormSet(nextId());
 	}
 	
-	public FormBundle createFormBundle(int id) {
-		return new FormBundle(this, id);
+	public FormSet createFormSet(int id) {
+		return new FormSet(this, id);
 	}
 
-	public List<FormBundle> getFormBundles() {
-		return CollectionUtils.unmodifiableList(formBundles);
+	public List<FormSet> getFormSets() {
+		return CollectionUtils.unmodifiableList(formSets);
 	}
 	
-	public void addFormBundle(FormBundle formBundle) {
-		if ( formBundles == null ) {
-			formBundles = new ArrayList<FormBundle>();
+	public void addFormSet(FormSet formSet) {
+		if ( formSets == null ) {
+			formSets = new ArrayList<FormSet>();
 		}
-		formBundles.add(formBundle);
+		formSets.add(formSet);
 	}
 	
+	@Deprecated
 	protected void copyLabels(EntityDefinition nodeDefn, UITab tab) {
 		removeLabels(tab);
 		List<NodeLabel> labels = nodeDefn.getLabels();
@@ -179,6 +187,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		}
 	}
 
+	@Deprecated
 	protected void removeLabels(UITab tab) {
 		List<LanguageSpecificText> labels = tab.getLabels();
 		for (LanguageSpecificText label : labels) {
@@ -186,6 +195,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		}
 	}
 	
+	@Deprecated
 	public UITab getMainTab(UITabSet rootTabSet) {
 		List<UITab> tabs = rootTabSet.getTabs();
 		if ( tabs.isEmpty() ) {
@@ -195,10 +205,12 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		}
 	}
 	
+	@Deprecated
 	public boolean isMainTab(UITab tab) {
 		return tab.getIndex() == 0 && tab.getDepth() == 1;
 	}
 	
+	@Deprecated
 	public UITab getTab(String name) {
 		Stack<UITab> stack = new Stack<UITab>();
 		List<UITabSet> tabSets = getTabSets();
@@ -215,15 +227,18 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return null;
 	}
 	
+	@Deprecated
 	public UITab getAssignedTab(NodeDefinition nodeDefn) {
 		return getAssignedTab(nodeDefn, true);
 	}
 	
+	@Deprecated
 	public UITab getAssignedTab(NodeDefinition nodeDefn, boolean includeInherited) {
 		EntityDefinition parentDefn = (EntityDefinition) nodeDefn.getParentDefinition();
 		return getAssignedTab(parentDefn, nodeDefn, includeInherited);
 	}
 	
+	@Deprecated
 	public UITab getAssignedTab(EntityDefinition parentDefn, NodeDefinition nodeDefn, boolean includeInherited) {
 		UITab result = null;
 		UITabSet rootTabSet = getAssignedRootTabSet(parentDefn, nodeDefn);
@@ -243,6 +258,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return result;
 	}
 
+	@Deprecated
 	protected UITabSet getAssignedRootTabSet(EntityDefinition parentDefn, NodeDefinition nodeDefn) {
 		EntityDefinition rootEntityDefn;
 		if ( parentDefn != null ) {
@@ -256,12 +272,14 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return tabSet;
 	}
 
+	@Deprecated
 	public UITabSet getAssignedRootTabSet(EntityDefinition rootEntityDefn) {
 		String tabSetName = rootEntityDefn.getAnnotation(Annotation.TAB_SET.getQName());
 		UITabSet tabSet = getTabSet(tabSetName);
 		return tabSet;
 	}
 	
+	@Deprecated
 	public List<UITab> getAssignableTabs(EntityDefinition parentEntity, NodeDefinition contextNode) {
 		boolean contextNodeIsMultipleEntity = contextNode instanceof EntityDefinition && contextNode.isMultiple();
 		Layout contextNodeLayout = contextNode instanceof EntityDefinition ? getLayout((EntityDefinition) contextNode): null;
@@ -270,6 +288,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 				contextNodeLayout, contextNodeId);
 	}
 
+	@Deprecated
 	public List<UITab> getAssignableTabs(EntityDefinition parentEntity,
 			boolean contextNodeIsMultipleEntity, Layout contextNodeLayout,
 			int contextNodeId) {
@@ -288,6 +307,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return result;
 	}
 	
+	@Deprecated
 	public UITabSet getAssignedTabSet(EntityDefinition entityDefn) {
 		if ( entityDefn.getParentDefinition() == null ) {
 			return getAssignedRootTabSet(entityDefn);
@@ -296,6 +316,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		}
 	}
 
+	@Deprecated
 	public List<UITab> getTabsAssignableToChildren(EntityDefinition entityDefn) {
 		EntityDefinition rootEntity = entityDefn.getRootEntity();
 		UITabSet rootTabSet = getAssignedRootTabSet(rootEntity);
@@ -315,6 +336,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		}
 	}
 	
+	@Deprecated
 	public boolean isAssignableTo(NodeDefinition nodeDefn, UITab tab) {
 		EntityDefinition parentEntityDefn = (EntityDefinition) nodeDefn.getParentDefinition();
 		List<UITab> allowedTabs = getTabsAssignableToChildren(parentEntityDefn);
@@ -323,10 +345,12 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 
 	
+	@Deprecated
 	public boolean isAssociatedWithMultipleEntityForm(UITab tab) {
 		return getFormLayoutMultipleEntity(tab) != null;
 	}
 	
+	@Deprecated
 	public List<NodeDefinition> getNodesPerTab(UITab tab, boolean includeDescendants) {
 		List<NodeDefinition> result = new ArrayList<NodeDefinition>();
 		UITabSet tabSet = tab.getRootTabSet();
@@ -348,11 +372,13 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return result;
 	}
 
+	@Deprecated
 	public void assignToTabSet(EntityDefinition rootEntity, UITabSet tabSet) {
 		String name = tabSet.getName();
 		rootEntity.setAnnotation(Annotation.TAB_SET.getQName(), name);
 	}
 
+	@Deprecated
 	public void assignToTab(NodeDefinition nodeDefn, UITab tab) {
 		String tabName = tab.getName();
 		nodeDefn.setAnnotation(Annotation.TAB_NAME.getQName(), tabName);
@@ -360,12 +386,14 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		afterTabAssociationChanged(nodeDefn);
 	}
 
+	@Deprecated
 	protected void afterTabAssociationChanged(NodeDefinition nodeDefn) {
 		if ( nodeDefn instanceof EntityDefinition ) {
 			removeInvalidTabAssociationInDescendants((EntityDefinition) nodeDefn);
 		}
 	}
 
+	@Deprecated
 	protected void removeInvalidTabAssociationInDescendants(EntityDefinition nodeDefn) {
 		((EntityDefinition) nodeDefn).traverse(new NodeDefinitionVisitor() {
 			@Override
@@ -379,16 +407,19 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		});
 	}
 	
+	@Deprecated
 	public void removeTabAssociation(NodeDefinition nodeDefn) {
 		performTabAssociationRemoval(nodeDefn);
 		
 		afterTabAssociationChanged(nodeDefn);
 	}
 
+	@Deprecated
 	protected void performTabAssociationRemoval(NodeDefinition nodeDefn) {
 		nodeDefn.setAnnotation(Annotation.TAB_NAME.getQName(), null);
 	}
 	
+	@Deprecated
 	public void removeTabAssociation(UITab tab) {
 		Stack<UITab> stack = new Stack<UITab>();
 		stack.push(tab);
@@ -403,11 +434,13 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		}
 	}
 
+	@Deprecated
 	public boolean isAssociatedToTab(NodeDefinition nodeDefn) {
 		UITab tab = getAssignedTab(nodeDefn);
 		return tab != null;
 	}
 	
+	@Deprecated
 	public Layout getLayout(EntityDefinition node) {
 		String layoutValue = node.getAnnotation(Annotation.LAYOUT.getQName());
 		if ( layoutValue == null ) {
@@ -425,11 +458,13 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return layoutValue != null ? Layout.valueOf(layoutValue.toUpperCase()): null;
 	}
 
+	@Deprecated
 	public void setLayout(EntityDefinition entityDefn, Layout layout) {
 		String layoutValue = layout != null ? layout.name().toLowerCase(): null;
 		entityDefn.setAnnotation(Annotation.LAYOUT.getQName(), layoutValue);
 	}
 	
+	@Deprecated
 	public Direction getDirection(EntityDefinition defn) {
 		String value = defn.getAnnotation(Annotation.DIRECTION.getQName());
 		if ( value == null ) {
@@ -446,25 +481,30 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		}
 	}
 	
+	@Deprecated
 	public void setDirection(EntityDefinition defn, Direction direction) {
 		String value = direction == null ? null: direction.getValue();
 		defn.setAnnotation(Annotation.DIRECTION.getQName(), value);
 	}
 	
+	@Deprecated
 	public boolean getShowRowNumbersValue(EntityDefinition defn) {
 		String annotationValue = defn.getAnnotation(Annotation.SHOW_ROW_NUMBERS.getQName());
 		return Boolean.valueOf(annotationValue);
 	}
 	
+	@Deprecated
 	public void setShowRowNumbersValue(EntityDefinition defn, boolean value) {
 		defn.setAnnotation(Annotation.SHOW_ROW_NUMBERS.getQName(), Boolean.toString(value));
 	}
 	
+	@Deprecated
 	public boolean getCountInSumamryListValue(EntityDefinition defn) {
 		String annotationValue = defn.getAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName());
 		return Boolean.valueOf(annotationValue);
 	}
 	
+	@Deprecated
 	public void setCountInSummaryListValue(EntityDefinition defn, boolean value) {
 		defn.setAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName(), Boolean.toString(value));
 	}
@@ -481,6 +521,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	 * @param layout
 	 * @return 
 	 */
+	@Deprecated
 	public boolean isLayoutSupported(EntityDefinition parentEntityDefn, int entityDefnId, UITab associatedTab, boolean multiple, Layout layout) {
 		if ( parentEntityDefn == null ) {
 			return layout == Layout.FORM;
@@ -503,6 +544,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		}
 	}
 
+	@Deprecated
 	protected EntityDefinition getFormLayoutMultipleEntity(UITab tab) {
 		List<NodeDefinition> nodesPerTab = getNodesPerTab(tab, false);
 		for (NodeDefinition nodeDefn : nodesPerTab) {
@@ -516,6 +558,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return null;
 	}
 
+	@Deprecated
 	public EntityDefinition getRootEntityDefinition(UITabSet tabSet) {
 		Schema schema = survey.getSchema();
 		List<EntityDefinition> rootEntityDefinitions = schema.getRootEntityDefinitions();
@@ -528,6 +571,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return null;
 	}
 	
+	@Deprecated
 	public UITabSet getTabSet(String name) {
 		if ( tabSets != null ) {
 			for (UITabSet tabSet : tabSets) {
@@ -539,6 +583,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		return null;
 	}
 	
+	@Deprecated
 	public void addTabSet(UITabSet tabSet) {
 		if ( tabSets == null ) {
 			tabSets = new ArrayList<UITabSet>();
@@ -546,6 +591,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		tabSets.add(tabSet);
 	}
 	
+	@Deprecated
 	public void setTabSet(int index, UITabSet tabSet) {
 		if ( tabSets == null ) {
 			tabSets = new ArrayList<UITabSet>();
@@ -553,10 +599,12 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		tabSets.set(index, tabSet);
 	}
 	
+	@Deprecated
 	public void removeTabSet(UITabSet tabSet) {
 		tabSets.remove(tabSet);
 	}
 	
+	@Deprecated
 	public UITabSet updateTabSet(String name, String newName) {
 		UITabSet tabSet = getTabSet(name);
 		tabSet.setName(newName);
@@ -568,7 +616,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((formBundles == null) ? 0 : formBundles.hashCode());
+				+ ((formSets == null) ? 0 : formSets.hashCode());
 		result = prime * result + lastId;
 		result = prime * result + ((survey == null) ? 0 : survey.hashCode());
 		result = prime * result + ((tabSets == null) ? 0 : tabSets.hashCode());
@@ -584,10 +632,10 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		UIOptions other = (UIOptions) obj;
-		if (formBundles == null) {
-			if (other.formBundles != null)
+		if (formSets == null) {
+			if (other.formSets != null)
 				return false;
-		} else if (!formBundles.equals(other.formBundles))
+		} else if (!formSets.equals(other.formSets))
 			return false;
 		if (lastId != other.lastId)
 			return false;

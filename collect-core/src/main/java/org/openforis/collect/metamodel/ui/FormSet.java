@@ -6,11 +6,11 @@ package org.openforis.collect.metamodel.ui;
  * @author S. Ricci
  *
  */
-public class FormBundle extends FormContainer {
+public class FormSet extends FormContainer {
 
 	private static final long serialVersionUID = 1L;
 	
-	FormBundle(UIOptions uiOptions, int id) {
+	FormSet(UIOptions uiOptions, int id) {
 		super(uiOptions, id);
 	}
 	

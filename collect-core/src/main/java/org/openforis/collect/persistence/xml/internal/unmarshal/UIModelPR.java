@@ -4,7 +4,7 @@ import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_NAMESPACE
 
 import java.util.List;
 
-import org.openforis.collect.metamodel.ui.FormBundle;
+import org.openforis.collect.metamodel.ui.FormSet;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.persistence.xml.UIOptionsBinder;
 import org.openforis.idm.metamodel.xml.internal.unmarshal.XmlPullReader;
@@ -46,17 +46,17 @@ abstract class UIModelPR extends XmlPullReader {
 //		return rootReader == null ? null: rootReader.getUIOptions();
 	}
 	
-	public FormBundlesPR getRootReader() {
+	public FormSetsPR getRootReader() {
 		UIModelPR parent = (UIModelPR) getParentReader();
 		while ( parent != null ) {
-			if ( parent instanceof FormBundlesPR ) {
-				return (FormBundlesPR) parent;
+			if ( parent instanceof FormSetsPR ) {
+				return (FormSetsPR) parent;
 			}
 		}
 		return null;
 	}
 	
-	public List<FormBundle> getFormBundles() {
+	public List<FormSet> getFormBundles() {
 		UIModelPR rootReader = getRootReader();
 		return rootReader == null ? null: rootReader.getFormBundles();
 	}

@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.collect.metamodel.ui.FormBundle;
+import org.openforis.collect.metamodel.ui.FormSet;
 import org.openforis.collect.persistence.xml.UIOptionsBinder;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.xml.XmlParseException;
@@ -19,15 +19,15 @@ import org.xmlpull.v1.XmlPullParser;
  * @author S. Ricci
  *
  */
-public class FormBundlesPR extends UIModelPR {
+public class FormSetsPR extends UIModelPR {
 	
-	private List<FormBundle> formBundles;
+	private List<FormSet> formBundles;
 	
-	public FormBundlesPR(UIOptionsBinder binder) {
+	public FormSetsPR(UIOptionsBinder binder) {
 		super(FORM_BUNDLES);
 		
 		addChildPullReaders(
-			new FormBundlePR()
+			new FormSetPR()
 		);
 		
 		setUIOptionsBinder(binder);
@@ -39,15 +39,15 @@ public class FormBundlesPR extends UIModelPR {
 		super.parse(parser);
 	}
 	
-	protected void addFormBundle(FormBundle formBundle) {
+	protected void addFormBundle(FormSet formBundle) {
 		if ( formBundles == null ) {
-			formBundles = new ArrayList<FormBundle>();
+			formBundles = new ArrayList<FormSet>();
 		}
 		formBundles.add(formBundle);
 	}
 
 	@Override
-	public List<FormBundle> getFormBundles() {
+	public List<FormSet> getFormBundles() {
 		return CollectionUtils.unmodifiableList(formBundles);
 	}
 	

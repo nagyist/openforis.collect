@@ -25,8 +25,8 @@ public interface UIOptionsConstants {
 	String TAB_SET = "tabSet";
 	String TAB = "tab";
 	
-	String FORM_BUNDLES = "formBundles";
-	String FORM_BUNDLE = "formBundle";
+	String FORM_SETS = "formSets";
+	String FORM_SET = "formSet";
 	String FORM = "form";
 	String FORM_SECTION = "section";
 	String FIELD = "field";

@@ -1,17 +1,20 @@
 package org.openforis.collect.persistence.xml.internal.marshal;
 
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.ATTRIBUTE_ID;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.AUTOCOMPLETE;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.COLUMN;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.COUNT;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.COLUMN_GROUP;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.ENTITY_ID;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FIELD;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM;
-import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM_BUNDLE;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM_SET;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM_BUNDLES;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM_SECTION;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.ID;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.LABEL;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.NAME;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.SHOW_ROW_NUMBERS;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.TAB;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.TABLE;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.TAB_SET;
@@ -27,7 +30,7 @@ import org.openforis.collect.metamodel.ui.ColumnGroup;
 import org.openforis.collect.metamodel.ui.Component;
 import org.openforis.collect.metamodel.ui.Field;
 import org.openforis.collect.metamodel.ui.Form;
-import org.openforis.collect.metamodel.ui.FormBundle;
+import org.openforis.collect.metamodel.ui.FormSet;
 import org.openforis.collect.metamodel.ui.FormSection;
 import org.openforis.collect.metamodel.ui.Table;
 import org.openforis.collect.metamodel.ui.UIOptions;
@@ -57,8 +60,8 @@ public class UIOptionsSerializer {
 //				writeTabSet(serializer, tabSet);
 //			}
 			serializer.startTag(UI_NAMESPACE_URI, FORM_BUNDLES);
-			List<FormBundle> formBundles = options.getFormBundles();
-			for (FormBundle formBundle : formBundles) {
+			List<FormSet> formBundles = options.getFormSets();
+			for (FormSet formBundle : formBundles) {
 				write(serializer, formBundle);
 			}
 			serializer.endTag(UI_NAMESPACE_URI, FORM_BUNDLES);
@@ -77,9 +80,9 @@ public class UIOptionsSerializer {
 		return serializer;
 	}
 
-	protected void write(XmlSerializer serializer, FormBundle formBundle)
+	protected void write(XmlSerializer serializer, FormSet formBundle)
 			throws IOException {
-		serializer.startTag(UI_NAMESPACE_URI, FORM_BUNDLE);
+		serializer.startTag(UI_NAMESPACE_URI, FORM_SET);
 		serializer.attribute(UI_NAMESPACE_URI, ID, Integer.toString(formBundle.getId()));
 		serializer.attribute(UI_NAMESPACE_URI, ENTITY_ID, Integer.toString(formBundle.getEntityId()));
 		List<LanguageSpecificText> labels = formBundle.getLabels();
@@ -90,7 +93,7 @@ public class UIOptionsSerializer {
 		for (Form form : forms) {
 			write(serializer, form);
 		}
-		serializer.endTag(UI_NAMESPACE_URI, FORM_BUNDLE);
+		serializer.endTag(UI_NAMESPACE_URI, FORM_SET);
 	}
 	
 	protected void write(XmlSerializer serializer, Form form)
@@ -136,6 +139,7 @@ public class UIOptionsSerializer {
 		serializer.startTag(UI_NAMESPACE_URI, FIELD);
 		serializer.attribute(UI_NAMESPACE_URI, ID, Integer.toString(field.getId()));
 		serializer.attribute(UI_NAMESPACE_URI, ATTRIBUTE_ID, Integer.toString(field.getAttributeId()));
+		serializer.attribute(UI_NAMESPACE_URI, AUTOCOMPLETE, field.isAutocomplete() ? Boolean.TRUE.toString(): null);
 		serializer.endTag(UI_NAMESPACE_URI, FIELD);
 	}
 
@@ -144,6 +148,8 @@ public class UIOptionsSerializer {
 		serializer.startTag(UI_NAMESPACE_URI, TABLE);
 		serializer.attribute(UI_NAMESPACE_URI, ID, Integer.toString(table.getId()));
 		serializer.attribute(UI_NAMESPACE_URI, ENTITY_ID, Integer.toString(table.getEntityId()));
+		serializer.attribute(UI_NAMESPACE_URI, COUNT, table.isCountInSummaryList() ? Boolean.TRUE.toString(): null);
+		serializer.attribute(UI_NAMESPACE_URI, SHOW_ROW_NUMBERS, table.isShowRowNumbers() ? Boolean.TRUE.toString(): null);
 		List<LanguageSpecificText> labels = table.getLabels();
 		for (LanguageSpecificText label : labels) {
 			writeLabel(serializer, label);

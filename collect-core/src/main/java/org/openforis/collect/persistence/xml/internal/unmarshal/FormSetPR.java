@@ -4,12 +4,12 @@
 package org.openforis.collect.persistence.xml.internal.unmarshal;
 
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.ENTITY_ID;
-import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM_BUNDLE;
+import static org.openforis.collect.metamodel.ui.UIOptionsConstants.FORM_SET;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.ID;
 
 import java.io.IOException;
 
-import org.openforis.collect.metamodel.ui.FormBundle;
+import org.openforis.collect.metamodel.ui.FormSet;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.openforis.idm.metamodel.xml.internal.unmarshal.XmlPullReader;
@@ -20,12 +20,12 @@ import org.xmlpull.v1.XmlPullParserException;
  * @author S. Ricci
  *
  */
-public class FormBundlePR extends UIModelPR {
+public class FormSetPR extends UIModelPR {
 	
-	protected FormBundle formBundle;
+	protected FormSet formBundle;
 
-	public FormBundlePR() {
-		super(FORM_BUNDLE);
+	public FormSetPR() {
+		super(FORM_SET);
 		
 		addChildPullReaders(
 			new FormPR()
@@ -43,14 +43,14 @@ public class FormBundlePR extends UIModelPR {
 			XmlPullParserException, IOException {
 		UIOptions uiOptions = getUIOptions();
 		int id = getIntegerAttribute(ID, true);
-		formBundle = uiOptions.createFormBundle(id);
+		formBundle = uiOptions.createFormSet(id);
 		int entityId = getIntegerAttribute(ENTITY_ID, true);
 		formBundle.setEntityId(entityId);
 	}
 	
 	@Override
 	protected void onEndTag() throws XmlParseException {
-		FormBundlesPR rootReader = getRootReader();
+		FormSetsPR rootReader = getRootReader();
 		rootReader.addFormBundle(formBundle);
 	}
 	
@@ -64,7 +64,7 @@ public class FormBundlePR extends UIModelPR {
 		
 	}
 	
-	public FormBundle getFormBundle() {
+	public FormSet getFormBundle() {
 		return formBundle;
 	}
 
