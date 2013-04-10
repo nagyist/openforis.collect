@@ -8,6 +8,7 @@ import static org.openforis.collect.metamodel.ui.UIOptionsConstants.ID;
 import java.io.IOException;
 
 import org.openforis.collect.metamodel.ui.Field;
+import org.openforis.collect.metamodel.ui.FormSection;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -26,11 +27,11 @@ class FieldPR extends ComponentPR {
 	protected void onStartTag() throws XmlParseException, XmlPullParserException, IOException {
 		super.onStartTag();
 		int id = getIntegerAttribute(ID, true);
-		component = parent.createField(id);
+		component = ((FormSection) parent).createField(id);
 		int attributeId = getIntegerAttribute(ATTRIBUTE_ID, true);
-		Boolean autocomplete = getBooleanAttribute(AUTOCOMPLETE, false);
+		String autoCompleteGroup = getAttribute(AUTOCOMPLETE, false);
 		Field field = (Field) component;
-		field.setAutocomplete(autocomplete == null ? false: autocomplete.booleanValue());
+		field.setAutoCompleteGroup(autoCompleteGroup);
 		field.setAttributeId(attributeId);
 	}
 	

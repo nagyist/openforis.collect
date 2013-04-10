@@ -9,6 +9,7 @@ import static org.openforis.collect.metamodel.ui.UIOptionsConstants.TABLE;
 
 import java.io.IOException;
 
+import org.openforis.collect.metamodel.ui.FormSection;
 import org.openforis.collect.metamodel.ui.Table;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.xml.XmlParseException;
@@ -36,7 +37,7 @@ class TablePR extends ComponentPR {
 	protected void onStartTag() throws XmlParseException, XmlPullParserException, IOException {
 		super.onStartTag();
 		int id = getIntegerAttribute(ID, true);
-		component = parent.createTable(id);
+		component = ((FormSection) parent).createTable(id);
 		int entityId = getIntegerAttribute(ENTITY_ID, true);
 		Boolean countInSummaryList = getBooleanAttribute(COUNT, false);
 		Boolean showRowNumbers = getBooleanAttribute(SHOW_ROW_NUMBERS, false);

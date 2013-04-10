@@ -24,6 +24,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 
 
 /**
@@ -509,6 +510,16 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		defn.setAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName(), Boolean.toString(value));
 	}
 	
+	@Deprecated
+	public String getAutoCompleteGroup(TextAttributeDefinition defn) {
+		String annotationValue = defn.getAnnotation(Annotation.AUTOCOMPLETE.getQName());
+		return annotationValue;
+	}
+	
+	@Deprecated
+	public void setAutoCompleteGroup(TextAttributeDefinition defn, String value) {
+		defn.setAnnotation(Annotation.AUTOCOMPLETE.getQName(), value);
+	}
 	/**
 	 * Supported layouts are:
 	 * - Root entity: FORM

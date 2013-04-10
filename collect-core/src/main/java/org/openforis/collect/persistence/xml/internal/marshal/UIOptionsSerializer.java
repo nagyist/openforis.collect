@@ -25,12 +25,13 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.metamodel.ui.Column;
 import org.openforis.collect.metamodel.ui.ColumnGroup;
-import org.openforis.collect.metamodel.ui.Component;
 import org.openforis.collect.metamodel.ui.Field;
 import org.openforis.collect.metamodel.ui.Form;
 import org.openforis.collect.metamodel.ui.FormSection;
+import org.openforis.collect.metamodel.ui.FormSectionComponent;
 import org.openforis.collect.metamodel.ui.FormSet;
 import org.openforis.collect.metamodel.ui.Table;
 import org.openforis.collect.metamodel.ui.TableHeadingComponent;
@@ -125,12 +126,16 @@ public class UIOptionsSerializer {
 		for (LanguageSpecificText label : labels) {
 			writeLabel(serializer, label);
 		}
-		List<Component> components = formSection.getComponents();
-		for (Component component : components) {
-			if ( component instanceof Field ) {
-				write(serializer, (Field) component);
+		List<FormSectionComponent> children = formSection.getChildren();
+		for (FormSectionComponent child : children) {
+			if ( child instanceof Field ) {
+				write(serializer, (Field) child);
+			} else if ( child instanceof Table ) {
+				write(serializer, (Table) child);
+			} else if  (child instanceof FormSection ) {
+				write(serializer, (FormSection) child);
 			} else {
-				write(serializer, (Table) component);
+				throw new IllegalArgumentException("Container subclass not supported as child of FormSection object: " + child.getClass().getSimpleName());
 			}
 		}
 		serializer.endTag(UI_NAMESPACE_URI, FORM_SECTION);
@@ -140,7 +145,8 @@ public class UIOptionsSerializer {
 		serializer.startTag(UI_NAMESPACE_URI, FIELD);
 		serializer.attribute(UI_NAMESPACE_URI, ID, Integer.toString(field.getId()));
 		serializer.attribute(UI_NAMESPACE_URI, ATTRIBUTE_ID, Integer.toString(field.getAttributeId()));
-		if ( field.isAutocomplete() ) {
+		String autoCompleteGroup = field.getAutoCompleteGroup();
+		if ( StringUtils.isNotBlank(autoCompleteGroup) ) {
 			serializer.attribute(UI_NAMESPACE_URI, AUTOCOMPLETE, Boolean.TRUE.toString());
 		}
 		serializer.endTag(UI_NAMESPACE_URI, FIELD);

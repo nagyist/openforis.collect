@@ -7,8 +7,11 @@ import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 
 /**
  * 
@@ -28,58 +31,90 @@ public class UIOptionsMigrator {
 			if ( associatedRootEntity != null ) {
 				formSet = result.createFormSet();
 				formSet.setEntityId(associatedRootEntity.getId());
+				result.addFormSet(formSet);
 			} else {
 				throw new IllegalStateException("Cannot find associated root entity. Tab set: " + tabSet.getName());
 			}
 			List<UITab> tabs = tabSet.getTabs();
 			for (UITab tab : tabs) {
-				Form form = formSet.createForm();
-				FormSection mainFormSection = form.createFormSection();
-				List<NodeDefinition> nodes = oldUIOptions.getNodesPerTab(tab, false);
-				for (NodeDefinition nodeDefn : nodes) {
-					if ( nodeDefn instanceof AttributeDefinition ) {
-						Field field = mainFormSection.createField();
-						mainFormSection.addComponent(field);
-					} else if ( nodeDefn instanceof EntityDefinition ) {
-						EntityDefinition entityDefn = (EntityDefinition) nodeDefn;
-						if ( nodeDefn.isMultiple() ) {
-							if ( oldUIOptions.getLayout(entityDefn) == Layout.TABLE ) {
-								Table table = createTable(mainFormSection, entityDefn);
-								mainFormSection.addComponent(table);
-							}
-						} else {
-							createFormSection(form, entityDefn);
-						}
-					}
-				}
+				createForm(formSet, tab);
 			}
 		}
 		return result;
 	}
 
-	protected FormSection createFormSection(Form form, EntityDefinition entityDefn) {
-		FormSection formSection = form.createFormSection();
+	protected void createForm(FormContainer parent, UITab tab) {
+		UIOptions oldUIOptions = tab.getUIOptions();
+		Form form = parent.createForm();
+		copyLabels(tab, form);
+		FormSection mainFormSection = form.createFormSection();
+		form.addFormSection(mainFormSection);
+		List<NodeDefinition> nodes = oldUIOptions.getNodesPerTab(tab, false);
+		for (NodeDefinition nodeDefn : nodes) {
+			createFormSectionComponent(tab, mainFormSection, nodeDefn);
+		}
+		List<UITab> innerTabs = tab.getTabs();
+		for (UITab innerTab : innerTabs) {
+			createForm(form, innerTab);
+		}
+		parent.addForm(form);
+	}
+
+	protected void createFormSectionComponent(UITab tab,
+			FormSection parent, NodeDefinition nodeDefn) {
+		if ( nodeDefn instanceof AttributeDefinition ) {
+			Field field = createField(parent, nodeDefn);
+			parent.addChild(field);
+		} else if ( nodeDefn instanceof EntityDefinition ) {
+			EntityDefinition entityDefn = (EntityDefinition) nodeDefn;
+			if ( entityDefn.isMultiple() ) {
+				UIOptions oldUIOptions = tab.getUIOptions();
+				if ( oldUIOptions.getLayout(entityDefn) == Layout.TABLE ) {
+					Table table = createTable(parent, entityDefn);
+					parent.addChild(table);
+				}
+			} else {
+				FormSection formSection = createFormSectionBySingleEntity(parent, entityDefn);
+				parent.addChild(formSection);
+			}
+		}
+	}
+
+	protected Field createField(FormSection parent, NodeDefinition nodeDefn) {
+		Field field = parent.createField();
+		field.setAttributeId(nodeDefn.getId());
+		if ( nodeDefn instanceof TextAttributeDefinition ) {
+			UIOptions uiOptions = parent.getUiOptions();
+			String autoCompleteGroup = uiOptions.getAutoCompleteGroup((TextAttributeDefinition) nodeDefn);
+			field.setAutoCompleteGroup(autoCompleteGroup);
+		}
+		return field;
+	}
+
+	protected FormSection createFormSectionBySingleEntity(FormSectionsContainer parent, EntityDefinition entityDefn) {
+		FormSection formSection = parent.createFormSection();
+		copyLabels(entityDefn, formSection);
 		List<NodeDefinition> childDefns = entityDefn.getChildDefinitions();
 		for (NodeDefinition childDefn : childDefns) {
-			Component component;
+			FormSectionComponent childComponent;
 			if ( childDefn instanceof AttributeDefinition ) {
-				component = formSection.createField();
-				((Field) component).setAttributeId(childDefn.getId());
+				childComponent = createField(formSection, childDefn);
 			} else if ( childDefn instanceof EntityDefinition ) {
 				EntityDefinition childEntityDefn = (EntityDefinition) childDefn;
 				if ( childDefn.isMultiple() ) {
-					component = createTable(formSection, childEntityDefn);
+					childComponent = createTable(formSection, childEntityDefn);
 				} else {
-					throw new IllegalStateException("Nested form sections are not supported");
+					childComponent = createFormSectionBySingleEntity(formSection, childEntityDefn);
 				}
-				formSection.addComponent(component);
+				formSection.addChild(childComponent);
 			}
 		}
 		return formSection;
 	}
 
-	protected Table createTable(FormSection mainFormSection, EntityDefinition entityDefn) {
-		Table table = mainFormSection.createTable();
+	protected Table createTable(FormSection parent, EntityDefinition entityDefn) {
+		Table table = parent.createTable();
+		copyLabels(entityDefn, table);
 		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitions();
 		for (NodeDefinition childDefn : childDefinitions) {
 			TableHeadingComponent component = createTableHeadingComponent(table, childDefn);
@@ -88,22 +123,23 @@ public class UIOptionsMigrator {
 		return table;
 	}
 	
-	protected TableHeadingComponent createTableHeadingComponent(Table table, NodeDefinition childDefn) {
+	protected TableHeadingComponent createTableHeadingComponent(Table table, NodeDefinition nodeDefn) {
 		TableHeadingComponent component;
-		if ( childDefn instanceof EntityDefinition ) {
-			if ( childDefn.isMultiple() ) {
-				throw new IllegalStateException("Nested multiple entity inside table layout entity is not supported");
+		if ( nodeDefn instanceof EntityDefinition ) {
+			if ( nodeDefn.isMultiple() ) {
+				throw new IllegalStateException("Nested multiple entity inside table layout entity is not supported: " + nodeDefn.getPath());
 			}
 			component = table.createColumnGroup();
-			List<NodeDefinition> innerChildDefns = ((EntityDefinition) childDefn).getChildDefinitions();
+			EntityDefinition entityDefn = (EntityDefinition) nodeDefn;
+			copyLabels(entityDefn, (ColumnGroup) component);
+			List<NodeDefinition> innerChildDefns = entityDefn.getChildDefinitions();
 			for (NodeDefinition innerChildDefn : innerChildDefns) {
 				TableHeadingComponent innerComponent = createTableHeadingComponent(table, innerChildDefn);
 				((ColumnGroup) component).addHeadingComponent(innerComponent);
 			}
-			//TODO copy labels from EntityDefinition to ColumnGroup
 		} else {
 			component = table.createColumn();
-			((Column) component).setAttributeId(childDefn.getId());
+			((Column) component).setAttributeId(nodeDefn.getId());
 		}
 		return component;
 	}
@@ -121,5 +157,40 @@ public class UIOptionsMigrator {
 		}
 		return null;
 	}
-	
+
+	protected void copyLabels(UITab tab, Form form) {
+		List<LanguageSpecificText> labels = tab.getLabels();
+		for (LanguageSpecificText lst : labels) {
+			form.setLabel(lst.getLanguage(), lst.getText());
+		}
+	}
+
+	protected void copyLabels(EntityDefinition entityDefn, FormSection formSection) {
+		List<NodeLabel> labels = entityDefn.getLabels();
+		for (NodeLabel label : labels) {
+			if ( label.getType() == NodeLabel.Type.HEADING ) {
+				formSection.setLabel(label.getLanguage(), label.getText());
+			}
+		}
+	}
+
+	protected void copyLabels(EntityDefinition entityDefn, Table table) {
+		List<NodeLabel> labels = entityDefn.getLabels();
+		for (NodeLabel label : labels) {
+			if ( label.getType() == NodeLabel.Type.HEADING ) {
+				table.setLabel(label.getLanguage(), label.getText());
+			}
+		}
+	}
+
+	protected void copyLabels(EntityDefinition entityDefn, ColumnGroup columnGroup) {
+		List<NodeLabel> labels = entityDefn.getLabels();
+		for (NodeLabel label : labels) {
+			if ( label.getType() == NodeLabel.Type.HEADING ) {
+				columnGroup.setLabel(label.getLanguage(), label.getText());
+			}
+		}
+		
+	}
+
 }

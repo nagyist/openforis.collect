@@ -46,7 +46,6 @@ public class UIOptionsBinder implements
 			if ( uiOptions == null || uiOptions.getFormSets().isEmpty() ) {
 				//backwards compatibility
 				unmarshalTabSets(body, parser);
-				//TODO convert to new ui model...
 			}
 			return uiOptions;
 		} catch (Exception e) {

@@ -6,7 +6,6 @@ import static org.openforis.collect.metamodel.ui.UIOptionsConstants.LABEL;
 
 import java.io.IOException;
 
-import org.openforis.collect.metamodel.ui.Form;
 import org.openforis.collect.metamodel.ui.FormSection;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.xml.XmlParseException;
@@ -18,9 +17,8 @@ import org.xmlpull.v1.XmlPullParserException;
  * @author S. Ricci
  *
  */
-class FormSectionPR extends UIModelPR {
+class FormSectionPR extends FormSectionComponentPR {
 	
-	protected Form parent;
 	protected FormSection formSection;
 	
 	public FormSectionPR() {
@@ -51,30 +49,14 @@ class FormSectionPR extends UIModelPR {
 	@Override
 	protected void handleChildTag(XmlPullReader childTagReader)
 			throws XmlPullParserException, IOException, XmlParseException {
-		if ( childTagReader instanceof FormSectionPR ) {
-			FormSectionPR formpr = (FormSectionPR) childTagReader;
-			// Store child state in case reused recursively
-			Form tmpParent = formpr.parent;
-			FormSection tmpFormSection = formpr.formSection;
-			super.handleChildTag(childTagReader);
-			formpr.parent = tmpParent;
-			formpr.formSection = tmpFormSection;
-		} else if ( childTagReader instanceof ComponentPR ) {
-			((ComponentPR) childTagReader).parent = formSection;
+		if ( childTagReader instanceof FormSectionComponentPR ) {
+			((FormSectionComponentPR) childTagReader).parent = formSection;
 			super.handleChildTag(childTagReader);
 		} else {
 			super.handleChildTag(childTagReader);
 		}
 	}
 	
-	public Form getParent() {
-		return parent;
-	}
-	
-	public void setParent(Form parent) {
-		this.parent = parent;
-	}
-
 	private class LabelPR extends LanguageSpecificTextPR {
 
 		public LabelPR() {

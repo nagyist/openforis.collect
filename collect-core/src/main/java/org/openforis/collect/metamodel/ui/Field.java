@@ -14,10 +14,10 @@ public class Field extends Component {
 	private static final long serialVersionUID = 1L;
 
 	private int attributeId; 
-	private boolean autocomplete;
+	private String autoCompleteGroup;
 	
-	Field(FormSection formSection, int id) {
-		super(formSection, id);
+	Field(FormSection parent, int id) {
+		super(parent, id);
 	}
 
 	public AttributeDefinition getAttribute() {
@@ -32,20 +32,23 @@ public class Field extends Component {
 		this.attributeId = attributeId;
 	}
 
-	public boolean isAutocomplete() {
-		return autocomplete;
+	public String getAutoCompleteGroup() {
+		return autoCompleteGroup;
 	}
-
-	public void setAutocomplete(boolean autocomplete) {
-		this.autocomplete = autocomplete;
+	
+	public void setAutoCompleteGroup(String autoCompleteGroup) {
+		this.autoCompleteGroup = autoCompleteGroup;
 	}
-
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result + attributeId;
-		result = prime * result + (autocomplete ? 1231 : 1237);
+		result = prime
+				* result
+				+ ((autoCompleteGroup == null) ? 0 : autoCompleteGroup
+						.hashCode());
 		return result;
 	}
 
@@ -60,7 +63,10 @@ public class Field extends Component {
 		Field other = (Field) obj;
 		if (attributeId != other.attributeId)
 			return false;
-		if (autocomplete != other.autocomplete)
+		if (autoCompleteGroup == null) {
+			if (other.autoCompleteGroup != null)
+				return false;
+		} else if (!autoCompleteGroup.equals(other.autoCompleteGroup))
 			return false;
 		return true;
 	}

@@ -15,23 +15,33 @@ import org.openforis.idm.metamodel.LanguageSpecificTextMap;
  * @author S. Ricci
  *
  */
-public class FormSection extends UIModelObject {
+public class FormSection extends UIModelObject implements FormSectionComponent, FormSectionsContainer {
 
 	private static final long serialVersionUID = 1L;
 
-	private Form form;
-	private List<Component> components;
+	protected FormSectionsContainer parent;
+	private List<FormSectionComponent> children;
 	private LanguageSpecificTextMap labels;
 
-	public FormSection(Form form, int id) {
-		super(form.getUiOptions(), id);
-		this.form = form;
+	public FormSection(FormSectionsContainer parent, int id) {
+		super(parent.getUiOptions(), id);
+		this.parent = parent;
 	}
 
-	public Form getForm() {
-		return form;
+	@Override
+	public void addFormSection(FormSection formSection) {
+		addChild(formSection);
 	}
-
+	
+	public FormSection createFormSection() {
+		UIOptions uiOptions = getUiOptions();
+		return createFormSection(uiOptions.nextId());
+	}
+	
+	public FormSection createFormSection(int id) {
+		return new FormSection(this, id);
+	}
+	
 	public Field createField() {
 		UIOptions uiOptions = getUiOptions();
 		return createField(uiOptions.nextId());
@@ -50,19 +60,19 @@ public class FormSection extends UIModelObject {
 		return new Table(this, id);
 	}
 	
-	public List<Component> getComponents() {
-		return CollectionUtils.unmodifiableList(components);
+	public List<FormSectionComponent> getChildren() {
+		return CollectionUtils.unmodifiableList(children);
 	}
 	
-	public void addComponent(Component component) {
-		if ( components == null ) {
-			components = new ArrayList<Component>();
+	public void addChild(FormSectionComponent child) {
+		if ( children == null ) {
+			children = new ArrayList<FormSectionComponent>();
 		}
-		components.add(component);
+		children.add(child);
 	}
 	
-	public void removeComponent(Component component) {
-		components.remove(component);
+	public void removeChild(FormSectionComponent child) {
+		children.remove(child);
 	}
 
 	public List<LanguageSpecificText> getLabels() {
@@ -100,7 +110,7 @@ public class FormSection extends UIModelObject {
 		final int prime = 31;
 		int result = super.hashCode();
 		result = prime * result
-				+ ((components == null) ? 0 : components.hashCode());
+				+ ((children == null) ? 0 : children.hashCode());
 		result = prime * result + ((labels == null) ? 0 : labels.hashCode());
 		return result;
 	}
@@ -114,10 +124,10 @@ public class FormSection extends UIModelObject {
 		if (getClass() != obj.getClass())
 			return false;
 		FormSection other = (FormSection) obj;
-		if (components == null) {
-			if (other.components != null)
+		if (children == null) {
+			if (other.children != null)
 				return false;
-		} else if (!components.equals(other.components))
+		} else if (!children.equals(other.children))
 			return false;
 		if (labels == null) {
 			if (other.labels != null)
@@ -126,5 +136,6 @@ public class FormSection extends UIModelObject {
 			return false;
 		return true;
 	}
-	
+
+
 }

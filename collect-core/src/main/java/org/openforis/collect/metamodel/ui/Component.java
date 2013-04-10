@@ -8,21 +8,14 @@ package org.openforis.collect.metamodel.ui;
  * @author S. Ricci
  *
  */
-public abstract class Component extends UIModelObject {
+public abstract class Component extends UIModelObject implements FormSectionComponent {
 
 	private static final long serialVersionUID = 1L;
 	
-	protected FormSection parent;
-	
 	Component(FormSection parent, int id) {
 		super(parent.getUiOptions(), id);
-		this.parent = parent;
 	}
 
-	public FormSection getParent() {
-		return parent;
-	}
-	
 	@Override
 	public int hashCode() {
 		int result = super.hashCode();

@@ -65,8 +65,7 @@ public class FormPR extends UIModelPR {
 			formpr.parentFormContainer = tmpParent;
 			formpr.form = tmpForm;
 		} else if ( childPR instanceof FormSectionPR ) {
-			FormSectionPR formSectionPR = (FormSectionPR) childPR;
-			formSectionPR.parent = form;
+			((FormSectionPR) childPR).parent = form;
 			super.handleChildTag(childPR);
 		} else {
 			super.handleChildTag(childPR);
