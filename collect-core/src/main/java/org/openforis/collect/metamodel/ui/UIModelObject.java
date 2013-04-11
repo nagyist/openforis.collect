@@ -11,7 +11,7 @@ import org.openforis.idm.metamodel.Schema;
  * @author S. Ricci
  *
  */
-abstract class UIModelObject implements Serializable {
+public abstract class UIModelObject implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	

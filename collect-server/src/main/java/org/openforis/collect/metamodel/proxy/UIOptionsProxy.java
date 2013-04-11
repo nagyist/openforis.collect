@@ -9,6 +9,7 @@ import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedPro
 import org.openforis.collect.Proxy;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITabSet;
+import org.openforis.collect.metamodel.ui.proxy.FormSetProxy;
 
 /**
  * @author riccist
@@ -29,6 +30,10 @@ public class UIOptionsProxy implements Proxy {
 		return UITabSetProxy.fromList(tabSets);
 	}
 	
+	@ExternalizedProperty
+	public List<FormSetProxy> getFormSets() {
+		return FormSetProxy.fromList(uiOptions.getFormSets());
+	}
 	
 
 }

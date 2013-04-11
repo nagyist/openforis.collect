@@ -10,6 +10,7 @@ package org.openforis.collect.metamodel.proxy {
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	
+	import org.openforis.collect.metamodel.ui.proxy.FormSetProxy;
 	import org.openforis.collect.util.CollectionUtil;
 
 	/**
@@ -21,6 +22,15 @@ package org.openforis.collect.metamodel.proxy {
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.UIOptionsProxy")]
     public class UIOptionsProxy extends UIOptionsProxyBase {
 		
+		public function getFormSet(rootEntityId:int):FormSetProxy {
+			for each (var formSet:FormSetProxy in formSets) {
+				if ( formSet.entityId == rootEntityId) {
+					return formSet;
+				}
+			}
+			return null;
+		}
+
 		public function getTabSet(name:String):UITabSetProxy {
 			for each (var tabSet:UITabSetProxy in tabSets) {
 				if(tabSet.name == name) {

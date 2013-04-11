@@ -7,6 +7,7 @@ package org.openforis.collect.ui {
 	import mx.core.IFactory;
 	import mx.core.IVisualElement;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.BooleanAttributeDefinitionProxy;
@@ -72,6 +73,9 @@ package org.openforis.collect.ui {
 	import spark.layouts.HorizontalLayout;
 	import spark.layouts.VerticalLayout;
 	import spark.layouts.supportClasses.LayoutBase;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
+	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
+	import org.openforis.collect.metamodel.ui.proxy.FormSetProxy;
 	
 	/**
 	 * @author Mino Togna
@@ -94,7 +98,10 @@ package org.openforis.collect.ui {
 		
 		public static function buildForm(rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
 			var formContainer:FormContainer = new FormContainer();
-			formContainer.rootEntityDefinition = rootEntity;
+			var survey:SurveyProxy = rootEntity.survey;
+			var uiOptions:UIOptionsProxy = survey.uiOptions;
+			var formSet:FormSetProxy = uiOptions.getFormSet(rootEntity.id);
+			formContainer.form = formSet;
 			formContainer.version = version;
 			return formContainer;
 		}
