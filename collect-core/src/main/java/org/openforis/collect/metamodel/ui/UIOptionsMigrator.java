@@ -1,5 +1,6 @@
 package org.openforis.collect.metamodel.ui;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.ObjectUtils;
@@ -10,6 +11,7 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel;
+import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 
@@ -106,8 +108,10 @@ public class UIOptionsMigrator {
 				} else {
 					childComponent = createFormSectionBySingleEntity(formSection, childEntityDefn);
 				}
-				formSection.addChild(childComponent);
+			} else {
+				throw new IllegalArgumentException("Unsupported child definition class: " + childDefn.getClass().getSimpleName());
 			}
+			formSection.addChild(childComponent);
 		}
 		return formSection;
 	}
@@ -166,9 +170,13 @@ public class UIOptionsMigrator {
 	}
 
 	protected void copyLabels(EntityDefinition entityDefn, FormSection formSection) {
-		List<NodeLabel> labels = entityDefn.getLabels();
+		List<NodeLabel> labels = getLabelsByType(entityDefn, Type.HEADING);
 		for (NodeLabel label : labels) {
-			if ( label.getType() == NodeLabel.Type.HEADING ) {
+			formSection.setLabel(label.getLanguage(), label.getText());
+		}
+		if ( formSection.getLabels().isEmpty() ) {
+			labels = getLabelsByType(entityDefn, Type.INSTANCE);
+			for (NodeLabel label : labels) {
 				formSection.setLabel(label.getLanguage(), label.getText());
 			}
 		}
@@ -184,13 +192,27 @@ public class UIOptionsMigrator {
 	}
 
 	protected void copyLabels(EntityDefinition entityDefn, ColumnGroup columnGroup) {
-		List<NodeLabel> labels = entityDefn.getLabels();
+		List<NodeLabel> labels = getLabelsByType(entityDefn, Type.HEADING);
 		for (NodeLabel label : labels) {
-			if ( label.getType() == NodeLabel.Type.HEADING ) {
+			columnGroup.setLabel(label.getLanguage(), label.getText());
+		}
+		if ( columnGroup.getLabels().isEmpty() ) {
+			labels = getLabelsByType(entityDefn, Type.INSTANCE);
+			for (NodeLabel label : labels) {
 				columnGroup.setLabel(label.getLanguage(), label.getText());
 			}
 		}
-		
+	}
+	
+	protected List<NodeLabel> getLabelsByType(NodeDefinition nodeDefn, NodeLabel.Type type) {
+		List<NodeLabel> result = new ArrayList<NodeLabel>();
+		List<NodeLabel> labels = nodeDefn.getLabels();
+		for (NodeLabel label : labels) {
+			if ( label.getType() == type ) {
+				result.add(label);
+			}
+		}
+		return result;
 	}
 
 }

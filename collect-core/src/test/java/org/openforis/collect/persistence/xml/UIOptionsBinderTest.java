@@ -15,12 +15,14 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openforis.collect.metamodel.ui.Column;
 import org.openforis.collect.metamodel.ui.Field;
 import org.openforis.collect.metamodel.ui.Form;
 import org.openforis.collect.metamodel.ui.FormSection;
 import org.openforis.collect.metamodel.ui.FormSectionComponent;
 import org.openforis.collect.metamodel.ui.FormSet;
 import org.openforis.collect.metamodel.ui.Table;
+import org.openforis.collect.metamodel.ui.TableHeadingComponent;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.metamodel.ui.UITab;
@@ -124,20 +126,30 @@ public class UIOptionsBinderTest {
 			FormSection mainFormSection = formSections.get(0);
 			List<FormSectionComponent> mainFormSectionChildren = mainFormSection.getChildren();
 			assertEquals(14, mainFormSectionChildren.size());
-			FormSectionComponent taskTable = mainFormSectionChildren.get(0);
-			assertTrue(taskTable instanceof Table);
-			String taskLabel = ((Table) taskTable).getLabel(null);
-			assertEquals("Quality assurance field", taskLabel);
-			
-			FormSectionComponent idField = mainFormSectionChildren.get(1);
-			assertTrue(idField instanceof Field);
-			AttributeDefinition idAttribute = ((Field) idField).getAttribute();
-			assertEquals("id", idAttribute.getName());
-			
-			FormSectionComponent vehicleLocationField = mainFormSectionChildren.get(7);
-			assertTrue(vehicleLocationField instanceof Field);
-			AttributeDefinition vehicleLocationAttribute = ((Field) vehicleLocationField).getAttribute();
-			assertEquals("vehicle_location", vehicleLocationAttribute.getName());
+			{
+				FormSectionComponent taskTable = mainFormSectionChildren.get(0);
+				assertTrue(taskTable instanceof Table);
+				String taskLabel = ((Table) taskTable).getLabel(null);
+				assertEquals("Quality assurance field", taskLabel);
+				List<TableHeadingComponent> taskTableHeadingComps = ((Table) taskTable).getHeadingComponents();
+				assertEquals(3, taskTableHeadingComps.size());
+				TableHeadingComponent typeColumn = taskTableHeadingComps.get(0);
+				assertTrue(typeColumn instanceof Column);
+				AttributeDefinition typeAttributeDefn = ((Column) typeColumn).getAttributeDefinition();
+				assertEquals("type", typeAttributeDefn.getName());
+			}
+			{
+				FormSectionComponent idField = mainFormSectionChildren.get(1);
+				assertTrue(idField instanceof Field);
+				AttributeDefinition idAttribute = ((Field) idField).getAttribute();
+				assertEquals("id", idAttribute.getName());
+			}
+			{
+				FormSectionComponent vehicleLocationField = mainFormSectionChildren.get(7);
+				assertTrue(vehicleLocationField instanceof Field);
+				AttributeDefinition vehicleLocationAttribute = ((Field) vehicleLocationField).getAttribute();
+				assertEquals("vehicle_location", vehicleLocationAttribute.getName());
+			}
 		}
 		{
 			Form form = clusterForms.get(1);
@@ -145,7 +157,6 @@ public class UIOptionsBinderTest {
 			assertEquals("Plot", label);
 			List<Form> subForms = form.getForms();
 			assertEquals(6, subForms.size());
-			
 			{
 				Form subForm = subForms.get(0);
 				String subFormLabel = subForm.getLabel(null);
@@ -153,8 +164,16 @@ public class UIOptionsBinderTest {
 				FormSection mainFormSection = subForm.getFormSections().get(0);
 				List<FormSectionComponent> children = mainFormSection.getChildren();
 				assertEquals(34, children.size());
+				
+				//single entity to FormSection migration 
+				FormSectionComponent timeStudyComp = children.get(2);
+				assertTrue(timeStudyComp instanceof FormSection);
+				FormSection timeStudyFormSection = (FormSection) timeStudyComp;
+				String timeStudyLabel = timeStudyFormSection.getLabel(null);
+				assertEquals("Time study", timeStudyLabel);
+				List<FormSectionComponent> timeStudyChildren = timeStudyFormSection.getChildren();
+				assertEquals(3, timeStudyChildren.size());
 			}
-			
 			{
 				Form subForm = subForms.get(4);
 				String subFormLabel = subForm.getLabel(null);
