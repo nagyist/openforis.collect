@@ -15,10 +15,10 @@
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-			import org.openforis.collect.metamodel.ui.proxy.FormProxy;
+			import org.openforis.collect.metamodel.ui.proxy.FormContainerProxy;
 			import org.openforis.collect.model.proxy.RecordProxy;
 			
-			private var _form:FormProxy;
+			private var _formContainer:FormContainerProxy;
 			private var _version:ModelVersionProxy;
 			private var _record:RecordProxy;
 
@@ -33,12 +33,12 @@
 			}
 			
 			[Bindable]
-			public function get form():FormProxy {
-				return _form;
+			public function get formContainer():FormContainerProxy {
+				return _formContainer;
 			}
 
-			public function set form(value:FormProxy):void {
-				_form = value;
+			public function set formContainer(value:FormContainerProxy):void {
+				_formContainer = value;
 			}
 
 			[Bindable]
@@ -63,7 +63,7 @@
 	</fx:Script>
 
 	<detail:TabbedFormContainer id="tabContentContainer"
-								form="{form}"
+								formContainer="{formContainer}"
 								modelVersion="{version}"
 								parentEntity="{record.rootEntity}"
 								/>

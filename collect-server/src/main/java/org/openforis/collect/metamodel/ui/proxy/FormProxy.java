@@ -14,7 +14,7 @@ import org.openforis.collect.metamodel.ui.Form;
  * @author S. Ricci
  *
  */
-public class FormProxy extends UIModelObjectProxy<Form> {
+public class FormProxy extends FormContainerProxy<Form> {
 
 	public FormProxy(Form modelObject) {
 		super(modelObject);
@@ -33,14 +33,4 @@ public class FormProxy extends UIModelObjectProxy<Form> {
 		return FormSectionProxy.fromList(modelObject.getFormSections());
 	}
 
-	@ExternalizedProperty
-	public List<FormProxy> getForms() {
-		return FormProxy.fromList(modelObject.getForms());
-	}
-	
-	@ExternalizedProperty
-	public List<LanguageSpecificTextProxy> getLabels() {
-		return LanguageSpecificTextProxy.fromList(modelObject.getLabels());
-	}
-	
 }

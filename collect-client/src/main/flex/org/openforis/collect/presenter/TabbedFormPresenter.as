@@ -1,11 +1,12 @@
 package org.openforis.collect.presenter {
 	import mx.binding.utils.BindingUtils;
 	
+	import org.openforis.collect.Application;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
-	import org.openforis.collect.metamodel.proxy.UITabProxy;
-	import org.openforis.collect.metamodel.proxy.UITabSetProxy;
+	import org.openforis.collect.metamodel.ui.proxy.FormContainerProxy;
+	import org.openforis.collect.metamodel.ui.proxy.FormProxy;
 	import org.openforis.collect.ui.component.detail.TabbedFormContainer;
 	
 	/**
@@ -25,16 +26,11 @@ package org.openforis.collect.presenter {
 		
 		override internal function initEventListeners():void {
 			super.initEventListeners();
-			BindingUtils.bindSetter(setUITabSet, _view, "uiTabSet");
-			BindingUtils.bindSetter(setEntityDefinition, _view, "entityDefinition");
+			BindingUtils.bindSetter(setFormContainer, _view, "formContainer");
 			BindingUtils.bindSetter(setModelVersion, _view, "modelVersion");
 		}
 		
-		protected function setUITabSet(value:UITabSetProxy):void {
-			buildView();
-		}
-		
-		protected function setEntityDefinition(value:EntityDefinitionProxy):void {
+		protected function setFormContainer(value:FormContainerProxy):void {
 			buildView();
 		}
 		
@@ -43,11 +39,11 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function buildView():void {
-			if ( _view.entityDefinition != null && _view.uiTabSet != null ) {
-				if ( _view.uiTabSet is UITabProxy ) {
-					_view.definitionsPerCurrentTab = UIOptionsProxy.getDefinitionsPerTab(_view.entityDefinition, _view.modelVersion, UITabProxy(_view.uiTabSet));
+			if ( _view.formContainer != null ) {
+				if ( _view.formContainer is FormProxy ) {
+					_view.fieldsPerCurrentForm = UIOptionsProxy.getFieldsPerForm(org.openforis.collect.Application.activeSurvey, 
+						_view.formContainer as FormProxy, _view.modelVersion);
 				}
-				_view.innerUITabs = UIOptionsProxy.getInnerTabs(_view.entityDefinition, _view.modelVersion, _view.uiTabSet);
 			}
 		}
 	}

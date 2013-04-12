@@ -10,6 +10,8 @@ package org.openforis.collect.metamodel.proxy {
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	
+	import org.openforis.collect.metamodel.ui.proxy.FormProxy;
+	import org.openforis.collect.metamodel.ui.proxy.FormSectionProxy;
 	import org.openforis.collect.metamodel.ui.proxy.FormSetProxy;
 	import org.openforis.collect.util.CollectionUtil;
 
@@ -31,6 +33,13 @@ package org.openforis.collect.metamodel.proxy {
 			return null;
 		}
 
+		public static function getFieldsPerForm(survey:SurveyProxy, form:FormProxy, version:ModelVersionProxy):IList {
+			var result:IList = new ArrayCollection();
+			var formSection:FormSectionProxy = form.formSection;
+			var result:IList = formSection.getChildrenInVersion(survey, version);
+			return result;
+		}
+		
 		public function getTabSet(name:String):UITabSetProxy {
 			for each (var tabSet:UITabSetProxy in tabSets) {
 				if(tabSet.name == name) {

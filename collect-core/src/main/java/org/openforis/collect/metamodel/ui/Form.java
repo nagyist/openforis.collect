@@ -12,7 +12,7 @@ import org.openforis.commons.collection.CollectionUtils;
  * @author S. Ricci
  *
  */
-public class Form extends FormContainer implements FormSectionsContainer {
+public class Form extends FormContainer implements FormSectionContainer {
 
 	private static final long serialVersionUID = 1L;
 
@@ -20,12 +20,12 @@ public class Form extends FormContainer implements FormSectionsContainer {
 	private List<FormSection> formSections;
 
 	public Form(FormContainer parent, int id) {
-		super(parent.getUiOptions(), id);
+		super(parent.getUIOptions(), id);
 		this.parent = parent;
 	}
 	
 	public FormSection createFormSection() {
-		UIOptions uiOptions = getUiOptions();
+		UIOptions uiOptions = getUIOptions();
 		return createFormSection(uiOptions.nextId());
 	}
 	

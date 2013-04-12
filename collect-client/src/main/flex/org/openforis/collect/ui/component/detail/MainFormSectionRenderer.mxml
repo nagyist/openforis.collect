@@ -12,12 +12,15 @@
 			
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+			import org.openforis.collect.metamodel.ui.proxy.FormProxy;
+			import org.openforis.collect.metamodel.ui.proxy.FormSectionProxy;
+			import org.openforis.collect.metamodel.ui.proxy.TableProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.util.UIUtil;
 			
-			private var _entityDefinition:EntityDefinitionProxy;
+			private var _formSection:FormSectionProxy;
 			private var _modelVersion:ModelVersionProxy;
-			private var _nodeDefinitions:IList;
+			private var _formSectionComponents:IList;
 			private var _parentEntity:EntityProxy;
 			private var _enlarged:Boolean;
 			
@@ -25,38 +28,26 @@
 			public static const STATE_ENLARGED:String = "enlarged";
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
-				BindingUtils.bindSetter(nodeDefinitionsSetter, this, "nodeDefinitions");
+				BindingUtils.bindSetter(formSectionComponentsSetter, this, "formSectionComponents");
 			}
 			
-			protected function nodeDefinitionsSetter(value:IList):void {
+			protected function formSectionComponentsSetter(value:IList):void {
 				updateCurrentState();
 			}
 			
 			protected function updateCurrentState():void {
-				enlarged = calculateContainsOnlyOneMultipleEntity()/* || isInsideFormLayoutEntity()*/;
+				enlarged = calculateContainsOnlyOneMultipleEntity()
 				currentState = enlarged ? STATE_ENLARGED: STATE_DEFAULT;
 			}
 			
 			protected function calculateContainsOnlyOneMultipleEntity():Boolean {
-				if(nodeDefinitions != null && nodeDefinitions.length == 1) {
-					var firstNode:Object = nodeDefinitions.getItemAt(0);
-					if(firstNode is EntityDefinitionProxy) {
-						var entity:EntityDefinitionProxy = EntityDefinitionProxy(firstNode);
-						if(entity.multiple /*&& entity.layout == UIUtil.LAYOUT_TABLE*/) {
-							return true;
-						}
+				if ( _formSectionComponents != null && _formSectionComponents.length == 1) {
+					var firstNode:Object = _formSectionComponents.getItemAt(0);
+					if ( firstNode is TableProxy ) {
+						return true;
 					}
 				}
 				return false;
-			}
-			
-			private function isInsideFormLayoutEntity():Boolean {
-				if ( entityDefinition != null && entityDefinition.parent != null && 
-					entityDefinition.parent.multiple && entityDefinition.parentLayout == UIUtil.LAYOUT_FORM ) {
-					return true;
-				} else {
-					return false;
-				}
 			}
 			
 			public function resetScrollBars():void {
@@ -65,15 +56,6 @@
 				}
 			}
 			
-			[Bindable]
-			public function get entityDefinition():EntityDefinitionProxy {
-				return _entityDefinition;
-			}
-
-			public function set entityDefinition(value:EntityDefinitionProxy):void {
-				_entityDefinition = value;
-			}
-
 			[Bindable]
 			public function get modelVersion():ModelVersionProxy {
 				return _modelVersion;
@@ -84,12 +66,12 @@
 			}
 			
 			[Bindable]
-			public function get nodeDefinitions():IList {
-				return _nodeDefinitions;
+			public function get formSectionComponents():IList {
+				return _formSectionComponents;
 			}
 			
-			public function set nodeDefinitions(value:IList):void {
-				_nodeDefinitions = value;
+			public function set formSectionComponents(value:IList):void {
+				_formSectionComponents = value;
 			}
 			
 			[Bindable]
@@ -125,7 +107,7 @@
 				verticalScrollPolicy.enlarged="off">
 		<s:Group>
 			<s:DataGroup id="formDataGroup" 
-						 dataProvider="{nodeDefinitions}">
+						 dataProvider="{formSectionComponents}">
 				<s:layout>
 					<s:VerticalLayout gap="5" 
 									  paddingBottom="10" 

@@ -6,11 +6,9 @@
  */
 
 package org.openforis.collect.metamodel.ui.proxy {
-	
 
     [Bindable]
-    [RemoteClass(alias="org.openforis.collect.metamodel.ui.proxy.UIModelObjectProxy")]
-    public class UIModelObjectProxy extends UIModelObjectProxyBase {
-		
+    [RemoteClass(alias="org.openforis.collect.metamodel.ui.proxy.FormContainerProxy")]
+    public class FormContainerProxy extends FormContainerProxyBase {
     }
 }

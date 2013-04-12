@@ -31,7 +31,7 @@ public class Table extends Component {
 	}
 	
 	public Column createColumn() {
-		UIOptions uiOptions = getUiOptions();
+		UIOptions uiOptions = getUIOptions();
 		return createColumn(uiOptions.nextId());
 	}
 	
@@ -40,7 +40,7 @@ public class Table extends Component {
 	}
 	
 	public ColumnGroup createColumnGroup() {
-		UIOptions uiOptions = getUiOptions();
+		UIOptions uiOptions = getUIOptions();
 		return createColumnGroup(uiOptions.nextId());
 	}
 	

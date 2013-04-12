@@ -27,7 +27,7 @@ public abstract class FormContainer extends UIModelObject {
 	}
 
 	public Form createForm() {
-		UIOptions uiOptions = getUiOptions();
+		UIOptions uiOptions = getUIOptions();
 		return createForm(uiOptions.nextId());
 	}
 	

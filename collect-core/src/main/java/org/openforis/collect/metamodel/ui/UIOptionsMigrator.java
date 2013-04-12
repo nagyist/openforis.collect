@@ -86,14 +86,14 @@ public class UIOptionsMigrator {
 		Field field = parent.createField();
 		field.setAttributeId(nodeDefn.getId());
 		if ( nodeDefn instanceof TextAttributeDefinition ) {
-			UIOptions uiOptions = parent.getUiOptions();
+			UIOptions uiOptions = parent.getUIOptions();
 			String autoCompleteGroup = uiOptions.getAutoCompleteGroup((TextAttributeDefinition) nodeDefn);
 			field.setAutoCompleteGroup(autoCompleteGroup);
 		}
 		return field;
 	}
 
-	protected FormSection createFormSectionBySingleEntity(FormSectionsContainer parent, EntityDefinition entityDefn) {
+	protected FormSection createFormSectionBySingleEntity(FormSectionContainer parent, EntityDefinition entityDefn) {
 		FormSection formSection = parent.createFormSection();
 		copyLabels(entityDefn, formSection);
 		List<NodeDefinition> childDefns = entityDefn.getChildDefinitions();

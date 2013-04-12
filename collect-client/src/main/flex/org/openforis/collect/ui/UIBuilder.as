@@ -101,7 +101,7 @@ package org.openforis.collect.ui {
 			var survey:SurveyProxy = rootEntity.survey;
 			var uiOptions:UIOptionsProxy = survey.uiOptions;
 			var formSet:FormSetProxy = uiOptions.getFormSet(rootEntity.id);
-			formContainer.form = formSet;
+			formContainer.formContainer = formSet;
 			formContainer.version = version;
 			return formContainer;
 		}

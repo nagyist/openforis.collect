@@ -6,9 +6,43 @@
  */
 
 package org.openforis.collect.metamodel.ui.proxy {
+	import mx.collections.ArrayList;
+	import mx.collections.IList;
+	
+	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
+	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
+	import org.openforis.collect.util.CollectionUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.ui.proxy.FormSectionProxy")]
     public class FormSectionProxy extends FormSectionProxyBase {
+		
+		public function getChildrenInVersion(survey:SurveyProxy, version:ModelVersionProxy):IList {
+			var result:IList = new ArrayList();
+			for each ( var child:FormSectionComponentProxy in children ) {
+				if ( child is FieldProxy ) {
+					var attributeId:int = (child as FieldProxy).attributeId;
+					var nodeDefn:NodeDefinitionProxy = survey.schema.getDefinitionById(attributeId);
+					if ( version.isApplicable(nodeDefn) ) {
+						result.addItem(child);
+					}
+				} else if ( child is TableProxy ) {
+					var entityId:int = (child as TableProxy).entityId;
+					var nodeDefn:NodeDefinitionProxy = survey.schema.getDefinitionById(entityId);
+					if ( version.isApplicable(nodeDefn) ) {
+						result.addItem(child);
+					}
+				} else if ( child is FormSectionProxy ) {
+					var childrenInVersion:IList = (child as FormSectionProxy).getChildrenInVersion(survey, version);
+					if ( CollectionUtil.isNotEmpty(childrenInVersion) ) {
+						result.addItem(child);
+					}
+				}
+			}
+			return result;
+		}
+		
     }
 }

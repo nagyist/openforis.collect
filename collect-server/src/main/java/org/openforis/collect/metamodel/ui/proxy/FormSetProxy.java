@@ -6,15 +6,13 @@ package org.openforis.collect.metamodel.ui.proxy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
 import org.openforis.collect.metamodel.ui.FormSet;
 
 /**
  * @author S. Ricci
  *
  */
-public class FormSetProxy extends UIModelObjectProxy<FormSet> {
+public class FormSetProxy extends FormContainerProxy<FormSet> {
 
 	public FormSetProxy(FormSet modelObject) {
 		super(modelObject);
@@ -28,20 +26,4 @@ public class FormSetProxy extends UIModelObjectProxy<FormSet> {
 		return result;
 	}
 
-	@ExternalizedProperty
-	public int getEntityId() {
-		return modelObject.getEntityId();
-	}
-
-	@ExternalizedProperty
-	public List<FormProxy> getForms() {
-		return FormProxy.fromList(modelObject.getForms());
-	}
-
-	@ExternalizedProperty
-	public List<LanguageSpecificTextProxy> getLabels() {
-		return LanguageSpecificTextProxy.fromList(modelObject.getLabels());
-	}
-
-	
 }

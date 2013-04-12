@@ -15,9 +15,14 @@
 			import mx.core.UIComponent;
 			import mx.events.FlexEvent;
 			
+			import org.openforis.collect.Application;
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+			import org.openforis.collect.metamodel.proxy.SchemaProxy;
+			import org.openforis.collect.metamodel.ui.proxy.FieldProxy;
+			import org.openforis.collect.metamodel.ui.proxy.FormSectionProxy;
+			import org.openforis.collect.metamodel.ui.proxy.TableProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.ui.UIBuilder;
 			import org.openforis.collect.util.UIUtil;
@@ -36,11 +41,15 @@
 				super.createChildren();
 				if(data != null) {
 					var formItem:CollectFormItem;
-					if(data is AttributeDefinitionProxy) {
-						formItem = UIBuilder.getAttributeFormItem(AttributeDefinitionProxy(data));
+					if(data is FieldProxy) {
+						var schema:SchemaProxy = Application.activeSurvey.schema;
+						var attr:AttributeDefinitionProxy = AttributeDefinitionProxy(schema.getDefinitionById(FieldProxy(data).attributeId));
+						formItem = UIBuilder.getAttributeFormItem(attr);
 						formItem.labelWidth = labelWidth;
 						addElement(formItem);
-					} else if(data is EntityDefinitionProxy) {
+					} else if(data is TableProxy) {
+						
+					} else if(data is FormSectionProxy) {
 						formItem = CollectFormItem(UIBuilder.getEntityFormItem(EntityDefinitionProxy(data)));
 						addElement(formItem);
 						BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");

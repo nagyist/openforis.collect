@@ -12,7 +12,7 @@ public abstract class TableHeadingComponent extends UIModelObject {
 	private static final long serialVersionUID = 1L;
 	
 	TableHeadingComponent(Table table, int id) {
-		super(table.getUiOptions(), id);
+		super(table.getUIOptions(), id);
 		this.table = table;
 	}
 

@@ -13,7 +13,7 @@ public abstract class Component extends UIModelObject implements FormSectionComp
 	private static final long serialVersionUID = 1L;
 	
 	Component(FormSection parent, int id) {
-		super(parent.getUiOptions(), id);
+		super(parent.getUIOptions(), id);
 	}
 
 	@Override

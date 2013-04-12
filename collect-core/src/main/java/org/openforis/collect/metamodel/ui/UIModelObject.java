@@ -25,7 +25,7 @@ public abstract class UIModelObject implements Serializable {
 	}
 	
 	protected NodeDefinition getNodeDefinition(int id) {
-		UIOptions uiOptions = getUiOptions();
+		UIOptions uiOptions = getUIOptions();
 		if ( uiOptions == null || uiOptions.getSurvey() == null ) {
 			throw new IllegalStateException("UIOptions not initialized correctly");
 		}
@@ -35,7 +35,7 @@ public abstract class UIModelObject implements Serializable {
 		return result;
 	}
 	
-	public UIOptions getUiOptions() {
+	public UIOptions getUIOptions() {
 		return uiOptions;
 	}
 	

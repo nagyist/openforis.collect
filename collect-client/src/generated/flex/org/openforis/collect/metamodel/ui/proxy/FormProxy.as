@@ -8,6 +8,7 @@
 package org.openforis.collect.metamodel.ui.proxy {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
+	import org.openforis.collect.util.CollectionUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.ui.proxy.FormProxy")]
@@ -21,6 +22,14 @@ package org.openforis.collect.metamodel.ui.proxy {
 				return String(id);
 			}
 			return result;
+		}
+		
+		public function get formSection():FormSectionProxy {
+			if ( CollectionUtil.isEmpty(formSections) ) {
+				return null;
+			} else {
+				return FormSectionProxy(formSections.getItemAt(0));
+			}
 		}
 		
     }

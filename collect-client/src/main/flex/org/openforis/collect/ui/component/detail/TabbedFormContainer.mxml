@@ -13,7 +13,7 @@
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-			import org.openforis.collect.metamodel.ui.proxy.FormProxy;
+			import org.openforis.collect.metamodel.ui.proxy.FormContainerProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.presenter.TabbedFormPresenter;
 			import org.openforis.collect.util.CollectionUtil;
@@ -23,10 +23,9 @@
 			private static const STATE_COMPLETE:String = "complete";
 			
 			private var _modelVersion:ModelVersionProxy;
-			private var _form:FormProxy;
+			private var _formContainer:FormContainerProxy;
 			private var _innerForms:IList;
-			private var _definitionsPerTab:IList;
-			private var _definitionsPerCurrentTab:IList;
+			private var _fieldsPerCurrentForm:IList;
 			private var _parentEntity:EntityProxy;
 			private var _entity:EntityProxy;
 			
@@ -61,14 +60,14 @@
 				}
 			}
 			
-			[Bindable(event="formChange")]
-			public function get form():FormProxy {
-				return _form;
+			[Bindable(event="formContainerChange")]
+			public function get formContainer():FormContainerProxy {
+				return _formContainer;
 			}
 			
-			public function set form(value:FormProxy):void {
-				_form = value;
-				dispatchEvent(new Event("formChange"));
+			public function set formContainer(value:FormContainerProxy):void {
+				_formContainer = value;
+				dispatchEvent(new Event("formContainerChange"));
 			}
 			
 			[Bindable]
@@ -89,27 +88,27 @@
 				_parentEntity = value;
 			}
 			
-			[Bindable(event="definitionsPerCurrentTabChange")]
-			public function get definitionsPerCurrentTab():IList {
-				return _definitionsPerCurrentTab;
+			[Bindable(event="fieldsPerCurrentFormChange")]
+			public function get fieldsPerCurrentForm():IList {
+				return _fieldsPerCurrentForm;
 			}
 			
-			public function set definitionsPerCurrentTab(value:IList):void {
-				_definitionsPerCurrentTab = value;
-				dispatchEvent(new Event("definitionsPerCurrentTabChange"));
+			public function set fieldsPerCurrentForm(value:IList):void {
+				_fieldsPerCurrentForm = value;
+				dispatchEvent(new Event("fieldsPerCurrentFormChange"));
 			}
 
 			[Bindable(event="definitionsPerCurrentTabChange")]
-			public function get hasDefinitionsPerCurrentTab():Boolean {
-				return CollectionUtil.isNotEmpty(_definitionsPerCurrentTab);
+			public function get hasFieldsPerCurrentForm():Boolean {
+				return CollectionUtil.isNotEmpty(_fieldsPerCurrentForm);
 			}
 			
 			[Bindable(event="formChange")]
 			public function get innerForms():IList {
-				if ( _form == null ) {
+				if ( _formContainer == null ) {
 					return null;
 				} else {
-					return _form.forms;
+					return _formContainer.forms;
 				}
 			}
 			
@@ -129,11 +128,11 @@
 	
 	<s:VGroup width="100%" height="100%" 
 			  gap="0">
-		<detail:InnerFormContainer 
+		<detail:MainFormSectionRenderer 
 			id="definitionsPerCurrentTabContainer"
 			modelVersion="{modelVersion}"
-			entityDefinition="{entityDefinition}"
-			nodeDefinitions="{definitionsPerCurrentTab}"
+			formContainer="{formContainer}"
+			fields="{fieldsPerCurrentForm}"
 			parentEntity="{parentEntity}"
 			width.default="100%"
 			height.default="100%"
@@ -162,7 +161,7 @@
 						modelVersion="{modelVersion}"
 						form="{form}"
 						parentEntity="{parentEntity}"
-						label="{FormProxy(innerFormsRP.currentItem).labelText}"
+						label="{FormContainerProxy(innerFormsRP.currentItem).labelText}"
 						/>
 				</mx:Repeater>
 			</mx:ViewStack>
