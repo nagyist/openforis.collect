@@ -21,12 +21,16 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NumericAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.TextAttributeDefinitionProxy$Type;
 	import org.openforis.collect.metamodel.proxy.TimeAttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
 	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
+	import org.openforis.collect.metamodel.ui.proxy.FormProxy;
+	import org.openforis.collect.metamodel.ui.proxy.FormSetProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.datagrid.CompleteColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
@@ -40,10 +44,11 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.FormContainer;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeDataGroupFormItem;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
-	import org.openforis.collect.ui.component.detail.MultipleEntityAsTableFormItem;
-	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
+	import org.openforis.collect.ui.component.detail.TableFormItem;
+	import org.openforis.collect.ui.component.detail.FormContainerFormItem;
 	import org.openforis.collect.ui.component.detail.SingleAttributeFormItem;
-	import org.openforis.collect.ui.component.detail.SingleEntityFormItem;
+	import org.openforis.collect.ui.component.detail.FormSectionFormItem;
+	import org.openforis.collect.ui.component.detail.TabbedFormContainer;
 	import org.openforis.collect.ui.component.input.AutoCompleteInputField;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
 	import org.openforis.collect.ui.component.input.CodeInputField;
@@ -73,9 +78,6 @@ package org.openforis.collect.ui {
 	import spark.layouts.HorizontalLayout;
 	import spark.layouts.VerticalLayout;
 	import spark.layouts.supportClasses.LayoutBase;
-	import org.openforis.collect.metamodel.proxy.SurveyProxy;
-	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
-	import org.openforis.collect.metamodel.ui.proxy.FormSetProxy;
 	
 	/**
 	 * @author Mino Togna
@@ -187,16 +189,16 @@ package org.openforis.collect.ui {
 			var entityFormItem:EntityFormItem = null;
 			if(definition.multiple) {
 				if ( definition.layout == UIUtil.LAYOUT_FORM ) {
-					entityFormItem = new MultipleEntityFormItem();
+					entityFormItem = new FormContainerFormItem();
 				} else {
-					entityFormItem = new MultipleEntityAsTableFormItem();
-					MultipleEntityAsTableFormItem(entityFormItem).entitiesDirection = 
+					entityFormItem = new TableFormItem();
+					TableFormItem(entityFormItem).entitiesDirection = 
 						definition.direction == UIOptions$Direction.BY_COLUMNS ? 
-							MultipleEntityAsTableFormItem.DIRECTION_BY_COLUMNS:
-							MultipleEntityAsTableFormItem.DIRECTION_BY_ROWS;
+							TableFormItem.DIRECTION_BY_COLUMNS:
+							TableFormItem.DIRECTION_BY_ROWS;
 				}
 			} else {
-				entityFormItem = new SingleEntityFormItem();
+				entityFormItem = new FormSectionFormItem();
 			}
 			entityFormItem.entityDefinition = definition;
 			return entityFormItem;

@@ -50,6 +50,7 @@
 					} else if(data is TableProxy) {
 						
 					} else if(data is FormSectionProxy) {
+						formItem = new FormContainerFormItem();
 						formItem = CollectFormItem(UIBuilder.getEntityFormItem(EntityDefinitionProxy(data)));
 						addElement(formItem);
 						BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");
@@ -70,8 +71,8 @@
 				if(!isNaN(maxAvailableHeight)) {
 					for(var i:int = 0; i < numElements; i++) {
 						var el:IVisualElement = getElementAt(i);
-						if(el is MultipleEntityAsTableFormItem) {
-							MultipleEntityAsTableFormItem(el).maxHeight = maxAvailableHeight;
+						if(el is TableFormItem) {
+							TableFormItem(el).maxHeight = maxAvailableHeight;
 						}
 					}
 				}
@@ -85,8 +86,8 @@
 					}
 					for(var i:int = 0; i < numElements; i++) {
 						var el:IVisualElement = getElementAt(i);
-						if(el is MultipleEntityAsTableFormItem) {
-							MultipleEntityAsTableFormItem(el).maxWidth = maxAvailableWidth;
+						if(el is TableFormItem) {
+							TableFormItem(el).maxWidth = maxAvailableWidth;
 						}
 					}
 				}

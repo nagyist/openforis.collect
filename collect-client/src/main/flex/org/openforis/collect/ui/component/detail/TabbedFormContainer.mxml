@@ -14,6 +14,7 @@
 			
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 			import org.openforis.collect.metamodel.ui.proxy.FormContainerProxy;
+			import org.openforis.collect.metamodel.ui.proxy.FormProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.presenter.TabbedFormPresenter;
 			import org.openforis.collect.util.CollectionUtil;
@@ -25,7 +26,7 @@
 			private var _modelVersion:ModelVersionProxy;
 			private var _formContainer:FormContainerProxy;
 			private var _innerForms:IList;
-			private var _fieldsPerCurrentForm:IList;
+			private var _fields:IList;
 			private var _parentEntity:EntityProxy;
 			private var _entity:EntityProxy;
 			
@@ -88,17 +89,17 @@
 				_parentEntity = value;
 			}
 			
-			[Bindable(event="fieldsPerCurrentFormChange")]
-			public function get fieldsPerCurrentForm():IList {
-				return _fieldsPerCurrentForm;
+			[Bindable(event="fieldsChange")]
+			public function get fields():IList {
+				return _fields;
 			}
 			
-			public function set fieldsPerCurrentForm(value:IList):void {
-				_fieldsPerCurrentForm = value;
-				dispatchEvent(new Event("fieldsPerCurrentFormChange"));
+			public function set fields(value:IList):void {
+				_fields = value;
+				dispatchEvent(new Event("fieldsChange"));
 			}
 
-			[Bindable(event="definitionsPerCurrentTabChange")]
+			[Bindable(event="fieldsChange")]
 			public function get hasFieldsPerCurrentForm():Boolean {
 				return CollectionUtil.isNotEmpty(_fieldsPerCurrentForm);
 			}
@@ -131,8 +132,8 @@
 		<detail:MainFormSectionRenderer 
 			id="definitionsPerCurrentTabContainer"
 			modelVersion="{modelVersion}"
-			formContainer="{formContainer}"
-			fields="{fieldsPerCurrentForm}"
+			formSection="{formContainer is FormProxy ? FormProxy(formContainer).formSection: null}"
+			formSectionComponents="{fieldsPerCurrentForm}"
 			parentEntity="{parentEntity}"
 			width.default="100%"
 			height.default="100%"
@@ -159,7 +160,7 @@
 					<detail:TabbedFormContainer 
 						id="tabContentContainers"
 						modelVersion="{modelVersion}"
-						form="{form}"
+						formContainer="{formContainer}"
 						parentEntity="{parentEntity}"
 						label="{FormContainerProxy(innerFormsRP.currentItem).labelText}"
 						/>

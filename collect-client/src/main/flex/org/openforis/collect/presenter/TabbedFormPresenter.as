@@ -8,6 +8,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.ui.proxy.FormContainerProxy;
 	import org.openforis.collect.metamodel.ui.proxy.FormProxy;
 	import org.openforis.collect.ui.component.detail.TabbedFormContainer;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	
 	/**
 	 * 
@@ -41,8 +42,9 @@ package org.openforis.collect.presenter {
 		protected function buildView():void {
 			if ( _view.formContainer != null ) {
 				if ( _view.formContainer is FormProxy ) {
-					_view.fieldsPerCurrentForm = UIOptionsProxy.getFieldsPerForm(org.openforis.collect.Application.activeSurvey, 
-						_view.formContainer as FormProxy, _view.modelVersion);
+					var survey:SurveyProxy = org.openforis.collect.Application.activeSurvey;
+					var form:FormProxy = FormProxy(_view.formContainer);
+					_view.fields = UIOptionsProxy.getFieldsPerForm(survey, form, _view.modelVersion);
 				}
 			}
 		}

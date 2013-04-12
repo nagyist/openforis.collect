@@ -15,7 +15,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
-	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
+	import org.openforis.collect.ui.component.detail.FormContainerFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
@@ -32,11 +32,11 @@ package org.openforis.collect.presenter
 	 * @author S. Ricci
 	 *  
 	 */
-	public class MultipleEntityFormItemPresenter extends EntityFormItemPresenter {
+	public class FormContainerFormItemPresenter extends EntityFormItemPresenter {
 		
 		private var _keyTextChangeWatchers:Array;
 		
-		public function MultipleEntityFormItemPresenter(view:MultipleEntityFormItem) {
+		public function FormContainerFormItemPresenter(view:FormContainerFormItem) {
 			super(view);
 		}
 		
@@ -52,8 +52,8 @@ package org.openforis.collect.presenter
 			view.addSection.dropDownList.addEventListener(IndexChangeEvent.CHANGE, dropDownListChangeHandler);
 		}
 		
-		private function get view():MultipleEntityFormItem {
-			return MultipleEntityFormItem(_view);
+		private function get view():FormContainerFormItem {
+			return FormContainerFormItem(_view);
 		}
 		
 		protected function buttonFocusInHandler(event:FocusEvent):void {

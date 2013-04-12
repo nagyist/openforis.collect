@@ -16,7 +16,7 @@
 			import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 			import org.openforis.collect.metamodel.proxy.UITabProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
-			import org.openforis.collect.presenter.MultipleEntityFormItemPresenter;
+			import org.openforis.collect.presenter.FormContainerFormItemPresenter;
 			
 			private var _entities:IList;
 			private var _selectedEntity:EntityProxy;
@@ -34,7 +34,7 @@
 			}
 			
 			override protected function initPresenter():void {
-				presenter = new MultipleEntityFormItemPresenter(this);
+				presenter = new FormContainerFormItemPresenter(this);
 			}
 
 			[Bindable]

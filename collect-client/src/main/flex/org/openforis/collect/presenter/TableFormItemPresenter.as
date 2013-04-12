@@ -13,8 +13,8 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.remoting.service.UpdateRequest;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation;
 	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
-	import org.openforis.collect.ui.component.detail.MultipleEntityAsTableFormItem;
-	import org.openforis.collect.ui.component.detail.MultipleEntityFormItem;
+	import org.openforis.collect.ui.component.detail.TableFormItem;
+	import org.openforis.collect.ui.component.detail.FormContainerFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.CollectionUtil;
@@ -25,9 +25,9 @@ package org.openforis.collect.presenter
 	 * @author S. Ricci
 	 *  
 	 */
-	public class MultipleEntityAsTableFormItemPresenter extends EntityFormItemPresenter {
+	public class TableFormItemPresenter extends EntityFormItemPresenter {
 		
-		public function MultipleEntityAsTableFormItemPresenter(view:MultipleEntityAsTableFormItem) {
+		public function TableFormItemPresenter(view:TableFormItem) {
 			super(view);
 		}
 		
@@ -39,8 +39,8 @@ package org.openforis.collect.presenter
 			eventDispatcher.addEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
 		}
 		
-		private function get view():MultipleEntityAsTableFormItem {
-			return MultipleEntityAsTableFormItem(_view);
+		private function get view():TableFormItem {
+			return TableFormItem(_view);
 		}
 		
 		override protected function initValidationDisplayManager():void {
