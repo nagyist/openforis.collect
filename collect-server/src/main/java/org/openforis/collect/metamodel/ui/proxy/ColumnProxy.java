@@ -12,8 +12,8 @@ import org.openforis.collect.metamodel.ui.Column;
  */
 public class ColumnProxy extends TableHeadingComponentProxy<Column> {
 
-	public ColumnProxy(Column modelObject) {
-		super(modelObject);
+	public ColumnProxy(UIModelObjectProxy<?> parent, Column modelObject) {
+		super(parent, modelObject);
 	}
 
 	@ExternalizedProperty

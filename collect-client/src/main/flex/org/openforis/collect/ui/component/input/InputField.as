@@ -6,7 +6,7 @@ package org.openforis.collect.ui.component.input {
 	import mx.core.UIComponent;
 	import mx.events.FlexEvent;
 	
-	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.ui.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
@@ -32,7 +32,7 @@ package org.openforis.collect.ui.component.input {
 		public static const STATE_SAVE_COMPLETE:String = "saveComplete";
 		public static const STATE_ERROR_SAVING:String = "errorSaving";
 		
-		private var _attributeDefinition:AttributeDefinitionProxy;
+		private var _uiField:org.openforis.collect.metamodel.ui.proxy.FieldProxy;
 		private var _parentEntity:EntityProxy;
 		private var _attribute:AttributeProxy;
 		private var _fieldIndex:int = 0;
@@ -46,6 +46,7 @@ package org.openforis.collect.ui.component.input {
 		private var _changed:Boolean;
 		private var _editable:Boolean = false;
 		protected var _textInput:UIComponent;
+		public var attributeDefinition:Object;
 		
 		public function InputField() {
 			super();
@@ -85,9 +86,9 @@ package org.openforis.collect.ui.component.input {
 			return StringUtil.isBlank(text);
 		}
 		
-		public function getField():FieldProxy {
+		public function getField():org.openforis.collect.model.proxy.FieldProxy {
 			if(attribute != null) {
-				var f:FieldProxy = attribute.getField(fieldIndex);
+				var f:org.openforis.collect.model.proxy.FieldProxy = attribute.getField(fieldIndex);
 				return f;
 			} else {
 				return null;
@@ -150,6 +151,15 @@ package org.openforis.collect.ui.component.input {
 		}
 
 		[Bindable]
+		public function get uiField():org.openforis.collect.metamodel.ui.proxy.FieldProxy {
+			return _uiField;
+		}
+		
+		public function set uiField(value:org.openforis.collect.metamodel.ui.proxy.FieldProxy):void {
+			_uiField = value;
+		}
+		
+		[Bindable]
 		public function get attribute():AttributeProxy {
 			return _attribute;
 		}
@@ -158,15 +168,6 @@ package org.openforis.collect.ui.component.input {
 			this._attribute = value;
 		}
 		
-		[Bindable]
-		public function get attributeDefinition():AttributeDefinitionProxy {
-			return _attributeDefinition;
-		}
-
-		public function set attributeDefinition(value:AttributeDefinitionProxy):void {
-			_attributeDefinition = value;
-		}
-
 		[Bindable]
 		public function get parentEntity():EntityProxy {
 			return _parentEntity;

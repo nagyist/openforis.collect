@@ -15,6 +15,7 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
+	import org.openforis.collect.ui.component.detail.TableFormItem;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.idm.metamodel.validation.ValidationResultFlag;
 
@@ -67,31 +68,33 @@ package org.openforis.collect.ui.component.input {
 		
 		private function createMenuItems(step:CollectRecord$Step):Array {
 			var nodeDefinition:NodeDefinitionProxy = _formItem.nodeDefinition;
-			var parentEntity:EntityProxy = _formItem.parentEntity;
 			var items:Array = new Array();
-			if(parentEntity != null) {
-				var nodeName:String = nodeDefinition.name;
-				var count:int = parentEntity.getCount(nodeName);
-				var minCountValid:ValidationResultFlag = parentEntity.childrenMinCountValidationMap.get(nodeName);
-				if(count == 0 || minCountValid == ValidationResultFlag.ERROR) {
-					switch(step) {
-						/*case CollectRecord$Step.ENTRY:
-							items.push(SET_BLANK_ON_FORM);
-							break;*/
-						case CollectRecord$Step.CLEANSING:
-							items.push(APPROVE_MISSING);
-							break;
+			if ( nodeDefinition != null ) {
+				var parentEntity:EntityProxy = _formItem.parentEntity;
+				if(parentEntity != null) {
+					var nodeName:String = nodeDefinition.name;
+					var count:int = parentEntity.getCount(nodeName);
+					var minCountValid:ValidationResultFlag = parentEntity.childrenMinCountValidationMap.get(nodeName);
+					if(count == 0 || minCountValid == ValidationResultFlag.ERROR) {
+						switch(step) {
+							/*case CollectRecord$Step.ENTRY:
+								items.push(SET_BLANK_ON_FORM);
+								break;*/
+							case CollectRecord$Step.CLEANSING:
+								items.push(APPROVE_MISSING);
+								break;
+						}
 					}
-				}
-				if(step == CollectRecord$Step.ENTRY) {
-					if ( _formItem.nodeDefinition is AttributeDefinitionProxy && ! nodeDefinition.multiple ) {
-						var attribute:AttributeProxy = parentEntity.getSingleAttribute(nodeDefinition.name);
-						var hasErrors:Boolean = attribute != null && attribute.hasErrors() &&
-							! CollectionUtil.containsItemWith(attribute.validationResults.errors, "ruleName", "SpecifiedValidator");
-						if(hasErrors) {
-							var hasConfirmedError:Boolean = parentEntity.hasConfirmedError(nodeDefinition.name);
-							if(! hasConfirmedError) {
-								items.push(CONFIRM_ERROR);
+					if(step == CollectRecord$Step.ENTRY) {
+						if ( nodeDefinition is AttributeDefinitionProxy && ! nodeDefinition.multiple ) {
+							var attribute:AttributeProxy = parentEntity.getSingleAttribute(nodeDefinition.name);
+							var hasErrors:Boolean = attribute != null && attribute.hasErrors() &&
+								! CollectionUtil.containsItemWith(attribute.validationResults.errors, "ruleName", "SpecifiedValidator");
+							if(hasErrors) {
+								var hasConfirmedError:Boolean = parentEntity.hasConfirmedError(nodeDefinition.name);
+								if(! hasConfirmedError) {
+									items.push(CONFIRM_ERROR);
+								}
 							}
 						}
 					}

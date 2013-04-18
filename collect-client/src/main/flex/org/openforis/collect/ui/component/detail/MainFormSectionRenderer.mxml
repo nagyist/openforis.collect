@@ -28,10 +28,20 @@
 			public static const STATE_ENLARGED:String = "enlarged";
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
-				BindingUtils.bindSetter(formSectionComponentsSetter, this, "formSectionComponents");
+				BindingUtils.bindSetter(formSectionSetter, this, "formSection");
+				BindingUtils.bindSetter(modelVersionSetter, this, "modelVersion");
 			}
 			
-			protected function formSectionComponentsSetter(value:IList):void {
+			protected function modelVersionSetter(value:ModelVersionProxy):void {
+				updateChildren();
+			}
+			
+			protected function formSectionSetter(value:FormSectionProxy):void {
+				updateChildren();
+			}
+			
+			protected function updateChildren():void {
+				formSectionComponents = _formSection == null ? null: _formSection.getChildrenInVersion(_modelVersion);
 				updateCurrentState();
 			}
 			
@@ -66,6 +76,15 @@
 			}
 			
 			[Bindable]
+			public function get formSection():FormSectionProxy {
+				return _formSection;
+			}
+			
+			public function set formSection(value:FormSectionProxy):void {
+				_formSection = value;
+			}
+			
+			[Bindable]
 			public function get formSectionComponents():IList {
 				return _formSectionComponents;
 			}
@@ -91,7 +110,7 @@
 			public function set enlarged(value:Boolean):void {
 				_enlarged = value;
 			}
-			
+
 		]]>
 	</fx:Script>
  	
@@ -121,12 +140,12 @@
 				</s:layout>
 				<s:itemRenderer>
 					<fx:Component>
-						<detail:FormDataGroupItemRenderer
+						<detail:FormSectionItemRenderer
 							occupyEntirePage="{parentDocument.enlarged}"
 							width="{parentDocument.enlarged ? parentDocument.width: NaN}"
 							height="{parentDocument.enlarged ? parentDocument.height: NaN}"
 							modelVersion="{parentDocument.modelVersion}"
-							entity="{parentDocument.parentEntity}" />
+							parentEntity="{parentDocument.parentEntity}" />
 					</fx:Component>
 				</s:itemRenderer>
 			</s:DataGroup>

@@ -91,19 +91,19 @@ package org.openforis.collect.ui.component.input {
 		
 		private function createMenuItems(step:CollectRecord$Step):Array {
 			var items:Array = new Array();
-
+			var attrDefn:AttributeDefinitionProxy = _inputField.uiField.attributeDefinition;
 			switch(step) {
 				case CollectRecord$Step.ENTRY:
 					// REASON BLANK ITEMS
-					if( ! ( _inputField.attributeDefinition is FileAttributeDefinitionProxy) && 
+					if( ! ( attrDefn is FileAttributeDefinitionProxy) && 
 						( _inputField.isEmpty() || FieldProxy.isShortCutForReasonBlank(_inputField.text) )) {
 						items.push( SET_STAR, SET_DASH, SET_ILLEGIBLE );
 					}
 					// CONFIRM ERROR ITEM
 					if( ! _inputField.isEmpty()) {
-						var hasErrors:Boolean = _inputField.parentEntity.childContainsErrors(_inputField.attributeDefinition.name);
+						var hasErrors:Boolean = _inputField.parentEntity.childContainsErrors(attrDefn.name);
 						if(hasErrors) {
-							var hasConfirmedError:Boolean = _inputField.parentEntity.hasConfirmedError(_inputField.attributeDefinition.name);
+							var hasConfirmedError:Boolean = _inputField.parentEntity.hasConfirmedError(attrDefn.name);
 							if(! hasConfirmedError) {
 								items.push(CONFIRM_ERROR);
 							}
@@ -113,7 +113,7 @@ package org.openforis.collect.ui.component.input {
 				case CollectRecord$Step.CLEANSING:
 					if(_inputField.isEmpty() || FieldProxy.isShortCutForReasonBlank(_inputField.text)) {
 						items.push(APPROVE_MISSING);
-						if ( _inputField.attributeDefinition.defaultValueApplicable ) {
+						if ( attrDefn.defaultValueApplicable ) {
 							items.push(APPLY_DEFAULT_VALUE);
 						}
 					}
@@ -123,7 +123,7 @@ package org.openforis.collect.ui.component.input {
 			items.push(EDIT_REMARKS_MENU_ITEM);
 			
 			if(step != CollectRecord$Step.ANALYSIS) {
-				var def:AttributeDefinitionProxy = _inputField.attributeDefinition;
+				var def:AttributeDefinitionProxy = _inputField.uiField.attributeDefinition;
 				if(def.multiple && ! (def is CodeAttributeDefinitionProxy)) {
 					items.push(DELETE_ATTRIBUTE);
 				} else if(def.parentLayout == UIUtil.LAYOUT_TABLE) {
@@ -151,7 +151,7 @@ package org.openforis.collect.ui.component.input {
 		
 		public static function menuItemSelectHandler(event:ContextMenuEvent):void {
 			var inputField:InputField = event.contextMenuOwner as InputField;
-			var attrDefn:AttributeDefinitionProxy = inputField.attributeDefinition;
+			var attrDefn:AttributeDefinitionProxy = inputField.uiField.attributeDefinition;
 			var attribute:AttributeProxy = inputField.attribute;
 			var parentEntity:EntityProxy = inputField.parentEntity;
 			var parentEntityDefn:EntityDefinitionProxy = attrDefn.parent;
@@ -222,7 +222,7 @@ package org.openforis.collect.ui.component.input {
 		
 		private static function createNodeEvent(type:String, inputField:InputField):NodeEvent {
 			var event:NodeEvent = new NodeEvent(type);
-			var attrDefn:AttributeDefinitionProxy = inputField.attributeDefinition;
+			var attrDefn:AttributeDefinitionProxy = inputField.uiField.attributeDefinition;
 			if(attrDefn.multiple && inputField is CodeInputField) {
 				event.nodes = inputField.parentEntity.getChildren(attrDefn.name);
 			} else {

@@ -40,13 +40,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function buildView():void {
-			if ( _view.formContainer != null ) {
-				if ( _view.formContainer is FormProxy ) {
-					var survey:SurveyProxy = org.openforis.collect.Application.activeSurvey;
-					var form:FormProxy = FormProxy(_view.formContainer);
-					_view.fields = UIOptionsProxy.getFieldsPerForm(survey, form, _view.modelVersion);
-				}
-			}
+			_view.innerForms = _view.formContainer == null ? null: _view.formContainer.forms;
 		}
 	}
 }

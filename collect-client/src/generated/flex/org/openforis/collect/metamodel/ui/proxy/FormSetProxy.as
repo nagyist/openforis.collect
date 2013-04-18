@@ -6,9 +6,25 @@
  */
 
 package org.openforis.collect.metamodel.ui.proxy {
+	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.ui.proxy.FormSetProxy")]
     public class FormSetProxy extends FormSetProxyBase {
+		
+		/**
+		 * Traverse each child and pass its parent and itself  to the argument function
+		 * */
+		override public function traverse(funct:Function):void {
+			for each (var form:FormProxy in forms) {
+				funct(this, form);
+				form.traverse(funct);
+			}
+		}
+		
+		override public function get uiOptions():UIOptionsProxy {
+			return this.UIOptions;
+		}
+		
     }
 }

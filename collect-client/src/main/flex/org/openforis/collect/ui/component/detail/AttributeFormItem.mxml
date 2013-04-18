@@ -14,28 +14,30 @@
 			
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+			import org.openforis.collect.metamodel.ui.proxy.FieldProxy;
 			import org.openforis.collect.model.proxy.AttributeProxy;
 			import org.openforis.collect.presenter.AttributeFormItemPresenter;
 			
-			private var _attributeDefinition:AttributeDefinitionProxy;
+			private var _field:FieldProxy;
 			private var _attribute:AttributeProxy;
 			private var _attributes:IList;
+			public var uiField:Object;
 			
 			override protected function initPresenter():void {
 				presenter = new AttributeFormItemPresenter(this);
 			}
 			
 			[Bindable]
-			public function get attributeDefinition():AttributeDefinitionProxy {
-				return _attributeDefinition;
+			public function get field():FieldProxy {
+				return _field;
 			}
 			
-			public function set attributeDefinition(value:AttributeDefinitionProxy):void {
-				_attributeDefinition = value;
+			public function set field(value:FieldProxy):void {
+				_field = value;
 			}
 			
 			override public function get nodeDefinition():NodeDefinitionProxy {
-				return attributeDefinition;
+				return _field == null ? null: _field.attributeDefinition;
 			}
 			
 			[Bindable]

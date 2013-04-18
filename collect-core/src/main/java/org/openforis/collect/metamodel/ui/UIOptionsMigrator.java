@@ -118,6 +118,11 @@ public class UIOptionsMigrator {
 
 	protected Table createTable(FormSection parent, EntityDefinition entityDefn) {
 		Table table = parent.createTable();
+		table.setEntityId(entityDefn.getId());
+		UIOptions uiOptions = parent.getUIOptions();
+		table.setCountInSummaryList(uiOptions.getCountInSumamryListValue(entityDefn));
+		table.setDirection(uiOptions.getDirection(entityDefn));
+		table.setShowRowNumbers(uiOptions.getShowRowNumbersValue(entityDefn));
 		copyLabels(entityDefn, table);
 		List<NodeDefinition> childDefinitions = entityDefn.getChildDefinitions();
 		for (NodeDefinition childDefn : childDefinitions) {

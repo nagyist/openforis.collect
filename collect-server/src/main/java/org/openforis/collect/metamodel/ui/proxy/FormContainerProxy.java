@@ -15,13 +15,13 @@ import org.openforis.collect.metamodel.ui.FormContainer;
  */
 public abstract class FormContainerProxy<T extends FormContainer> extends UIModelObjectProxy<T> {
 
-	public FormContainerProxy(T modelObject) {
-		super(modelObject);
+	public FormContainerProxy(UIModelObjectProxy<?> parent, T modelObject) {
+		super(parent, modelObject);
 	}
 	
 	@ExternalizedProperty
 	public List<FormProxy> getForms() {
-		return FormProxy.fromList(modelObject.getForms());
+		return FormProxy.fromList(this, modelObject.getForms());
 	}
 
 	@ExternalizedProperty

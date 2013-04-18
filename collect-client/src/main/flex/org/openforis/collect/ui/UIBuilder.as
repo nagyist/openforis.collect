@@ -6,8 +6,8 @@ package org.openforis.collect.ui {
 	import mx.core.ClassFactory;
 	import mx.core.IFactory;
 	import mx.core.IVisualElement;
+	import mx.messaging.management.Attribute;
 	
-	import org.openforis.collect.Application;
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.BooleanAttributeDefinitionProxy;
@@ -29,26 +29,15 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
 	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
-	import org.openforis.collect.metamodel.ui.proxy.FormProxy;
+	import org.openforis.collect.metamodel.ui.proxy.FieldProxy;
 	import org.openforis.collect.metamodel.ui.proxy.FormSetProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.datagrid.CompleteColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryErrorsColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagroup.DataGridHeaderRenderer;
-	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
-	import org.openforis.collect.ui.component.detail.CodeAttributeFormItem;
-	import org.openforis.collect.ui.component.detail.CompositeAttributeFormItem;
-	import org.openforis.collect.ui.component.detail.EntityFormItem;
 	import org.openforis.collect.ui.component.detail.FormContainer;
-	import org.openforis.collect.ui.component.detail.MultipleAttributeDataGroupFormItem;
-	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
-	import org.openforis.collect.ui.component.detail.TableFormItem;
-	import org.openforis.collect.ui.component.detail.FormContainerFormItem;
-	import org.openforis.collect.ui.component.detail.SingleAttributeFormItem;
-	import org.openforis.collect.ui.component.detail.FormSectionFormItem;
-	import org.openforis.collect.ui.component.detail.TabbedFormContainer;
 	import org.openforis.collect.ui.component.input.AutoCompleteInputField;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
 	import org.openforis.collect.ui.component.input.CodeInputField;
@@ -163,45 +152,6 @@ package org.openforis.collect.ui {
 				null, true, new ClassFactory(CompleteColumnItemRenderer));
 			columns.addItem(column);
 			return columns;
-		}
-		
-		public static function getAttributeFormItem(def:AttributeDefinitionProxy):AttributeFormItem {
-			var parentLayout:String = def.parentLayout;
-			var formItem:AttributeFormItem = null;
-			if(def is CodeAttributeDefinitionProxy) {
-				formItem = new CodeAttributeFormItem();
-			} else if(def is CoordinateAttributeDefinitionProxy || def is TaxonAttributeDefinitionProxy) {
-				formItem = new CompositeAttributeFormItem();
-			} else if(def.multiple) {
-				if(parentLayout == UIUtil.LAYOUT_TABLE){
-					formItem = new MultipleAttributeDataGroupFormItem();
-				} else {
-					formItem = new MultipleAttributeFormItem();
-				}
-			} else {
-				formItem = new SingleAttributeFormItem();
-			}
-			formItem.attributeDefinition = def;
-			return formItem;
-		}
-		
-		public static function getEntityFormItem(definition:EntityDefinitionProxy):EntityFormItem {
-			var entityFormItem:EntityFormItem = null;
-			if(definition.multiple) {
-				if ( definition.layout == UIUtil.LAYOUT_FORM ) {
-					entityFormItem = new FormContainerFormItem();
-				} else {
-					entityFormItem = new TableFormItem();
-					TableFormItem(entityFormItem).entitiesDirection = 
-						definition.direction == UIOptions$Direction.BY_COLUMNS ? 
-							TableFormItem.DIRECTION_BY_COLUMNS:
-							TableFormItem.DIRECTION_BY_ROWS;
-				}
-			} else {
-				entityFormItem = new FormSectionFormItem();
-			}
-			entityFormItem.entityDefinition = definition;
-			return entityFormItem;
 		}
 		
 		public static function getInputFieldWidth(def:AttributeDefinitionProxy):Number {
@@ -363,7 +313,8 @@ package org.openforis.collect.ui {
 			return inputField;
 		}
 		
-		public static function getAttributeItemRenderer(def:AttributeDefinitionProxy):AttributeItemRenderer {
+		public static function createAttributeItemRenderer(field:FieldProxy):AttributeItemRenderer {
+			var def:AttributeDefinitionProxy = field.attributeDefinition;
 			var renderer:AttributeItemRenderer;
 			if(def is CoordinateAttributeDefinitionProxy) {
 				renderer = new CoordinateAttributeRenderer();
@@ -390,7 +341,7 @@ package org.openforis.collect.ui {
 					BindingUtils.bindProperty(inputField, "attributes", renderer, "attributes");
 				}
 			}
-			renderer.attributeDefinition = def;
+			renderer.field = field;
 			return renderer;
 		}
 		

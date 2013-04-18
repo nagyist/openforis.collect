@@ -97,8 +97,7 @@
 					 layout="{nodesDirection == DIRECTION_HORIZONTAL ? horizontalLayout: verticalLayout}">
 			<s:itemRenderer>
 				<fx:Component>
-					<detail:FormDataGroupItemRenderer
-						entity="{parentDocument.entity}"
+					<detail:FormSectionItemRenderer
 						modelVersion="{parentDocument.modelVersion}"
 						/>
 				</fx:Component>

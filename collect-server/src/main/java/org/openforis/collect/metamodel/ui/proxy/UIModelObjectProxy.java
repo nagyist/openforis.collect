@@ -14,9 +14,11 @@ import org.openforis.collect.metamodel.ui.UIModelObject;
 public class UIModelObjectProxy<T extends UIModelObject> implements Proxy {
 	
 	protected transient T modelObject;
+	private UIModelObjectProxy<?> parent;
 
-	public UIModelObjectProxy(T modelObject) {
+	public UIModelObjectProxy(UIModelObjectProxy<?> parent, T modelObject) {
 		super();
+		this.parent = parent;
 		this.modelObject = modelObject;
 	}
 
@@ -24,6 +26,10 @@ public class UIModelObjectProxy<T extends UIModelObject> implements Proxy {
 	public int getId() {
 		return modelObject.getId();
 	}
-	
+
+	public UIModelObjectProxy<?> getParent() {
+		return parent;
+	}
+
 	
 }

@@ -13,8 +13,8 @@
 			import mx.collections.IList;
 			import mx.events.FlexEvent;
 			
-			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+			import org.openforis.collect.metamodel.ui.proxy.FieldProxy;
 			import org.openforis.collect.model.proxy.AttributeProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.presenter.AttributePresenter;
@@ -28,7 +28,7 @@
 			
 
 			private var _direction:String;
-			private var _attributeDefinition:AttributeDefinitionProxy;
+			private var _field:FieldProxy;
 			private var _modelVersion:ModelVersionProxy;
 			private var _parentEntity:EntityProxy;
 			private var _attribute:AttributeProxy;
@@ -68,12 +68,12 @@
 			}
 			
 			[Bindable]
-			public function get attributeDefinition():AttributeDefinitionProxy {
-				return _attributeDefinition;
+			public function get field():FieldProxy {
+				return _field;
 			}
 			
-			public function set attributeDefinition(value:AttributeDefinitionProxy):void {
-				_attributeDefinition = value;
+			public function set field(value:FieldProxy):void {
+				_field = value;
 			}
 			
 			[Bindable]

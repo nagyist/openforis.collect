@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<detail:EntityFormItem 
+<detail:FormComponentFormItem 
 		xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" 
 		xmlns:mx="library://ns.adobe.com/flex/mx"
@@ -9,80 +9,63 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.IList;
 			import mx.events.FlexEvent;
 			
-			import org.openforis.collect.metamodel.ui.UIOptions$Direction;
-			import org.openforis.collect.util.UIUtil;
+			import org.openforis.collect.metamodel.ui.proxy.FormSectionProxy;
 			
-			private static const STATE_HORIZONTAL:String = "horizontal";
-			private static const STATE_VERTICAL:String = "vertical";
-			private static const STATE_VERTICAL_FORM_LAYOUT:String = "verticalFormLayout";
-
+			private var _formSection:FormSectionProxy;
+			private var _items:IList;
+			
 			override protected function creationCompleteHandler(event:FlexEvent):void {
 				super.creationCompleteHandler(event);
-				checkState();
 			}
 
-			protected function checkState(event:Event = null):void {
-				if(entityDefinition.parentLayout == UIUtil.LAYOUT_TABLE) {
-					if ( entityDefinition.direction == UIOptions$Direction.BY_COLUMNS ) {
-						currentState = STATE_VERTICAL;
-					} else {
-						currentState = STATE_HORIZONTAL;
-					}
-				} else {
-					currentState = STATE_VERTICAL_FORM_LAYOUT;
-				}
+			[Bindable]
+			public function get formSection():FormSectionProxy {
+				return _formSection;
+			}
+
+			public function set formSection(value:FormSectionProxy):void {
+				_formSection = value;
+			}
+
+			[Bindable]
+			public function get items():IList {
+				return _items;
+			}
+
+			public function set items(value:IList):void {
+				_items = value;
 			}
 			
 		]]>
 	</fx:Script>
 	
 	
-	<detail:states>
-		<s:State name="horizontal" />
-		<s:State name="vertical" />
-		<s:State name="verticalFormLayout" basedOn="vertical" />
-	</detail:states>
-	
 	<detail:layout>
 		<s:VerticalLayout />
 	</detail:layout>
 
-	<!--<s:BorderContainer id="border" 
-					   height="100%" 
-					   width="100%"
-					   minHeight="0"
-					   minWidth="0">
-	-->		
-	
-	<detail:FormItemLabel id="formItemLabel"
-		  				  nodeDefinition="{entityDefinition}" 
-						  includeIn="verticalFormLayout"
-						/>
+	<s:Label styleName="formSectionLabel"
+			 text="{formSection.labelText}" />
 
 	<s:DataGroup 
-		dataProvider="{nodeDefinitions}">
-		<s:layout.horizontal>
-			<s:HorizontalLayout gap="4" />
-		</s:layout.horizontal>
-		<s:layout.vertical>
-			<s:VerticalLayout gap="2" />
-		</s:layout.vertical>
-		<s:layout.verticalFormLayout>
+		dataProvider="{items}">
+		<s:layout>
 			<s:VerticalLayout gap="2" 
 							  paddingLeft="20" 
 							  />
-		</s:layout.verticalFormLayout>
+		</s:layout>
 		<s:itemRenderer>
 			<fx:Component>
-				<detail:FormDataGroupItemRenderer
+				<detail:FormSectionItemRenderer
 					modelVersion="{outerDocument.modelVersion}"
-					entity="{outerDocument.entity}"
+					parentEntity="{outerDocument.parentEntity}"
 					labelWidth="130"
 					/>
 			</fx:Component>
 		</s:itemRenderer>
 	</s:DataGroup>
 	
-</detail:EntityFormItem>
+</detail:FormComponentFormItem>

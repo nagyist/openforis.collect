@@ -16,17 +16,17 @@ import org.openforis.collect.metamodel.ui.Table;
  */
 public abstract class ComponentProxy<T extends Component> extends UIModelObjectProxy<T> {
 	
-	public ComponentProxy(T modelObject) {
-		super(modelObject);
+	public ComponentProxy(UIModelObjectProxy<?> parent, T modelObject) {
+		super(parent, modelObject);
 	}
 
-	public static List<ComponentProxy<?>> fromList(List<Component> components) {
+	public static List<ComponentProxy<?>> fromList(UIModelObjectProxy<?> parent, List<Component> components) {
 		ArrayList<ComponentProxy<?>> result = new ArrayList<ComponentProxy<?>>();
 		for (Component comp : components) {
 			if ( comp instanceof Table ) {
-				result.add(new TableProxy((Table) comp));
+				result.add(new TableProxy(parent, (Table) comp));
 			} else {
-				result.add(new FieldProxy((Field) comp));
+				result.add(new FieldProxy(parent, (Field) comp));
 			}
 		}
 		return result;

@@ -13,8 +13,8 @@ import org.openforis.collect.metamodel.ui.FormSection;
  */
 public class FieldProxy extends ComponentProxy<Field> implements FormSectionComponentProxy<FormSection> {
 
-	public FieldProxy(Field modelObject) {
-		super(modelObject);
+	public FieldProxy(UIModelObjectProxy<?> parent, Field modelObject) {
+		super(parent, modelObject);
 	}
 
 	@ExternalizedProperty

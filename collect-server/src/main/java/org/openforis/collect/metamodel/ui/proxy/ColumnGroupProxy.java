@@ -15,13 +15,13 @@ import org.openforis.idm.metamodel.LanguageSpecificText;
  */
 public class ColumnGroupProxy extends TableHeadingComponentProxy<ColumnGroup> {
 	
-	public ColumnGroupProxy(ColumnGroup modelObject) {
-		super(modelObject);
+	public ColumnGroupProxy(UIModelObjectProxy<?> parent, ColumnGroup modelObject) {
+		super(parent, modelObject);
 	}
 
 	@ExternalizedProperty
 	public List<TableHeadingComponentProxy<?>> getHeadingComponents() {
-		return TableHeadingComponentProxy.fromList(modelObject.getHeadingComponents());
+		return TableHeadingComponentProxy.fromList(this, modelObject.getHeadingComponents());
 	}
 
 	@ExternalizedProperty

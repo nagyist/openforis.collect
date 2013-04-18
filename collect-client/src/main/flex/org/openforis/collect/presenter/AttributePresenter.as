@@ -9,7 +9,10 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.remoting.service.UpdateResponse;
+	import org.openforis.collect.model.proxy.AttributeUpdateResponseProxy;
+	import org.openforis.collect.model.proxy.EntityUpdateResponseProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateResponseProxy;
+	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
 	import org.openforis.collect.ui.component.input.InputField;
@@ -49,7 +52,7 @@ package org.openforis.collect.presenter {
 			var validationStateDisplay:UIComponent = inputField != null ? inputField.validationStateDisplay: _view;
 			var validationToolTipTrigger:UIComponent = validationStateDisplay;
 			_validationDisplayManager = new ValidationDisplayManager(validationToolTipTrigger, validationStateDisplay);
-			var attrDefn:AttributeDefinitionProxy = _view.attributeDefinition;
+			var attrDefn:AttributeDefinitionProxy = _view.field.attributeDefinition;
 			_validationDisplayManager.showMinMaxCountErrors = ! attrDefn.multiple || attrDefn is CodeAttributeDefinitionProxy;
 			if(_view.attribute != null) {
 				updateValidationDisplayManager();
@@ -66,28 +69,31 @@ package org.openforis.collect.presenter {
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.parentEntity != null && _view.attribute != null || _view.attributes != null) {
-				var responses:IList = IList(event.result);
-				if ( nodeUpdated(responses) ) {
+				var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
+				if ( nodeUpdated(responseSet) ) {
 					updateView();
-				} else if ( parentEntityUpdated(responses) ) {
+				} else if ( parentEntityUpdated(responseSet) ) {
 					updateValidationDisplayManager();
 				}
 			}
 		}
 		
-		protected function nodeUpdated(responses:IList):Boolean {
-			for each (var response:UpdateResponse in responses) {
-				if ( _view.attribute != null && _view.attribute.id == response.nodeId ||
-					 _view.attributes != null && CollectionUtil.containsItemWith(_view.attributes, "id", response.nodeId) ) {
-					return true;
+		protected function nodeUpdated(responseSet:RecordUpdateResponseSetProxy):Boolean {
+			for each (var response:NodeUpdateResponseProxy in responseSet.responses) {
+				if ( response is AttributeUpdateResponseProxy) {
+					var attrResp:AttributeUpdateResponseProxy = AttributeUpdateResponseProxy(response);
+					if (_view.attribute != null && _view.attribute.id == attrResp.nodeId ||
+					 	_view.attributes != null && CollectionUtil.containsItemWith(_view.attributes, "id", attrResp.nodeId) ) {
+						return true;
+					}
 				}
 			}
 			return false;
 		}
 		
-		protected function parentEntityUpdated(responses:IList):Boolean {
-			for each (var response:UpdateResponse in responses) {
-				if ( response.nodeId == _view.parentEntity.id ) {
+		protected function parentEntityUpdated(responseSet:RecordUpdateResponseSetProxy):Boolean {
+			for each (var response:NodeUpdateResponseProxy in responseSet.responses) {
+				if ( response is EntityUpdateResponseProxy && EntityUpdateResponseProxy(response).nodeId == _view.parentEntity.id ) {
 					return true;
 				}
 			}
@@ -95,8 +101,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function fieldVisitedHandler(event:PropertyChangeEvent):void {
-			if(event.newValue == true && (_view.attribute != null || _view.attributeDefinition.multiple && _view.attributes != null)) {
-				var attributeName:String = _view.attributeDefinition.name;
+			if(event.newValue == true && (_view.attribute != null || _view.field.attributeDefinition.multiple && _view.attributes != null)) {
+				var attributeName:String = _view.field.attributeDefinition.name;
 				_view.parentEntity.showErrorsOnChild(attributeName);
 			}
 			updateValidationDisplayManager();
@@ -122,15 +128,16 @@ package org.openforis.collect.presenter {
 				if(_validationDisplayManager == null) {
 					initValidationDisplayManager();
 				}
-				var attributeName:String = _view.attributeDefinition.name;
+				var attributeDefn:AttributeDefinitionProxy = _view.field.attributeDefinition;
+				var attributeName:String = attributeDefn.name;
 				var visited:Boolean = _view.parentEntity.isErrorOnChildVisible(attributeName);
 				var active:Boolean = visited && !_updating && (_view.attribute != null || _view.attributes != null);
 				if(active) {
 					_validationDisplayManager.active = true;
 					if (_view.attribute != null ) {
-						_validationDisplayManager.displayAttributeValidation(_view.parentEntity, _view.attributeDefinition, _view.attribute);
+						_validationDisplayManager.displayAttributeValidation(_view.parentEntity, attributeDefn, _view.attribute);
 					} else {
-						_validationDisplayManager.displayAttributesValidation(_view.parentEntity, _view.attributeDefinition);
+						_validationDisplayManager.displayAttributesValidation(_view.parentEntity, attributeDefn);
 					}
 				} else {
 					_validationDisplayManager.active = false;

@@ -6,22 +6,30 @@
  */
 
 package org.openforis.collect.metamodel.ui.proxy {
+	import mx.collections.IList;
+	
 	import org.openforis.collect.Application;
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
+	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.ui.proxy.FormProxy")]
     public class FormProxy extends FormProxyBase {
 		
-		public function get labelText():String {
-			var langCode:String = Application.localeLanguageCode;
-			var defaultLanguage:Boolean = Application.activeSurvey.defaultLanguageCode == langCode;
-			var result:String = LanguageSpecificTextProxy.getLocalizedText(labels, langCode, defaultLanguage);
-			if ( result == null ) {
-				return String(id);
+		/**
+		 * Traverse each child and pass its parent and itself  to the argument function
+		 * */
+		override public function traverse(funct:Function):void {
+			for each (var formSection:FormSectionProxy in formSections) {
+				funct(this, formSection);
+				formSection.traverse(funct);
 			}
-			return result;
+			for each (var form:FormProxy in forms) {
+				funct(this, form);
+				form.traverse(funct);
+			}
 		}
 		
 		public function get formSection():FormSectionProxy {
@@ -30,6 +38,11 @@ package org.openforis.collect.metamodel.ui.proxy {
 			} else {
 				return FormSectionProxy(formSections.getItemAt(0));
 			}
+		}
+		
+		public function get entityDefinition():EntityDefinitionProxy {
+			//TODO
+			return null;
 		}
 		
     }

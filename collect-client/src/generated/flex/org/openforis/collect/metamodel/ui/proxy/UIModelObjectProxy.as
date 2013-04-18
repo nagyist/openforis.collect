@@ -6,11 +6,40 @@
  */
 
 package org.openforis.collect.metamodel.ui.proxy {
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
+	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 	
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.ui.proxy.UIModelObjectProxy")]
     public class UIModelObjectProxy extends UIModelObjectProxyBase {
+		
+		/**
+		 * Traverse each child and pass its parent and itself  to the argument function
+		 * */
+		public function traverse(funct:Function):void {
+		}
+		
+		public function get uiOptions():UIOptionsProxy {
+			var r:FormSetProxy = root;
+			return r.uiOptions;
+		}
+
+		public function get survey():SurveyProxy {
+			return uiOptions.survey;
+		}
+		
+		public function get root():FormSetProxy {
+			var currentNode:UIModelObjectProxy = this;
+			while ( currentNode.parent != null ) {
+				currentNode = currentNode.parent;
+			}
+			if ( currentNode is FormSetProxy ) {
+				return FormSetProxy(currentNode);
+			} else {
+				throw new Error("Wrong root type: FormSetProxyExpected");
+			}
+		}
 		
     }
 }

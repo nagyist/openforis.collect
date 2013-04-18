@@ -11,30 +11,31 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.binding.utils.BindingUtils;
+			import mx.collections.IList;
 			import mx.core.IVisualElement;
 			import mx.core.UIComponent;
 			import mx.events.FlexEvent;
 			
-			import org.openforis.collect.Application;
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
-			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.CoordinateAttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-			import org.openforis.collect.metamodel.proxy.SchemaProxy;
+			import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.ui.proxy.FieldProxy;
 			import org.openforis.collect.metamodel.ui.proxy.FormSectionProxy;
 			import org.openforis.collect.metamodel.ui.proxy.TableProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
-			import org.openforis.collect.ui.UIBuilder;
+			import org.openforis.collect.model.proxy.NodeProxy;
 			import org.openforis.collect.util.UIUtil;
 			
-			private var _entity:EntityProxy;
+			private var _parentEntity:EntityProxy;
 			private var _modelVersion:ModelVersionProxy;
 			private var _labelWidth:Number = 150;
 			private var _occupyEntirePage:Boolean = false;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
-				BindingUtils.bindSetter(updateMultipleEntitiesMaxHeight, this, "height");
-				BindingUtils.bindSetter(updateMultipleEntitiesMaxWidth, this, "width");
+				BindingUtils.bindSetter(updateTablesMaxHeight, this, "height");
+				BindingUtils.bindSetter(updateTablesMaxWidth, this, "width");
 			}
 			
 			override protected function createChildren():void {
@@ -42,19 +43,15 @@
 				if(data != null) {
 					var formItem:CollectFormItem;
 					if(data is FieldProxy) {
-						var schema:SchemaProxy = Application.activeSurvey.schema;
-						var attr:AttributeDefinitionProxy = AttributeDefinitionProxy(schema.getDefinitionById(FieldProxy(data).attributeId));
-						formItem = UIBuilder.getAttributeFormItem(attr);
-						formItem.labelWidth = labelWidth;
-						addElement(formItem);
+						formItem = createAttributeFormItem(FieldProxy(data));
 					} else if(data is TableProxy) {
-						
+						formItem = createTableFormItem(TableProxy(data));
 					} else if(data is FormSectionProxy) {
-						formItem = new FormContainerFormItem();
-						formItem = CollectFormItem(UIBuilder.getEntityFormItem(EntityDefinitionProxy(data)));
-						addElement(formItem);
-						BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");
+						formItem = createFormSectionFormItem(FormSectionProxy(data));
+					} else {
+						throw new Error("Unsupported child type: " + data.toString());
 					}
+					addElement(formItem);
 					BindingUtils.bindProperty(formItem, "parentEntity", this, "entity");
 					BindingUtils.bindProperty(formItem, "occupyEntirePage", this, "occupyEntirePage");
 				}
@@ -66,7 +63,7 @@
 				initialize();
 			}
 			
-			protected function updateMultipleEntitiesMaxHeight(value:Number):void {
+			protected function updateTablesMaxHeight(value:Number):void {
 				var maxAvailableHeight:Number = UIUtil.getMaxAvailableHeight(UIComponent(parentDocument));
 				if(!isNaN(maxAvailableHeight)) {
 					for(var i:int = 0; i < numElements; i++) {
@@ -78,7 +75,7 @@
 				}
 			}
 			
-			protected function updateMultipleEntitiesMaxWidth(value:Number):void {
+			protected function updateTablesMaxWidth(value:Number):void {
 				var maxAvailableWidth:Number = UIUtil.getMaxAvailableWidth(UIComponent(parentDocument));
 				if(!isNaN(maxAvailableWidth)) {
 					if ( ! occupyEntirePage ) {
@@ -93,13 +90,66 @@
 				}
 			}
 
-			[Bindable]
-			public function get entity():EntityProxy {
-				return _entity;
+			public function createAttributeFormItem(field:FieldProxy):AttributeFormItem {
+				var def:AttributeDefinitionProxy = field.attributeDefinition;
+				var parentLayout:String = def.parentLayout;
+				var formItem:AttributeFormItem = null;
+				if(def is CodeAttributeDefinitionProxy) {
+					formItem = new CodeAttributeFormItem();
+				} else if(def is CoordinateAttributeDefinitionProxy || def is TaxonAttributeDefinitionProxy) {
+					formItem = new CompositeAttributeFormItem();
+				} else if(def.multiple) {
+					if(parentLayout == UIUtil.LAYOUT_TABLE){
+						formItem = new MultipleAttributeDataGroupFormItem();
+					} else {
+						formItem = new MultipleAttributeFormItem();
+					}
+				} else {
+					formItem = new SingleAttributeFormItem();
+				}
+				formItem.field = field;
+				formItem.labelWidth = labelWidth;
+				return formItem;
 			}
 			
-			public function set entity(value:EntityProxy):void {
-				_entity = value;
+			private function createTableFormItem(param0:TableProxy):TableFormItem {
+				var result:TableFormItem = new TableFormItem();
+				result.table = TableProxy(data);
+				return result;
+			}
+			
+			private function createFormSectionFormItem(param0:FormSectionProxy):CollectFormItem {
+				var formItem:FormSectionFormItem = new FormSectionFormItem();
+				BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");
+				return formItem;
+			}
+			
+
+			[Bindable]
+			public function get parentEntity():EntityProxy {
+				return _parentEntity;
+			}
+			
+			public function set parentEntity(value:EntityProxy):void {
+				_parentEntity = value;
+				dispatchEvent(new Event("parentEntityChange"));
+			}
+			
+			[Bindable(event="parentEntityChange")]
+			public function get entity():EntityProxy {
+				if ( parentEntity == null ) {
+					return null;
+				} else {
+					var children:IList = parentEntity.getChildren();
+					if ( children.length == 1 ) {
+						var firstChild:NodeProxy = children.getItemAt(0) as NodeProxy;
+						if ( firstChild is EntityProxy && ! firstChild.definition.multiple ) {
+							//single entity
+							return EntityProxy(firstChild);
+						}
+					}
+					return parentEntity;
+				}
 			}
 			
 			[Bindable]
@@ -129,6 +179,7 @@
 				_occupyEntirePage = value;
 			}
 			
+
 		]]>
 	</fx:Script>
 

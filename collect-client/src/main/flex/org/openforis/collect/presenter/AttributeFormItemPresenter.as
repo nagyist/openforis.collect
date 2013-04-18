@@ -7,6 +7,7 @@ package org.openforis.collect.presenter
 	import mx.collections.IList;
 	
 	import org.openforis.collect.event.ApplicationEvent;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
@@ -56,7 +57,7 @@ package org.openforis.collect.presenter
 		
 		override protected function updateRelevanceDisplayManager():void {
 			super.updateRelevanceDisplayManager();
-			relevanceDisplayManager.displayNodeRelevance(view.parentEntity, view.attributeDefinition);
+			relevanceDisplayManager.displayNodeRelevance(view.parentEntity, view.uiField.attributeDefinition);
 		}
 		
 		override protected function updateValidationDisplayManager():void {
@@ -68,9 +69,10 @@ package org.openforis.collect.presenter
 		 * get the attribute (or attributes) from the parentEntity
 		 */
 		protected function assignAttribute():void {
-			if (view.parentEntity != null && view.attributeDefinition != null) {
-				var name:String = view.attributeDefinition.name;
-				if (view.attributeDefinition.multiple) {
+			if (view.parentEntity != null ) {
+				var attrDefn:AttributeDefinitionProxy = view.uiField.attributeDefinition;
+				var name:String = attrDefn.name;
+				if (attrDefn.multiple) {
 					var attributes:IList = view.parentEntity.getChildren(name);
 					view.attributes = attributes;
 				} else {

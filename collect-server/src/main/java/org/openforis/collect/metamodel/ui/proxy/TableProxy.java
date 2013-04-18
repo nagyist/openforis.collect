@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.metamodel.ui.Table;
+import org.openforis.collect.metamodel.ui.UIOptions.Direction;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 
 /**
@@ -13,13 +14,13 @@ import org.openforis.idm.metamodel.LanguageSpecificText;
  */
 public class TableProxy extends ComponentProxy<Table> implements FormSectionComponentProxy<Table> {
 
-	public TableProxy(Table table) {
-		super(table);
+	public TableProxy(UIModelObjectProxy<?> parent, Table table) {
+		super(parent, table);
 	}
 
 	@ExternalizedProperty
 	public List<TableHeadingComponentProxy<?>> getHeadingComponents() {
-		return TableHeadingComponentProxy.fromList(modelObject.getHeadingComponents());
+		return TableHeadingComponentProxy.fromList(this, modelObject.getHeadingComponents());
 	}
 
 	@ExternalizedProperty
@@ -40,6 +41,11 @@ public class TableProxy extends ComponentProxy<Table> implements FormSectionComp
 	@ExternalizedProperty
 	public boolean isCountInSummaryList() {
 		return modelObject.isCountInSummaryList();
+	}
+	
+	@ExternalizedProperty
+	public Direction getDirection() {
+		return modelObject.getDirection();
 	}
 	
 }

@@ -12,18 +12,24 @@ import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.metamodel.ui.proxy.FormSetProxy;
 
 /**
- * @author riccist
+ * @author S. Ricci
  *
  */
 public class UIOptionsProxy implements Proxy {
 	
 	private transient UIOptions uiOptions;
+	private SurveyProxy survey;
 
-	public UIOptionsProxy(UIOptions uiOptions) {
+	public UIOptionsProxy(SurveyProxy survey, UIOptions uiOptions) {
 		super();
 		this.uiOptions = uiOptions;
+		this.survey = survey;
 	}
 
+	public SurveyProxy getSurvey() {
+		return survey;
+	}
+	
 	@ExternalizedProperty
 	public List<UITabSetProxy> getTabSets() {
 		List<UITabSet> tabSets = uiOptions.getTabSets();
@@ -32,8 +38,7 @@ public class UIOptionsProxy implements Proxy {
 	
 	@ExternalizedProperty
 	public List<FormSetProxy> getFormSets() {
-		return FormSetProxy.fromList(uiOptions.getFormSets());
+		return FormSetProxy.fromList(this, uiOptions.getFormSets());
 	}
 	
-
 }

@@ -16,10 +16,6 @@ package org.openforis.collect.model.proxy {
 	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
-	import org.openforis.collect.remoting.service.UpdateRequest;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation;
-	import org.openforis.collect.remoting.service.UpdateRequestOperation$Method;
-	import org.openforis.collect.remoting.service.UpdateResponse;
 	import org.openforis.collect.util.ArrayUtil;
 
     [Bindable]
@@ -67,126 +63,130 @@ package org.openforis.collect.model.proxy {
 			return _nodesMap[id];
 		}
 		
-		public function update(responses:IList, req:UpdateRequest):void {
-			updateNodes(req);
-			
-			for each (var response:UpdateResponse in responses)	{
+		public function update(responseSet:RecordUpdateResponseSetProxy, requestSet:RecordUpdateRequestSetProxy):void {
+			updateNodes(requestSet);
+			this.skipped = responseSet.skipped;
+			this.missing = responseSet.missing;
+			this.missingErrors = responseSet.missingErrors;
+			this.missingWarnings = responseSet.missingWarnings;
+			this.warnings = responseSet.warnings;
+			for each (var response:NodeUpdateResponseProxy in responseSet.responses)	{
 				processResponse(response);
 			}
-			
-			if ( responses != null && responses.length > 0 ) {
-				var firstResp:UpdateResponse = UpdateResponse(responses.getItemAt(0));
-				this.errors = firstResp.errors;
-				this.skipped = firstResp.skipped;
-				this.missing = firstResp.missing;
-				this.missingErrors = firstResp.missingErrors;
-				this.missingWarnings = firstResp.missingWarnings;
-				this.warnings = firstResp.warnings;
-			}
-			
 			_updated = true;
-			
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = responses;
+			appEvt.result = responseSet;
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
 		}
 		
-		private function updateNodes(req:UpdateRequest):void {
-			var reqOperations:ListCollectionView = req.operations;
+		private function updateNodes(reqSet:RecordUpdateRequestSetProxy):void {
+			var requests:ListCollectionView = reqSet.requests;
 			var attr:AttributeProxy;
 			var field:FieldProxy;
-			for each (var reqOp:UpdateRequestOperation in reqOperations) {
-				switch(reqOp.method) {
-					case UpdateRequestOperation$Method.UPDATE_REMARKS:
-						attr = getNode(reqOp.nodeId) as AttributeProxy;
-						field = attr.getField(reqOp.fieldIndex);
-						field.remarks = reqOp.remarks;
-						break;
-					case UpdateRequestOperation$Method.UPDATE:
-						attr = getNode(reqOp.nodeId) as AttributeProxy;
-						if(reqOp.fieldIndex >= 0) {
-							field = attr.getField(reqOp.fieldIndex);
-							field.symbol = reqOp.symbol;
-							field.remarks = reqOp.remarks;
-						} else {
-							for each (field in attr.fields) {
-								field.symbol = reqOp.symbol;
-								field.remarks = reqOp.remarks;
-							}
-						}
-						break;
-					case UpdateRequestOperation$Method.APPLY_DEFAULT_VALUE:
-						//nullify the symbol (if any)
-						attr = getNode(reqOp.nodeId) as AttributeProxy;
-						for each (field in attr.fields) {
-							field.symbol = null;
-						}
-						break;
-					case UpdateRequestOperation$Method.CONFIRM_ERROR:
-						attr = getNode(reqOp.nodeId) as AttributeProxy;
-						if ( attr != null ) {
-							attr.errorConfirmed = true;
-						}
-						break;
+			for each (var reqOp:RecordUpdateRequestProxy in requests) {
+				if ( reqOp is RemarksUpdateRequestProxy ) {
+					var updRemarksReq:RemarksUpdateRequestProxy = RemarksUpdateRequestProxy(reqOp);
+					attr = getNode(updRemarksReq.nodeId) as AttributeProxy;
+					field = attr.getField(updRemarksReq.fieldIndex);
+					field.remarks = updRemarksReq.remarks;
+				} else if ( reqOp is FieldUpdateRequestProxy ) {
+					var updFieldReq:FieldUpdateRequestProxy = FieldUpdateRequestProxy(reqOp);
+					attr = getNode(updFieldReq.nodeId) as AttributeProxy;
+					field = attr.getField(updFieldReq.fieldIndex);
+					field.symbol = updFieldReq.symbol;
+					field.remarks = updFieldReq.remarks;
+				} else if ( reqOp is AttributeUpdateRequestProxy ) {
+					var updAttrReq:AttributeUpdateRequestProxy = AttributeUpdateRequestProxy(reqOp);
+					attr = getNode(updAttrReq.nodeId) as AttributeProxy;
+					for each (field in attr.fields) {
+						field.symbol = updAttrReq.symbol;
+						field.remarks = updAttrReq.remarks;
+					}
+				} else if ( reqOp is DefaultValueApplyRequestProxy ) {
+					attr = getNode(DefaultValueApplyRequestProxy(reqOp).nodeId) as AttributeProxy;
+					for each (field in attr.fields) {
+						field.symbol = null;
+					}
+				} else if ( reqOp is ConfirmErrorRequestProxy ) {
+					attr = getNode(ConfirmErrorRequestProxy(reqOp).nodeId) as AttributeProxy;
+					if ( attr != null ) {
+						attr.errorConfirmed = true;
+					}
 				}
 			}
 		}
 		
-		private function processResponse(response:UpdateResponse):void {
-			var node:NodeProxy, oldNode:NodeProxy, parent:EntityProxy;
-			if(response.createdNode != null) {
-				node = response.createdNode;
-				associateDefinition(node);
-				if ( node is EntityProxy ) {
-					EntityProxy(node).traverse(associateDefinition);
-				}
-				parent = getNode(node.parentId) as EntityProxy;
-				parent.addChild(node);
-				node.parent = parent;
-				initNode(node);
-				if(node is EntityProxy) {
-					EntityProxy(node).traverse(initNode);
-				}
+		private function processResponse(response:NodeUpdateResponseProxy):void {
+			if ( response is NodeAddResponseProxy ) {
+				processNodeAddResponse(NodeAddResponseProxy(response));
 			}
-			if(response.deletedNodeId > 0) {
-				node = getNode(response.deletedNodeId);
-				if(node != null) {
-					parent = getNode(node.parentId) as EntityProxy;
+			if ( response is NodeDeleteResponseProxy ) {
+				processNodeDeleteResponse(NodeDeleteResponseProxy(response));
+			} else if ( response is AttributeUpdateResponseProxy ) {
+				processAttributeUpdateResponse(AttributeUpdateResponseProxy(response));
+			} else if ( response is EntityUpdateResponseProxy ) {
+				processEntityUpdateResponse(EntityUpdateResponseProxy(response));
+			}
+		}
+		
+		protected function processNodeAddResponse(response:NodeAddResponseProxy):void {
+			var node:NodeProxy = NodeAddResponseProxy(response).createdNode;
+			associateDefinition(node);
+			if ( node is EntityProxy ) {
+				EntityProxy(node).traverse(associateDefinition);
+			}
+			var parent:EntityProxy = getNode(node.parentId) as EntityProxy;
+			parent.addChild(node);
+			node.parent = parent;
+			initNode(node);
+			if(node is EntityProxy) {
+				EntityProxy(node).traverse(initNode);
+			}
+		}
+		
+		protected function processNodeDeleteResponse(response:NodeDeleteResponseProxy):void {
+			if ( response.deletedNodeId > 0 ) {
+				var node:NodeProxy = getNode(response.deletedNodeId);
+				if (node != null ) {
+					var parent:EntityProxy = getNode(node.parentId) as EntityProxy;
 					parent.removeChild(node);
 					_nodesMap[node.id] = null;
 				}
-			} else {
-				node = getNode(response.nodeId);
-				if(node is AttributeProxy) {
-					var a:AttributeProxy = AttributeProxy(node);
-					if(response.validationResults != null) {
-						a.validationResults = response.validationResults;
-					}
-					if(response.updatedFieldValues != null) {
-						var fieldIdxs:ArrayCollection = response.updatedFieldValues.keySet;
-						for each (var i:int in fieldIdxs) {
-							var f:FieldProxy = a.getField(i);
-							f.value = response.updatedFieldValues.get(i);
-						}
-						a.errorConfirmed = false;
-						parent = getNode(node.parentId) as EntityProxy;
-						parent.updateKeyText();
-					}
-				} else if(node is EntityProxy) {
-					var e:EntityProxy = EntityProxy(node);
-					if(response.maxCountValidation != null && response.maxCountValidation.length > 0) {
-						e.updateChildrenMaxCountValiditationMap(response.maxCountValidation);
-					}
-					if(response.minCountValidation != null && response.minCountValidation.length > 0) {
-						e.updateChildrenMinCountValiditationMap(response.minCountValidation);
-					}
-					if(response.relevant != null && response.relevant.length > 0) {
-						e.updateChildrenRelevanceMap(response.relevant);
-					}
-					if(response.required != null && response.required.length > 0) {
-						e.updateChildrenRequiredMap(response.required);
-					}
+			}
+		}
+		
+		protected function processAttributeUpdateResponse(response:AttributeUpdateResponseProxy):void {
+			var node:NodeProxy = getNode(response.nodeId);
+			var a:AttributeProxy = AttributeProxy(node);
+			if ( response.validationResults != null ) {
+				a.validationResults = response.validationResults;
+			}
+			if ( response.updatedFieldValues != null ) {
+				var fieldIdxs:ArrayCollection = response.updatedFieldValues.keySet;
+				for each (var i:int in fieldIdxs) {
+					var f:FieldProxy = a.getField(i);
+					f.value = response.updatedFieldValues.get(i);
 				}
+				a.errorConfirmed = false;
+				var parent:EntityProxy = getNode(node.parentId) as EntityProxy;
+				parent.updateKeyText();
+			}
+		}
+		
+		protected function processEntityUpdateResponse(response:EntityUpdateResponseProxy):void {
+			var node:NodeProxy = getNode(response.nodeId);
+			var e:EntityProxy = node as EntityProxy;
+			if ( response.maxCountValidation != null && response.maxCountValidation.length > 0 ) {
+				e.updateChildrenMaxCountValiditationMap(response.maxCountValidation);
+			}
+			if ( response.minCountValidation != null && response.minCountValidation.length > 0 ) {
+				e.updateChildrenMinCountValiditationMap(response.minCountValidation);
+			}
+			if ( response.relevant != null && response.relevant.length > 0 ) {
+				e.updateChildrenRelevanceMap(response.relevant);
+			}
+			if ( response.required != null && response.required.length > 0 ) {
+				e.updateChildrenRequiredMap(response.required);
 			}
 		}
 		

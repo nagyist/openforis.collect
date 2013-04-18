@@ -9,33 +9,56 @@ package org.openforis.collect.metamodel.ui.proxy {
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	
+	import org.openforis.collect.Application;
+	import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	import org.openforis.collect.metamodel.proxy.SurveyProxy;
-	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 	import org.openforis.collect.util.CollectionUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.ui.proxy.FormSectionProxy")]
     public class FormSectionProxy extends FormSectionProxyBase {
 		
-		public function getChildrenInVersion(survey:SurveyProxy, version:ModelVersionProxy):IList {
+		public function get labelText():String {
+			var langCode:String = Application.localeLanguageCode;
+			var defaultLanguage:Boolean = survey.defaultLanguageCode == langCode;
+			var result:String = LanguageSpecificTextProxy.getLocalizedText(this.labels, langCode, defaultLanguage);
+			if ( result == null ) {
+				return String(id);
+			} else {
+				return result;
+			}
+		}
+		
+		/**
+		 * Traverse each child and pass its parent and itself  to the argument function
+		 * */
+		override public function traverse(funct:Function):void {
+			for each (var child:UIModelObjectProxy in children) {
+				funct(this, child);
+				child.traverse(funct);
+			}
+		}
+
+		public function getChildrenInVersion(version:ModelVersionProxy):IList {
 			var result:IList = new ArrayList();
+			var survey:SurveyProxy = uiOptions.survey;
+			var schema:SchemaProxy = survey.schema;
 			for each ( var child:FormSectionComponentProxy in children ) {
 				if ( child is FieldProxy ) {
-					var attributeId:int = (child as FieldProxy).attributeId;
-					var nodeDefn:NodeDefinitionProxy = survey.schema.getDefinitionById(attributeId);
-					if ( version.isApplicable(nodeDefn) ) {
+					var attrDefn:NodeDefinitionProxy = (child as FieldProxy).attributeDefinition;
+					if ( version.isApplicable(attrDefn) ) {
 						result.addItem(child);
 					}
 				} else if ( child is TableProxy ) {
-					var entityId:int = (child as TableProxy).entityId;
-					var nodeDefn:NodeDefinitionProxy = survey.schema.getDefinitionById(entityId);
-					if ( version.isApplicable(nodeDefn) ) {
+					var entityDefn:NodeDefinitionProxy = (child as TableProxy).entityDefinition;
+					if ( version.isApplicable(entityDefn) ) {
 						result.addItem(child);
 					}
 				} else if ( child is FormSectionProxy ) {
-					var childrenInVersion:IList = (child as FormSectionProxy).getChildrenInVersion(survey, version);
+					var childrenInVersion:IList = (child as FormSectionProxy).getChildrenInVersion(version);
 					if ( CollectionUtil.isNotEmpty(childrenInVersion) ) {
 						result.addItem(child);
 					}

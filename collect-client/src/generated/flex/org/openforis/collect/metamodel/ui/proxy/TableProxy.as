@@ -6,9 +6,28 @@
  */
 
 package org.openforis.collect.metamodel.ui.proxy {
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.ui.proxy.TableProxy")]
     public class TableProxy extends TableProxyBase {
+		
+		/**
+		 * Traverse each child and pass its parent and itself  to the argument function
+		 * */
+		override public function traverse(funct:Function):void {
+			for each (var child:TableHeadingComponentProxy in headingComponents) {
+				funct(this, child);
+				child.traverse(funct);
+			}
+		}
+		
+		public function get entityDefinition():EntityDefinitionProxy {
+			var schema:SchemaProxy = survey.schema;
+			var defn:NodeDefinitionProxy = schema.getDefinitionById(entityId);
+			return defn as EntityDefinitionProxy;
+		}
     }
 }

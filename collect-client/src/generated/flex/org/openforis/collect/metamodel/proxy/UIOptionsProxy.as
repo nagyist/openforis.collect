@@ -11,8 +11,8 @@ package org.openforis.collect.metamodel.proxy {
 	import mx.collections.ListCollectionView;
 	
 	import org.openforis.collect.metamodel.ui.proxy.FormProxy;
-	import org.openforis.collect.metamodel.ui.proxy.FormSectionProxy;
 	import org.openforis.collect.metamodel.ui.proxy.FormSetProxy;
+	import org.openforis.collect.metamodel.ui.proxy.UIModelObjectProxy;
 	import org.openforis.collect.util.CollectionUtil;
 
 	/**
@@ -23,7 +23,7 @@ package org.openforis.collect.metamodel.proxy {
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.proxy.UIOptionsProxy")]
     public class UIOptionsProxy extends UIOptionsProxyBase {
-		
+
 		public function getFormSet(rootEntityId:int):FormSetProxy {
 			for each (var formSet:FormSetProxy in formSets) {
 				if ( formSet.entityId == rootEntityId) {
@@ -33,13 +33,6 @@ package org.openforis.collect.metamodel.proxy {
 			return null;
 		}
 
-		public static function getFieldsPerForm(survey:SurveyProxy, form:FormProxy, version:ModelVersionProxy):IList {
-			var result:IList = new ArrayCollection();
-			var formSection:FormSectionProxy = form.formSection;
-			var result:IList = formSection.getChildrenInVersion(survey, version);
-			return result;
-		}
-		
 		public function getTabSet(name:String):UITabSetProxy {
 			for each (var tabSet:UITabSetProxy in tabSets) {
 				if(tabSet.name == name) {
@@ -137,5 +130,6 @@ package org.openforis.collect.metamodel.proxy {
 			}
 			return result;
 		}
+
 	}
 }

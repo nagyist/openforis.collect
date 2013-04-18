@@ -5,7 +5,7 @@
 		 width="100%" height="100%" 
 		 xmlns:detail="org.openforis.collect.ui.component.detail.*" xmlns:layout="org.openforis.collect.ui.layout.*"
 		 creationComplete="creationCompleteHandler(event)"
-		 currentState="{hasDefinitionsPerCurrentTab &amp;&amp; hasInnerUITabs ? STATE_COMPLETE: hasInnerUITabs ? STATE_INNER_TABS: STATE_DEFAULT}">
+		 currentState="{hasItemsPerCurrentForm &amp;&amp; hasInnerForms ? STATE_COMPLETE: hasInnerForms ? STATE_INNER_TABS: STATE_DEFAULT}">
 	
 	<fx:Script>
 		<![CDATA[
@@ -26,9 +26,7 @@
 			private var _modelVersion:ModelVersionProxy;
 			private var _formContainer:FormContainerProxy;
 			private var _innerForms:IList;
-			private var _fields:IList;
 			private var _parentEntity:EntityProxy;
-			private var _entity:EntityProxy;
 			
 			private var _presenter:TabbedFormPresenter;
 			
@@ -48,8 +46,8 @@
 			}
 			
 			public function resetScrollbars():void {
-				if ( definitionsPerCurrentTabContainer != null ) {
-					definitionsPerCurrentTabContainer.resetScrollBars();
+				if ( mainFormSectionRenderer != null ) {
+					mainFormSectionRenderer.resetScrollBars();
 				}
 				if ( viewStack != null ) {
 					var forms:Array = viewStack.getChildren();
@@ -89,33 +87,24 @@
 				_parentEntity = value;
 			}
 			
-			[Bindable(event="fieldsChange")]
-			public function get fields():IList {
-				return _fields;
-			}
-			
-			public function set fields(value:IList):void {
-				_fields = value;
-				dispatchEvent(new Event("fieldsChange"));
-			}
-
-			[Bindable(event="fieldsChange")]
-			public function get hasFieldsPerCurrentForm():Boolean {
-				return CollectionUtil.isNotEmpty(_fieldsPerCurrentForm);
-			}
-			
-			[Bindable(event="formChange")]
+			[Bindable("innerFormsChange")]
 			public function get innerForms():IList {
-				if ( _formContainer == null ) {
-					return null;
-				} else {
-					return _formContainer.forms;
-				}
+				return _innerForms;
 			}
 			
-			[Bindable(event="formChange")]
+			public function set innerForms(value:IList):void {
+				_innerForms = value;
+				dispatchEvent(new Event("innerFormsChange"));
+			}
+			
+			[Bindable(event="innerFormsChange")]
 			public function get hasInnerForms():Boolean {
 				return CollectionUtil.isNotEmpty(innerForms);
+			}
+			
+			[Bindable(event="formContainerChange")]
+			public function get hasItemsPerCurrentForm():Boolean {
+				return formContainer != null && formContainer is FormProxy && CollectionUtil.isNotEmpty(FormProxy(formContainer).formSection.children);
 			}
 			
 		]]>
@@ -130,10 +119,9 @@
 	<s:VGroup width="100%" height="100%" 
 			  gap="0">
 		<detail:MainFormSectionRenderer 
-			id="definitionsPerCurrentTabContainer"
+			id="mainFormSectionRenderer"
 			modelVersion="{modelVersion}"
 			formSection="{formContainer is FormProxy ? FormProxy(formContainer).formSection: null}"
-			formSectionComponents="{fieldsPerCurrentForm}"
 			parentEntity="{parentEntity}"
 			width.default="100%"
 			height.default="100%"
@@ -160,7 +148,7 @@
 					<detail:TabbedFormContainer 
 						id="tabContentContainers"
 						modelVersion="{modelVersion}"
-						formContainer="{formContainer}"
+						formContainer="{FormContainerProxy(innerFormsRP.currentItem)}"
 						parentEntity="{parentEntity}"
 						label="{FormContainerProxy(innerFormsRP.currentItem).labelText}"
 						/>
