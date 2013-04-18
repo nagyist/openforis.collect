@@ -1,6 +1,9 @@
 package org.openforis.collect.presenter {
 	
 	import flash.events.MouseEvent;
+	import flash.net.URLRequest;
+	import flash.net.URLRequestMethod;
+	import flash.net.navigateToURL;
 	
 	import mx.collections.IList;
 	import mx.managers.PopUpManager;
@@ -20,6 +23,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.component.speciesImport.TaxonomyEditPopUp;
 	import org.openforis.collect.ui.view.SpeciesImportView;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.ApplicationConstants;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.PopUpUtil;
 	import org.openforis.collect.util.StringUtil;
@@ -50,6 +54,7 @@ package org.openforis.collect.presenter {
 			_speciesImportClient = ClientFactory.speciesImportClient;
 			_speciesClient = ClientFactory.speciesClient;
 			super(view, new MessageKeys(), UPLOAD_FILE_NAME_PREFIX);
+			view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO);
 		}
 		
 		private function get view():SpeciesImportView {
@@ -71,6 +76,30 @@ package org.openforis.collect.presenter {
 		override protected function loadInitialData():void {
 			updateStatus();
 			loadTaxonomies();
+		}
+		
+		override protected function browseFileToImport():void {
+			super.browseFileToImport();
+		}
+		
+		override protected function exportButtonClickHandler(event:MouseEvent):void {
+			var request:URLRequest = getExportUrlRequest();
+			if(request != null) {
+				navigateToURL(request, "_new");
+			}
+		}
+		
+		protected function getExportUrlRequest():URLRequest {
+			if ( _selectedTaxonomy == null ) {
+				AlertUtil.showError(messageKeys.SELECT_TAXONOMY);
+				return null;
+			} else {
+				var selectedTaxonomyId:Number = _selectedTaxonomy.id;
+				var url:String = ApplicationConstants.getSpeciesExportUrl(selectedTaxonomyId);
+				var request:URLRequest = new URLRequest(url);
+				request.method = URLRequestMethod.GET;
+				return request;
+			}
 		}
 		
 		protected function loadTaxonomies():void {
@@ -346,5 +375,9 @@ class MessageKeys extends ReferenceDataImportMessageKeys {
 	
 	public function get SAVE_SURVEY_BEFORE_EDIT():String {
 		return "speciesImport.saveSurveyBeforeEdit";
+	}
+	
+	public function get IMPORT_FILE_FORMAT_INFO():String {
+		return "speciesImport.importFileFormatInfo";
 	}
 }

@@ -261,12 +261,13 @@ public class SurveyManager {
 	@Transactional
 	public void publish(CollectSurvey survey) throws SurveyImportException {
 		Integer surveyWorkId = survey.getId();
-		if ( survey.isPublished() ) {
-			updateModel(survey);
-		} else {
+		CollectSurvey publishedSurvey = get(survey.getName());
+		if ( publishedSurvey == null ) {
 			survey.setPublished(true);
 			importModel(survey);
 			initSurveysCache();
+		} else {
+			updateModel(survey);
 		}
 		if ( surveyWorkId != null ) {
 			int publishedSurveyId = survey.getId();
@@ -274,6 +275,50 @@ public class SurveyManager {
 			speciesManager.publishTaxonomies(surveyWorkId, publishedSurveyId);
 			surveyWorkDao.delete(surveyWorkId);
 		}
+	}
+
+	/*
+	 * Getters and setters
+	 * 
+	 */
+	public SamplingDesignManager getSamplingDesignManager() {
+		return samplingDesignManager;
+	}
+
+	public void setSamplingDesignManager(SamplingDesignManager samplingDesignManager) {
+		this.samplingDesignManager = samplingDesignManager;
+	}
+
+	public SpeciesManager getSpeciesManager() {
+		return speciesManager;
+	}
+
+	public void setSpeciesManager(SpeciesManager speciesManager) {
+		this.speciesManager = speciesManager;
+	}
+
+	public SurveyDao getSurveyDao() {
+		return surveyDao;
+	}
+
+	public void setSurveyDao(SurveyDao surveyDao) {
+		this.surveyDao = surveyDao;
+	}
+
+	public SurveyWorkDao getSurveyWorkDao() {
+		return surveyWorkDao;
+	}
+
+	public void setSurveyWorkDao(SurveyWorkDao surveyWorkDao) {
+		this.surveyWorkDao = surveyWorkDao;
+	}
+
+	public CollectSurveyContext getCollectSurveyContext() {
+		return collectSurveyContext;
+	}
+
+	public void setCollectSurveyContext(CollectSurveyContext collectSurveyContext) {
+		this.collectSurveyContext = collectSurveyContext;
 	}
 	
 }

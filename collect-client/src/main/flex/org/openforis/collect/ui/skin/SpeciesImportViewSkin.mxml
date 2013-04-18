@@ -10,6 +10,8 @@
 	<fx:Script>
 		<![CDATA[
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.ui.Images;
+			import org.openforis.collect.util.AlertUtil;
 		]]>
 	</fx:Script>
 	
@@ -86,18 +88,26 @@
 		</s:VGroup>
 		
 		<s:HGroup gap="50">
-			<s:Button id="importButton" 
-					  label="{Message.get('referenceDataImport.import')}"
+			<s:HGroup gap="10">
+				<s:Button id="importButton" 
+						  label="{Message.get('referenceDataImport.import')}"
+						  useHandCursor="true"
+						  buttonMode="true"
+						  />
+				<s:Image id="importFileFormatInfoIcon"
+						 source="{Images.INFO}"
+						 useHandCursor="true"
+						 toolTip="{Message.get('referenceDataImport.importFileFormatIconToolTip')}"
+						 click="{AlertUtil.showMessage(hostComponent.importFileFormatInfo)}"
+						 horizontalCenter="0"
+						 verticalCenter="0"
+						 />
+			</s:HGroup>
+			<!--<s:Button id="exportButton" 
+					  label="{Message.get('referenceDataImport.export')}"
 					  useHandCursor="true"
 					  buttonMode="true"
-					  />
-			
-			<!--<s:Button id="exportButton" 
-			label="{Message.get('speciesImport.export')}"
-			useHandCursor="true"
-			buttonMode="true"
-			/>-->
-			
+					  />-->
 			<s:Button id="closeButton"
 					  label="{Message.get('global.close')}"
 					  includeInLayout="{hostComponent.showCloseButton}"

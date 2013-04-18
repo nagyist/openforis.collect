@@ -1,5 +1,10 @@
 package org.openforis.collect.presenter
 {
+	import flash.events.MouseEvent;
+	import flash.net.URLRequest;
+	import flash.net.URLRequestMethod;
+	import flash.net.navigateToURL;
+	
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
@@ -7,9 +12,11 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.client.SamplingDesignClient;
 	import org.openforis.collect.client.SamplingDesignImportClient;
+	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.model.proxy.SamplingDesignSummariesProxy;
 	import org.openforis.collect.ui.view.SamplingDesignImportView;
 	import org.openforis.collect.util.AlertUtil;
+	import org.openforis.collect.util.ApplicationConstants;
 	
 	/**
 	 * 
@@ -27,8 +34,8 @@ package org.openforis.collect.presenter
 		public function SamplingDesignImportPresenter(view:SamplingDesignImportView) {
 			_samplingDesignClient = ClientFactory.samplingDesignClient;
 			_samplingDesignImportClient = ClientFactory.samplingDesignImportClient;
-
 			super(view, new MessageKeys(), UPLOAD_FILE_NAME_PREFIX);
+			view.importFileFormatInfo = Message.get(messageKeys.IMPORT_FILE_FORMAT_INFO);
 		}
 		
 		private function get view():SamplingDesignImportView {
@@ -95,6 +102,19 @@ package org.openforis.collect.presenter
 			_samplingDesignImportClient.getStatus(_getStatusResponder);
 		}
 		
+		override protected function exportButtonClickHandler(event:MouseEvent):void {
+			var request:URLRequest = getExportUrlRequest();
+			if(request != null) {
+				navigateToURL(request, "_new");
+			}
+		}
+		
+		protected function getExportUrlRequest():URLRequest {
+			var url:String = ApplicationConstants.getSamplingDesignExportUrl(view.surveyId, view.work);
+			var request:URLRequest = new URLRequest(url);
+			request.method = URLRequestMethod.GET;
+			return request;
+		}
 	}
 }
 import org.openforis.collect.presenter.ReferenceDataImportMessageKeys;
@@ -119,6 +139,10 @@ class MessageKeys extends ReferenceDataImportMessageKeys {
 	
 	public function get IMPORT_POPUP_TITLE():String {
 		return "samplingDesignImport.importPopUpTitle";
+	}
+
+	public function get IMPORT_FILE_FORMAT_INFO():String {
+		return "samplingDesignImport.importFileFormatInfo";
 	}
 
 }
