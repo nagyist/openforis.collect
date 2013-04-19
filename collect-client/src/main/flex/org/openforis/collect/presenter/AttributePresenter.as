@@ -52,7 +52,7 @@ package org.openforis.collect.presenter {
 			var validationStateDisplay:UIComponent = inputField != null ? inputField.validationStateDisplay: _view;
 			var validationToolTipTrigger:UIComponent = validationStateDisplay;
 			_validationDisplayManager = new ValidationDisplayManager(validationToolTipTrigger, validationStateDisplay);
-			var attrDefn:AttributeDefinitionProxy = _view.field.attributeDefinition;
+			var attrDefn:AttributeDefinitionProxy = _view.attributeUIModelObject.attributeDefinition;
 			_validationDisplayManager.showMinMaxCountErrors = ! attrDefn.multiple || attrDefn is CodeAttributeDefinitionProxy;
 			if(_view.attribute != null) {
 				updateValidationDisplayManager();
@@ -101,8 +101,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function fieldVisitedHandler(event:PropertyChangeEvent):void {
-			if(event.newValue == true && (_view.attribute != null || _view.field.attributeDefinition.multiple && _view.attributes != null)) {
-				var attributeName:String = _view.field.attributeDefinition.name;
+			if(event.newValue == true && (_view.attribute != null || _view.attributeUIModelObject.attributeDefinition.multiple && _view.attributes != null)) {
+				var attributeName:String = _view.attributeUIModelObject.attributeDefinition.name;
 				_view.parentEntity.showErrorsOnChild(attributeName);
 			}
 			updateValidationDisplayManager();
@@ -128,7 +128,7 @@ package org.openforis.collect.presenter {
 				if(_validationDisplayManager == null) {
 					initValidationDisplayManager();
 				}
-				var attributeDefn:AttributeDefinitionProxy = _view.field.attributeDefinition;
+				var attributeDefn:AttributeDefinitionProxy = _view.attributeUIModelObject.attributeDefinition;
 				var attributeName:String = attributeDefn.name;
 				var visited:Boolean = _view.parentEntity.isErrorOnChildVisible(attributeName);
 				var active:Boolean = visited && !_updating && (_view.attribute != null || _view.attributes != null);

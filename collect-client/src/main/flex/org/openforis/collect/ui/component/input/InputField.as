@@ -6,7 +6,10 @@ package org.openforis.collect.ui.component.input {
 	import mx.core.UIComponent;
 	import mx.events.FlexEvent;
 	
-	import org.openforis.collect.metamodel.ui.proxy.FieldProxy;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.ui.proxy.AttributeModelObjectProxy;
+	import org.openforis.collect.metamodel.ui.proxy.TableProxy;
+	import org.openforis.collect.metamodel.ui.proxy.UIModelObjectProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
@@ -32,7 +35,7 @@ package org.openforis.collect.ui.component.input {
 		public static const STATE_SAVE_COMPLETE:String = "saveComplete";
 		public static const STATE_ERROR_SAVING:String = "errorSaving";
 		
-		private var _uiField:org.openforis.collect.metamodel.ui.proxy.FieldProxy;
+		private var _attributeUIModelObject:AttributeModelObjectProxy;
 		private var _parentEntity:EntityProxy;
 		private var _attribute:AttributeProxy;
 		private var _fieldIndex:int = 0;
@@ -46,7 +49,6 @@ package org.openforis.collect.ui.component.input {
 		private var _changed:Boolean;
 		private var _editable:Boolean = false;
 		protected var _textInput:UIComponent;
-		public var attributeDefinition:Object;
 		
 		public function InputField() {
 			super();
@@ -150,13 +152,24 @@ package org.openforis.collect.ui.component.input {
 			_presenter = value;
 		}
 
-		[Bindable]
-		public function get uiField():org.openforis.collect.metamodel.ui.proxy.FieldProxy {
-			return _uiField;
+		[Bindable(event="attributeModelObjectChange")]
+		public function get attributeUIModelObject():AttributeModelObjectProxy {
+			return _attributeUIModelObject;
 		}
 		
-		public function set uiField(value:org.openforis.collect.metamodel.ui.proxy.FieldProxy):void {
-			_uiField = value;
+		[Bindable(event="attributeModelObjectChange")]
+		public function get attributeDefinition():AttributeDefinitionProxy {
+			return _attributeUIModelObject == null ? null: _attributeUIModelObject.attributeDefinition;
+		}
+		
+		public function set attributeUIModelObject(value:AttributeModelObjectProxy):void {
+			_attributeUIModelObject = value;
+			dispatchEvent(new Event("attributeModelObjectChange"));
+		}
+		
+		[Bindable(event="attributeModelObjectChange")]
+		public function get insideTable():Boolean {
+			return attributeUIModelObject == null ? false: UIModelObjectProxy(attributeUIModelObject).parent is TableProxy;
 		}
 		
 		[Bindable]
@@ -247,6 +260,5 @@ package org.openforis.collect.ui.component.input {
 			_changed = value;
 		}
 		
-
-}
+	}
 }

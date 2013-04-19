@@ -22,6 +22,7 @@
 			private var _entities:IList;
 			private var _selectedEntity:EntityProxy;
 			private var _form:FormProxy;
+			private var _label:String;
 			
 			override protected function initializeHandler(event:FlexEvent):void {
 			}
@@ -37,6 +38,33 @@
 
 			public function set form(value:FormProxy):void {
 				_form = value;
+			}
+
+			[Bindable]
+			public function get label():String {
+				return _label;
+			}
+
+			public function set label(value:String):void {
+				_label = value;
+			}
+
+			[Bindable]
+			public function get entities():IList {
+				return _entities;
+			}
+
+			public function set entities(value:IList):void {
+				_entities = value;
+			}
+
+			[Bindable]
+			public function get selectedEntity():EntityProxy {
+				return _selectedEntity;
+			}
+
+			public function set selectedEntity(value:EntityProxy):void {
+				_selectedEntity = value;
 			}
 
 
@@ -74,9 +102,8 @@
 			id="internalContainer" 
 			height="100%" width="100%"
 			modelVersion="{modelVersion}"
-			parentEntity="{entity}"
+			parentEntity="{selectedEntity}"
 			formContainer="{form}"
-			label="{uiTab.labelText}"
 			visible="false"
 			showEffect="{showFormEffect}" 
 			hideEffect="{hideFormEffect}"

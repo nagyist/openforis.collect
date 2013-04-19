@@ -51,8 +51,8 @@
 				 source="{Images.OPEN_POPUP}" 
 				 useHandCursor="true" 
 				 buttonMode="true"
-				 visible="{! CodeAttributeDefinitionProxy(attributeDefinition).external}"
-				 includeInLayout="{! CodeAttributeDefinitionProxy(attributeDefinition).external}"
+				 visible="{! CodeAttributeDefinitionProxy(attributeUIModelObject.attributeDefinition).external}"
+				 includeInLayout="{! CodeAttributeDefinitionProxy(attributeUIModelObject.attributeDefinition).external}"
 				 />
 		
 		<s:Label id="descriptionLabel" 

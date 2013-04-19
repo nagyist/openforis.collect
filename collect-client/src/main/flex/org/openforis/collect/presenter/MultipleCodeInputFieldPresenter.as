@@ -10,7 +10,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.model.FieldSymbol;
-	import org.openforis.collect.model.proxy.AttributeAddRequestProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.AttributeUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
@@ -52,7 +51,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function setFocusHandler(event:InputFieldEvent):void {
-			if ( _view.textInput != null && _view.parentEntity != null && _view.attributeDefinition != null &&
+			if ( _view.textInput != null && _view.parentEntity != null &&
 				_view.parentEntity.id == event.parentEntityId && _view.attributeDefinition.name == event.nodeName) {
 				_view.textInput.setFocus();
 			}
@@ -91,24 +90,22 @@ package org.openforis.collect.presenter {
 		}
 		
 		override protected function getTextFromValue():String {
-			if(_view.attributeDefinition != null) {
-				if(CollectionUtil.isNotEmpty(_view.attributes)) {
-					var firstAttribute:AttributeProxy = _view.attributes.getItemAt(0) as AttributeProxy;
-					var field:FieldProxy = firstAttribute.getField(0);
-					if(field.symbol != null) {
-						var shortCut:String = FieldProxy.getShortCutForReasonBlank(field.symbol);
-						if(shortCut != null) {
-							return shortCut;
-						}
+			if(CollectionUtil.isNotEmpty(_view.attributes)) {
+				var firstAttribute:AttributeProxy = _view.attributes.getItemAt(0) as AttributeProxy;
+				var field:FieldProxy = firstAttribute.getField(0);
+				if(field.symbol != null) {
+					var shortCut:String = FieldProxy.getShortCutForReasonBlank(field.symbol);
+					if(shortCut != null) {
+						return shortCut;
 					}
-					var parts:Array = new Array();
-					for each (var attribute:AttributeProxy in _view.attributes) {
-						var part:String = codeAttributeToText(attribute);
-						parts.push(part);
-					}
-					var result:String = org.openforis.collect.util.StringUtil.concat(", ", parts);
-					return result;
 				}
+				var parts:Array = new Array();
+				for each (var attribute:AttributeProxy in _view.attributes) {
+					var part:String = codeAttributeToText(attribute);
+					parts.push(part);
+				}
+				var result:String = org.openforis.collect.util.StringUtil.concat(", ", parts);
+				return result;
 			}
 			return "";
 		}
@@ -181,10 +178,9 @@ package org.openforis.collect.presenter {
 					}
 				}
 				var parentEntityId:int = _view.parentEntity.id;
-				var name:String = _view.attributeDefinition.name;
 				var responder:IResponder = new AsyncResponder(findItemsResultHandler, faultHandler);
-				
-				dataClient.getCodeListItems(responder, parentEntityId, name, codes);
+				var attrName:String = _view.attributeDefinition.name;
+				dataClient.getCodeListItems(responder, parentEntityId, attrName, codes);
 			}
 		}
 	}

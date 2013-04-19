@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009" 
+				xmlns:s="library://ns.adobe.com/flex/spark" 
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				dataChange="dataChangeHandler(event)" 
+				autoDrawBackground="false"
+				creationComplete="creationCompleteHandler(event)"
+				width="100%"
+				>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.binding.utils.BindingUtils;
+			import mx.collections.IList;
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+			import org.openforis.collect.metamodel.ui.proxy.AttributeModelObjectProxy;
+			import org.openforis.collect.metamodel.ui.proxy.ColumnProxy;
+			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.model.proxy.NodeProxy;
+			import org.openforis.collect.ui.UIBuilder;
+			
+			private var _parentEntity:EntityProxy;
+			private var _modelVersion:ModelVersionProxy;
+			private var _attributeUIModelObject:AttributeModelObjectProxy;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+			}
+			
+			override protected function createChildren():void {
+				super.createChildren();
+				if(data != null) {
+					var formItem:CollectFormItem;
+					if(data is ColumnProxy) {
+						formItem = UIBuilder.createAttributeFormItem(ColumnProxy(data));
+					} else {
+						throw new Error("Unsupported child type: " + data.toString());
+					}
+					addElement(formItem);
+					BindingUtils.bindProperty(formItem, "parentEntity", this, "parentEntity");
+				}
+			}
+			
+			protected function dataChangeHandler(event:FlexEvent):void {
+				removeAllElements();
+				initialized = false;
+				initialize();
+			}
+			
+			[Bindable]
+			public function get parentEntity():EntityProxy {
+				return _parentEntity;
+			}
+			
+			public function set parentEntity(value:EntityProxy):void {
+				_parentEntity = value;
+				dispatchEvent(new Event("parentEntityChange"));
+			}
+			
+			[Bindable(event="parentEntityChange")]
+			public function get entity():EntityProxy {
+				if ( parentEntity == null ) {
+					return null;
+				} else {
+					var children:IList = parentEntity.getChildren();
+					if ( children.length == 1 ) {
+						var firstChild:NodeProxy = children.getItemAt(0) as NodeProxy;
+						if ( firstChild is EntityProxy && ! firstChild.definition.multiple ) {
+							//single entity
+							return EntityProxy(firstChild);
+						}
+					}
+					return parentEntity;
+				}
+			}
+			
+			[Bindable]
+			public function get modelVersion():ModelVersionProxy {
+				return _modelVersion;
+			}
+			
+			public function set modelVersion(value:ModelVersionProxy):void {
+				_modelVersion = value;
+			}
+			
+		]]>
+	</fx:Script>
+
+</s:ItemRenderer>

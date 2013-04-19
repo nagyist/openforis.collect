@@ -46,16 +46,16 @@
 	</detail:states>
 	
 	<s:HGroup gap="2">
-		<input:RangeInputField id="rangeInputField" 
-								 attributeDefinition="{attributeDefinition}"
-								 parentEntity="{parentEntity}"
-								 attribute="{attribute}"
-								 width="120"
-								 />
+		<input:RangeInputField id="rangeInputField"
+							   attributeUIModelObject="{attributeUIModelObject}"
+							   parentEntity="{parentEntity}"
+							   attribute="{attribute}"
+							   width="120"
+							   />
 		
 		<input:DropDownInputField id="unitInputField" 
 								  includeIn="multipleUnits"
-								  attributeDefinition="{attributeDefinition}"
+								  attributeUIModelObject="{attributeUIModelObject}"
 								  parentEntity="{parentEntity}"
 								  attribute="{attribute}"
 								  fieldIndex="3"

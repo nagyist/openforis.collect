@@ -145,13 +145,15 @@
 			<mx:ViewStack id="viewStack" width="100%" height="100%" 
 						  verticalGap="0">
 				<mx:Repeater id="innerFormsRP" dataProvider="{innerForms}">
-					<detail:TabbedFormContainer 
-						id="tabContentContainers"
-						modelVersion="{modelVersion}"
-						formContainer="{FormContainerProxy(innerFormsRP.currentItem)}"
-						parentEntity="{parentEntity}"
-						label="{FormContainerProxy(innerFormsRP.currentItem).labelText}"
-						/>
+					<mx:Canvas>
+						<detail:FormContainerFormItem 
+							id="formContainsers"
+							modelVersion="{modelVersion}"
+							form="{FormProxy(innerFormsRP.currentItem)}"
+							parentEntity="{parentEntity}"
+							label="{FormProxy(innerFormsRP.currentItem).labelText}"
+							/>
+					</mx:Canvas>
 				</mx:Repeater>
 			</mx:ViewStack>
 		</s:BorderContainer>

@@ -15,7 +15,6 @@ package org.openforis.collect.presenter {
 	import mx.collections.IList;
 	import mx.rpc.events.ResultEvent;
 	
-	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.FileAttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.AttributeUpdateRequestProxy;
@@ -64,7 +63,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		private function initFileFilter():void {
-			var attrDefn:FileAttributeDefinitionProxy = FileAttributeDefinitionProxy(_view.attributeDefinition);
+			var attrDefn:FileAttributeDefinitionProxy = FileAttributeDefinitionProxy(_view.attributeUIModelObject.attributeDefinition);
 			var extensions:IList = attrDefn.extensions;
 			if ( CollectionUtil.isEmpty(extensions) || 
 					extensions.length == 1 && StringUtil.isBlank(extensions.getItemAt(0) as String) ) {
@@ -116,7 +115,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function fileReferenceSelectHandler(event:Event):void {
-			var attrDefn:FileAttributeDefinitionProxy = FileAttributeDefinitionProxy(_view.attributeDefinition);
+			var attrDefn:FileAttributeDefinitionProxy = FileAttributeDefinitionProxy(_view.attributeUIModelObject.attributeDefinition);
 			var maxSize:Number = attrDefn.maxSize;
 			if(fileReference.size > maxSize) {
 				var numberFormatter:spark.formatters.NumberFormatter = new NumberFormatter();

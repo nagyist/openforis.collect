@@ -35,7 +35,7 @@
 			width="100%"
 			gap="2">
 		<input:IntegerInputField id="day"
-								 attributeDefinition="{attributeDefinition}"
+								 attributeUIModelObject="{attributeUIModelObject}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
 								 fieldIndex="2"
@@ -45,7 +45,7 @@
 								 />
 		<s:Label id="separator1" text="{separator}" />
 		<input:IntegerInputField id="month"
-								 attributeDefinition="{attributeDefinition}"
+								 attributeUIModelObject="{attributeUIModelObject}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
 								 fieldIndex="1"
@@ -55,7 +55,7 @@
 								 />
 		<s:Label id="separator2" text="{separator}" />
 		<input:IntegerInputField id="year"
-								 attributeDefinition="{attributeDefinition}"
+								 attributeUIModelObject="{attributeUIModelObject}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
 								 fieldIndex="0"

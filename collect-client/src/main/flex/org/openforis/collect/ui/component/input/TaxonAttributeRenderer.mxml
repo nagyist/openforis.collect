@@ -28,7 +28,7 @@
 	<s:HGroup includeIn="horizontal" gap="{UIBuilder.COMPOSITE_ATTRIBUTE_H_GAP}">
 		<input:StringInputField id="codeTextInput" 
 								includeIn="horizontal"
-								attributeDefinition="{attributeDefinition}"
+								attributeUIModelObject="{attributeUIModelObject}"
 								parentEntity="{parentEntity}"
 								attribute="{attribute}"
 								fieldIndex="0"
@@ -37,7 +37,7 @@
 								/>
 		<input:StringInputField id="scientificNameTextInput" 
 								includeIn="horizontal"
-								attributeDefinition="{attributeDefinition}"
+								attributeUIModelObject="{attributeUIModelObject}"
 								parentEntity="{parentEntity}"
 								attribute="{attribute}"
 								fieldIndex="1"
@@ -46,7 +46,7 @@
 								/>
 		<input:StringInputField id="vernacularNameTextInput" 
 								includeIn="horizontal"
-								attributeDefinition="{attributeDefinition}"
+								attributeUIModelObject="{attributeUIModelObject}"
 								parentEntity="{parentEntity}"
 								attribute="{attribute}"
 								fieldIndex="2"
@@ -55,7 +55,7 @@
 								/>
 		<input:LanguageAutoComplete id="languageAutocomplete" 
 								includeIn="horizontal"
-								attributeDefinition="{attributeDefinition}"
+								attributeUIModelObject="{attributeUIModelObject}"
 								parentEntity="{parentEntity}"
 								attribute="{attribute}"
 								upperCase="false"
@@ -64,7 +64,7 @@
 								/>
 		<input:StringInputField id="languageVarietyTextInput" 
 								includeIn="horizontal"
-								attributeDefinition="{attributeDefinition}"
+								attributeUIModelObject="{attributeUIModelObject}"
 								parentEntity="{parentEntity}"
 								attribute="{attribute}"
 								fieldIndex="4"
@@ -75,7 +75,7 @@
 	
 	<s:VGroup includeIn="vertical, vertical_form">
 		<s:Label styleName="bold" 
-				 text="{attributeDefinition.getInstanceOrHeadingLabelText()}"
+				 text="{attributeUIModelObject.attributeDefinition.getInstanceOrHeadingLabelText()}"
 				 includeIn="vertical_form" />
 		<s:VGroup>
 			<s:HGroup>

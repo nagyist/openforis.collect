@@ -6,7 +6,6 @@ package org.openforis.collect.ui {
 	import mx.core.ClassFactory;
 	import mx.core.IFactory;
 	import mx.core.IVisualElement;
-	import mx.messaging.management.Attribute;
 	
 	import org.openforis.collect.i18n.Message;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
@@ -29,15 +28,29 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
 	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
+	import org.openforis.collect.metamodel.ui.proxy.AttributeModelObjectProxy;
+	import org.openforis.collect.metamodel.ui.proxy.ColumnGroupProxy;
+	import org.openforis.collect.metamodel.ui.proxy.ColumnProxy;
 	import org.openforis.collect.metamodel.ui.proxy.FieldProxy;
+	import org.openforis.collect.metamodel.ui.proxy.FormSectionProxy;
 	import org.openforis.collect.metamodel.ui.proxy.FormSetProxy;
+	import org.openforis.collect.metamodel.ui.proxy.TableHeadingComponentProxy;
+	import org.openforis.collect.metamodel.ui.proxy.TableProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.datagrid.CompleteColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryDataGrid;
 	import org.openforis.collect.ui.component.datagrid.RecordSummaryErrorsColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagroup.DataGridHeaderRenderer;
+	import org.openforis.collect.ui.component.detail.AttributeFormItem;
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
+	import org.openforis.collect.ui.component.detail.CodeAttributeFormItem;
+	import org.openforis.collect.ui.component.detail.CompositeAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.FormContainer;
+	import org.openforis.collect.ui.component.detail.FormSectionFormItem;
+	import org.openforis.collect.ui.component.detail.MultipleAttributeDataGroupFormItem;
+	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
+	import org.openforis.collect.ui.component.detail.SingleAttributeFormItem;
+	import org.openforis.collect.ui.component.detail.TableFormItem;
 	import org.openforis.collect.ui.component.input.AutoCompleteInputField;
 	import org.openforis.collect.ui.component.input.BooleanInputField;
 	import org.openforis.collect.ui.component.input.CodeInputField;
@@ -265,7 +278,41 @@ package org.openforis.collect.ui {
 			return width;
 		}
 		
-		public static function getInputField(def:AttributeDefinitionProxy):InputField {
+		public static function createAttributeFormItem(attrUIModelObj:AttributeModelObjectProxy):AttributeFormItem {
+			var def:AttributeDefinitionProxy = attrUIModelObj.attributeDefinition;
+			var parentLayout:String = def.parentLayout;
+			var formItem:AttributeFormItem = null;
+			if(def is CodeAttributeDefinitionProxy) {
+				formItem = new CodeAttributeFormItem();
+			} else if(def is CoordinateAttributeDefinitionProxy || def is TaxonAttributeDefinitionProxy) {
+				formItem = new CompositeAttributeFormItem();
+			} else if(def.multiple) {
+				if(parentLayout == UIUtil.LAYOUT_TABLE){
+					formItem = new MultipleAttributeDataGroupFormItem();
+				} else {
+					formItem = new MultipleAttributeFormItem();
+				}
+			} else {
+				formItem = new SingleAttributeFormItem();
+			}
+			formItem.attributeUIModelObject = attrUIModelObj;
+			return formItem;
+		}
+		
+		public static function createTableFormItem(tableProxy:TableProxy):TableFormItem {
+			var result:TableFormItem = new TableFormItem();
+			result.table = tableProxy;
+			return result;
+		}
+		
+		public static function createFormSectionFormItem(formSection:FormSectionProxy):FormSectionFormItem {
+			var formItem:FormSectionFormItem = new FormSectionFormItem();
+			formItem.formSection = formSection;
+			return formItem;
+		}
+		
+		public static function createInputField(attributeUIModelObject:AttributeModelObjectProxy):InputField {
+			var def:AttributeDefinitionProxy = attributeUIModelObject.attributeDefinition;
 			var parentLayout:String = def.parentLayout;
 			var inputField:InputField = null;
 			if(def is BooleanAttributeDefinitionProxy) {
@@ -309,12 +356,12 @@ package org.openforis.collect.ui {
 				}
 			}
 			inputField.width = getInputFieldWidth(def);
-			inputField.attributeDefinition = def;
+			inputField.attributeUIModelObject = attributeUIModelObject;
 			return inputField;
 		}
 		
-		public static function createAttributeItemRenderer(field:FieldProxy):AttributeItemRenderer {
-			var def:AttributeDefinitionProxy = field.attributeDefinition;
+		public static function createAttributeItemRenderer(attributeUIModelObject:AttributeModelObjectProxy):AttributeItemRenderer {
+			var def:AttributeDefinitionProxy = attributeUIModelObject.attributeDefinition;
 			var renderer:AttributeItemRenderer;
 			if(def is CoordinateAttributeDefinitionProxy) {
 				renderer = new CoordinateAttributeRenderer();
@@ -332,7 +379,7 @@ package org.openforis.collect.ui {
 			}
 			if(renderer == null) {
 				renderer = new AttributeItemRenderer();
-				var inputField:InputField = getInputField(def);
+				var inputField:InputField = createInputField(attributeUIModelObject);
 				inputField.fieldIndex = 0;
 				renderer.addElement(inputField);
 				BindingUtils.bindProperty(inputField, "parentEntity", renderer, "parentEntity");
@@ -341,27 +388,28 @@ package org.openforis.collect.ui {
 					BindingUtils.bindProperty(inputField, "attributes", renderer, "attributes");
 				}
 			}
-			renderer.field = field;
+			renderer.attributeUIModelObject = attributeUIModelObject;
 			return renderer;
 		}
 		
-		public static function getDataGroupHeader(defn:NodeDefinitionProxy, parentEntity:EntityProxy = null):IVisualElement {
+		public static function createDataGroupHeader(headingComponent:TableHeadingComponentProxy, parentEntity:EntityProxy = null):IVisualElement {
 			var elem:IVisualElement = null;
-			if(defn is AttributeDefinitionProxy){
-				elem = getAttributeDataGroupHeader(defn as AttributeDefinitionProxy, parentEntity);
-			} else if(defn is EntityDefinitionProxy) {
-				elem = getEntityDataGroupHeader(defn as EntityDefinitionProxy, parentEntity);
+			if(headingComponent is ColumnProxy){
+				elem = getAttributeDataGroupHeader(ColumnProxy(headingComponent), parentEntity);
+			} else if(headingComponent is ColumnGroupProxy) {
+				elem = createColumnGroupDataGroupHeader(ColumnGroupProxy(headingComponent), parentEntity);
 			}
 			return elem;
 		}
 		
-		private static function getEntityDataGroupHeader(defn:EntityDefinitionProxy, parentEntity:EntityProxy = null):IVisualElement {
-			var directionByColumns:Boolean = defn.parent != null && defn.parent.direction == UIOptions$Direction.BY_COLUMNS;
+		private static function createColumnGroupDataGroupHeader(colGroup:ColumnGroupProxy, parentEntity:EntityProxy = null):IVisualElement {
+			var table:TableProxy = colGroup.parentTable;
+			var directionByColumns:Boolean = table.direction == UIOptions$Direction.BY_COLUMNS;
 			var result:SkinnableContainer = new SkinnableContainer();
 			result.styleName = DATA_GROUP_HEADER_STYLE;
 			var l:Label = new Label();
 			l.styleName = HEADER_LABEL_STYLE;
-			l.text = defn.getNumberAndHeadingLabelText();
+			l.text = table.entityDefinition.getNumberAndHeadingLabelText();
 			var layout:LayoutBase;
 			if ( directionByColumns ) {
 				layout = new HorizontalLayout();
@@ -389,17 +437,19 @@ package org.openforis.collect.ui {
 				hGroup.percentHeight = 100;
 				childDefinitionsContainer = hGroup;
 			}
-			var childDefn:ListCollectionView = defn.childDefinitions;
+			/*
+			var childDefn:ListCollectionView = table.entityDefinition.childDefinitions;
 			for each (var childDef:NodeDefinitionProxy in childDefn) {
-				var elem:IVisualElement = getDataGroupHeader(childDef, null);
+				var elem:IVisualElement = createDataGroupHeader(childDef, null);
 				childDefinitionsContainer.addElement(elem);
 			}
+			*/
 			result.addElement(childDefinitionsContainer);
-			
 			return result;
 		}
 		
-		private static function getAttributeDataGroupHeader(defn:AttributeDefinitionProxy, parentEntity:EntityProxy = null):IVisualElement {
+		private static function getAttributeDataGroupHeader(col:ColumnProxy, parentEntity:EntityProxy = null):IVisualElement {
+			var defn:AttributeDefinitionProxy = col.attributeDefinition;
 			var result:SkinnableContainer = new SkinnableContainer();
 			result.styleName = DATA_GROUP_HEADER_STYLE;
 			var width:Number = getAttributeDataGroupHeaderWidth(defn, parentEntity);

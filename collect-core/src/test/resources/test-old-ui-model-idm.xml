@@ -4550,7 +4550,7 @@
         </text>
       </entity>
     </entity>
-    <entity id="340" name="household" ui:layout="form" ui:tabSet="household" ui:tab="household">
+    <entity id="340" name="household" ui:layout="form" ui:tabSet="household" ui:tab="hs_general">
       <label>Household Survey</label>
       <label type="heading">Household Surveys</label>
       <!--- A. Control information -->

@@ -6,6 +6,7 @@
 				  width="20">
 	<fx:Script>
 		<![CDATA[
+			import org.openforis.collect.metamodel.ui.proxy.TableProxy;
 			import org.openforis.collect.presenter.BooleanInputFieldPresenter;
 			import org.openforis.collect.util.UIUtil;
 			
@@ -21,7 +22,7 @@
 	</input:layout>
 	
 	<input:TextInput id="textInput" width="20" 
-					 horizontalCenter="{attributeDefinition.parentLayout == UIUtil.LAYOUT_TABLE ? 0: NaN}" 
+					 horizontalCenter="{insideTable ? 0: NaN}" 
 					 maxChars="1" 
 					 minWidth="0" />
 	

@@ -3,7 +3,8 @@
 		 xmlns:s="library://ns.adobe.com/flex/spark" 
 		 xmlns:mx="library://ns.adobe.com/flex/mx"
 		 xmlns:detail="org.openforis.collect.ui.component.detail.*"
-		 xmlns:input="org.openforis.collect.ui.component.input.*" xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
+		 xmlns:input="org.openforis.collect.ui.component.input.*" 
+		 xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
 		 >
 
 	<fx:Script>
@@ -41,7 +42,7 @@
 		</s:layout>
 		
 		<detail:FormItemLabel id="formItemLabel"
-						  nodeDefinition="{attributeDefinition}" 
+						  nodeDefinition="{attributeUIModelObject.attributeDefinition}" 
 						  width="{labelWidth}"
 						  />
 		
@@ -80,8 +81,7 @@
 									
 									override protected function createChildren():void {
 										super.createChildren();
-										
-										var renderer:AttributeItemRenderer = UIBuilder.getAttributeItemRenderer(outerDocument.attributeDefinition);
+										var renderer:AttributeItemRenderer = UIBuilder.createAttributeItemRenderer(outerDocument.attributeUIModelObject);
 										BindingUtils.bindProperty(renderer, "parentEntity", outerDocument, "parentEntity");
 										BindingUtils.bindProperty(renderer, "attribute", this, "attribute");
 										contentGroup.addElement(renderer);

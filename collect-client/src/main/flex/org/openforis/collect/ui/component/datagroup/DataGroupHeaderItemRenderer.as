@@ -5,6 +5,7 @@ package org.openforis.collect.ui.component.datagroup
 	import mx.events.FlexEvent;
 	
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+	import org.openforis.collect.metamodel.ui.proxy.TableHeadingComponentProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	
@@ -30,7 +31,7 @@ package org.openforis.collect.ui.component.datagroup
 		override protected function createChildren():void {
 			if(data != null && parentEntity != null) {
 				super.createChildren();
-				var elem:IVisualElement = UIBuilder.getDataGroupHeader(data as NodeDefinitionProxy, parentEntity);
+				var elem:IVisualElement = UIBuilder.createDataGroupHeader(data as TableHeadingComponentProxy, parentEntity);
 				addElement(elem);
 				/*
 				var constraintColumns:Vector.<ConstraintColumn> = outerDocument.constraintLayout.constraintColumns;

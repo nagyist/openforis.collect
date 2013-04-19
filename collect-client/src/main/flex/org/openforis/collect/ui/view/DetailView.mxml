@@ -95,7 +95,7 @@
 		<!--<s:Group id="formWrapper" width="100%" height="100%" />-->
 		<component:LoadingContent width="100%" height="100%" includeIn="loading" itemCreationPolicy="immediate" />
 		
-		<detail:FormsContainer id="formsContainer" 
+		<detail:FormSetRenderer id="formsContainer" 
 							   height="100%" 
 							   width="100%" 
 							   includeIn="edit" 

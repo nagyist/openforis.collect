@@ -2,6 +2,7 @@ package org.openforis.collect.metamodel.ui;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
@@ -48,6 +49,8 @@ public class UIOptionsMigrator {
 	protected void createForm(FormContainer parent, UITab tab) {
 		UIOptions oldUIOptions = tab.getUIOptions();
 		Form form = parent.createForm();
+		EntityDefinition tabAssignedEntityDefn = findAssignedEntityDefinition(parent, tab);
+		form.setEntityId(tabAssignedEntityDefn.getId());
 		copyLabels(tab, form);
 		FormSection mainFormSection = form.createFormSection();
 		form.addFormSection(mainFormSection);
@@ -60,6 +63,25 @@ public class UIOptionsMigrator {
 			createForm(form, innerTab);
 		}
 		parent.addForm(form);
+	}
+
+	protected EntityDefinition findAssignedEntityDefinition(FormContainer parent,
+			UITab tab) {
+		UIOptions oldUIOptions = tab.getUIOptions();
+		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
+		stack.push(parent.getEntity());
+		while ( ! stack.isEmpty() ) {
+			NodeDefinition nodeDefn = stack.pop();
+			if ( nodeDefn instanceof EntityDefinition ) {
+				UITab assignedTab = oldUIOptions.getAssignedTab(nodeDefn, true);
+				if ( assignedTab.equals(tab) ) {
+					return (EntityDefinition) nodeDefn;
+				} else {
+					stack.addAll(((EntityDefinition) nodeDefn).getChildDefinitions());
+				}
+			}
+		}
+		return parent.getEntity();
 	}
 
 	protected void createFormSectionComponent(UITab tab,

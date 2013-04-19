@@ -30,7 +30,10 @@ import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectSurveyContext;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.EntityDefinition;
+import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
+import org.openforis.idm.path.InvalidPathException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -109,7 +112,7 @@ public class UIOptionsBinderTest {
 	}
 
 	@Test
-	public void testMigrator() throws IdmlParseException, IOException {
+	public void testMigrator() throws IdmlParseException, IOException, InvalidPathException {
 		CollectSurvey survey = loadOldUIModelTestSurvey();
 		UIOptions uiOptions = survey.getUIOptions();
 		List<FormSet> formSets = uiOptions.getFormSets();
@@ -153,6 +156,9 @@ public class UIOptionsBinderTest {
 		}
 		{
 			Form form = clusterForms.get(1);
+			Schema schema = survey.getSchema();
+			EntityDefinition plotEntity = (EntityDefinition) schema.getDefinitionByPath("cluster/plot");
+			assertEquals(plotEntity.getId(), form.getEntityId());
 			String label = form.getLabel(null);
 			assertEquals("Plot", label);
 			List<Form> subForms = form.getForms();

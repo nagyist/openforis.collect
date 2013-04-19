@@ -10,8 +10,10 @@
 			import mx.binding.utils.BindingUtils;
 			import mx.events.FlexEvent;
 			
+			import org.openforis.collect.metamodel.ui.proxy.AttributeModelObjectProxy;
 			import org.openforis.collect.metamodel.ui.proxy.FieldProxy;
 			import org.openforis.collect.metamodel.ui.proxy.FormSectionProxy;
+			import org.openforis.collect.metamodel.ui.proxy.UIModelObjectProxy;
 			
 			public static const STATE_TABLE_LAYOUT:String = "table";
 			public static const STATE_FORM_LAYOUT:String = "form";
@@ -26,16 +28,16 @@
 			
 			override protected function initializeHandler(event:FlexEvent):void {
 				super.initializeHandler(event);
-				BindingUtils.bindSetter(fieldSetter, this, "field");
+				BindingUtils.bindSetter(setAttributeUIModelObject, this, "attributeUIModelObject");
 			}
 			
-			protected function fieldSetter(field:FieldProxy):void {
+			protected function setAttributeUIModelObject(attributeUIModelObject:AttributeModelObjectProxy):void {
 				updateCurrentState();
 			}
 
 			protected function updateCurrentState():void {
-				if ( field != null ) {
-					if ( field.parent is FormSectionProxy ) {
+				if ( attributeUIModelObject != null ) {
+					if ( UIModelObjectProxy(attributeUIModelObject).parent is FormSectionProxy ) {
 						currentState = STATE_FORM_LAYOUT;
 					} else {
 						currentState = STATE_TABLE_LAYOUT;
@@ -46,8 +48,8 @@
 			override protected function createChildren():void {
 				if(!childrenAdded) {
 					super.createChildren();
-					renderer = UIBuilder.createAttributeItemRenderer(field);
-					BindingUtils.bindProperty(renderer, "field", this, "field");
+					renderer = UIBuilder.createAttributeItemRenderer(attributeUIModelObject);
+					BindingUtils.bindProperty(renderer, "attributeUIModelObject", this, "attributeUIModelObject");
 					BindingUtils.bindProperty(renderer, "parentEntity", this, "parentEntity");
 					BindingUtils.bindProperty(renderer, "attribute", this, "attribute");
 					contentGroup.addElement(renderer);
@@ -68,7 +70,7 @@
 	</detail:layout>
 	
 	<detail:FormItemLabel id="formItemLabel"
-	  				  nodeDefinition="{attributeDefinition}"
+	  				  nodeDefinition="{attributeUIModelObject.attributeDefinition}"
 					  width="{labelWidth}"
 					  includeIn="form"
 					  />

@@ -46,11 +46,11 @@
 		
 		<s:TitleWindow
 			width="500" height="400" 
-			id="popup" title="{attributeDefinition.getInstanceOrHeadingLabelText()}">
+			id="popup" title="{attributeUIModelObject.attributeDefinition.getInstanceOrHeadingLabelText()}">
 			<s:layout>
 				<s:VerticalLayout gap="10" paddingLeft="10" paddingTop="10" paddingBottom="10" paddingRight="10" />
 			</s:layout>
-			<detail:MultipleAttributeFormItem attributeDefinition="{attributeDefinition}" />
+			<detail:MultipleAttributeFormItem attributeUIModelObject="{attributeUIModelObject}" />
 		</s:TitleWindow>
 		
 	</fx:Declarations>

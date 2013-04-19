@@ -49,12 +49,12 @@ package org.openforis.collect.metamodel.ui.proxy {
 			for each ( var child:FormSectionComponentProxy in children ) {
 				if ( child is FieldProxy ) {
 					var attrDefn:NodeDefinitionProxy = (child as FieldProxy).attributeDefinition;
-					if ( version.isApplicable(attrDefn) ) {
+					if ( version == null || version.isApplicable(attrDefn) ) {
 						result.addItem(child);
 					}
 				} else if ( child is TableProxy ) {
 					var entityDefn:NodeDefinitionProxy = (child as TableProxy).entityDefinition;
-					if ( version.isApplicable(entityDefn) ) {
+					if ( version == null || version.isApplicable(entityDefn) ) {
 						result.addItem(child);
 					}
 				} else if ( child is FormSectionProxy ) {

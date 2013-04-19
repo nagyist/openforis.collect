@@ -13,8 +13,12 @@
 			import mx.collections.IList;
 			import mx.events.FlexEvent;
 			
+			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+			import org.openforis.collect.metamodel.ui.proxy.AttributeModelObjectProxy;
 			import org.openforis.collect.metamodel.ui.proxy.FieldProxy;
+			import org.openforis.collect.metamodel.ui.proxy.TableProxy;
+			import org.openforis.collect.metamodel.ui.proxy.UIModelObjectProxy;
 			import org.openforis.collect.model.proxy.AttributeProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.presenter.AttributePresenter;
@@ -28,7 +32,7 @@
 			
 
 			private var _direction:String;
-			private var _field:FieldProxy;
+			private var _attributeUIModelObject:AttributeModelObjectProxy;
 			private var _modelVersion:ModelVersionProxy;
 			private var _parentEntity:EntityProxy;
 			private var _attribute:AttributeProxy;
@@ -58,6 +62,26 @@
 				_direction = value;
 			}
 			
+			[Bindable(event="attributeModelObjectChange")]
+			public function get attributeUIModelObject():AttributeModelObjectProxy {
+				return _attributeUIModelObject;
+			}
+			
+			[Bindable(event="attributeModelObjectChange")]
+			public function get attributeDefinition():AttributeDefinitionProxy {
+				return _attributeUIModelObject == null ? null: _attributeUIModelObject.attributeDefinition;
+			}
+			
+			public function set attributeUIModelObject(value:AttributeModelObjectProxy):void {
+				_attributeUIModelObject = value;
+				dispatchEvent(new Event("attributeModelObjectChange"));
+			}
+			
+			[Bindable(event="attributeModelObjectChange")]
+			public function get insideTable():Boolean {
+				return attributeUIModelObject == null ? false: UIModelObjectProxy(attributeUIModelObject).parent is TableProxy;
+			}
+			
 			[Bindable]
 			public function get modelVersion():ModelVersionProxy {
 				return _modelVersion;
@@ -65,15 +89,6 @@
 			
 			public function set modelVersion(value:ModelVersionProxy):void {
 				_modelVersion = value;
-			}
-			
-			[Bindable]
-			public function get field():FieldProxy {
-				return _field;
-			}
-			
-			public function set field(value:FieldProxy):void {
-				_field = value;
 			}
 			
 			[Bindable]
@@ -131,7 +146,7 @@
 					UIUtil.removeStyleName(this, STYLE_NAME_APPROVED);
 				}
 			}
-			
+	
 		]]>
 	</fx:Script>
 	

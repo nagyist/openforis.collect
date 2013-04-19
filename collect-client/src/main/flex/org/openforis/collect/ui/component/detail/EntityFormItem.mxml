@@ -20,10 +20,8 @@
 			import org.openforis.collect.presenter.EntityFormItemPresenter;
 			
 			private var _entity:EntityProxy;
-			private var _entityDefinition:EntityDefinitionProxy;
 			private var _nodeDefinitions:IList;
-			private var _modelVersion:ModelVersionProxy;
-
+			
 			override protected function initPresenter():void {
 				presenter = new EntityFormItemPresenter(this);
 			}
@@ -37,28 +35,10 @@
 				_entity = value;
 			}
 			
-			[Bindable]
-			public function get entityDefinition():EntityDefinitionProxy {
-				return _entityDefinition;
-			}
-
-			public function set entityDefinition(value:EntityDefinitionProxy):void {
-				_entityDefinition = value;
-			}
-			
 			override public function get nodeDefinition():NodeDefinitionProxy {
 				return entityDefinition;
 			}
 
-			[Bindable]
-			public function get modelVersion():ModelVersionProxy {
-				return _modelVersion;
-			}
-			
-			public function set modelVersion(value:ModelVersionProxy):void {
-				_modelVersion = value;
-			}
-			
 			[Bindable]
 			public function get nodeDefinitions():IList {
 				return _nodeDefinitions;

@@ -57,7 +57,7 @@ package org.openforis.collect.presenter
 		
 		override protected function updateRelevanceDisplayManager():void {
 			super.updateRelevanceDisplayManager();
-			relevanceDisplayManager.displayNodeRelevance(view.parentEntity, view.uiField.attributeDefinition);
+			relevanceDisplayManager.displayNodeRelevance(view.parentEntity, view.attributeUIModelObject.attributeDefinition);
 		}
 		
 		override protected function updateValidationDisplayManager():void {
@@ -70,7 +70,7 @@ package org.openforis.collect.presenter
 		 */
 		protected function assignAttribute():void {
 			if (view.parentEntity != null ) {
-				var attrDefn:AttributeDefinitionProxy = view.uiField.attributeDefinition;
+				var attrDefn:AttributeDefinitionProxy = view.attributeUIModelObject.attributeDefinition;
 				var name:String = attrDefn.name;
 				if (attrDefn.multiple) {
 					var attributes:IList = view.parentEntity.getChildren(name);

@@ -47,7 +47,7 @@
 	
 	<s:HGroup includeIn="horizontal" gap="6">
 		<input:DropDownInputField id="srsDropDownList" 
-								  uiField="{field}"
+								  attributeUIModelObject="{attributeUIModelObject}"
 								  parentEntity="{parentEntity}"
 								  attribute="{attribute}"
 								  fieldIndex="2"
@@ -60,14 +60,14 @@
 								  dataProvider="{Application.activeSurvey.spatialReferenceSystems}"
 								  />
 		<input:NumericInputField id="yTextInput" includeIn="horizontal" itemCreationPolicy="immediate" 
-								 uiField="{field}"
+								 attributeUIModelObject="{attributeUIModelObject}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
 								 fieldIndex="1"
 								 width="70"
 								 />
 		<input:NumericInputField id="xTextInput" includeIn="horizontal" itemCreationPolicy="immediate"
-								 uiField="{field}"
+								 attributeUIModelObject="{attributeUIModelObject}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
 								 fieldIndex="0"

@@ -53,7 +53,7 @@ package org.openforis.collect.presenter {
 				var entityName:String = _view.parentEntity.name;
 				var ancestorEntityId:Number = _view.parentEntity.parentId;
 				var ancestorEntity:EntityProxy = Application.activeRecord.getNode(ancestorEntityId) as EntityProxy;
-				var width:Number = UIBuilder.getEnumeratedCodeHeaderWidth(_view.uiField.attributeDefinition, ancestorEntity);
+				var width:Number = UIBuilder.getEnumeratedCodeHeaderWidth(_view.attributeUIModelObject.attributeDefinition, ancestorEntity);
 				_view.width = width;
 			}
 		}

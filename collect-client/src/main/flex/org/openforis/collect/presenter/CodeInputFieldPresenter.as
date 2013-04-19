@@ -17,6 +17,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
+	import org.openforis.collect.metamodel.ui.proxy.TableProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
@@ -28,6 +29,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.UIUtil;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	
 	/**
 	 * 
@@ -56,7 +58,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function initViewState():void {
-			if(_view.attributeDefinition.parentLayout == UIUtil.LAYOUT_TABLE) {
+			if(_view.insideTable) {
 				_view.currentState = CodeInputField.STATE_DEFAULT;
 			} else {
 				_view.currentState = CodeInputField.STATE_DESCRIPTION_VISIBLE;
@@ -91,11 +93,12 @@ package org.openforis.collect.presenter {
 				_popUp.applyButton.addEventListener(MouseEvent.CLICK, applyButtonClickHandler);
 				_popUp.addEventListener(KeyboardEvent.KEY_DOWN, popUpKeyDownHandler);
 			}
+			var attrDefn:AttributeDefinitionProxy = _view.attributeDefinition;
 			PopUpManager.addPopUp(_popUp, FlexGlobals.topLevelApplication as DisplayObject, true);
 			_popUp.editable = Application.activeRecordEditable;
-			_popUp.multiple = _view.attributeDefinition.multiple;
-			_popUp.maxSpecified = _view.attributeDefinition.maxCount;
-			_popUp.title = _view.attributeDefinition.getInstanceOrHeadingLabelText();
+			_popUp.multiple = attrDefn.multiple;
+			_popUp.maxSpecified = attrDefn.maxCount;
+			_popUp.title = attrDefn.getInstanceOrHeadingLabelText();
 			_popUp.codeInputField = _view;
 			_popUp.setFocus();
 			loadCodes();

@@ -25,7 +25,6 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.ui.component.input.TextInput;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.PopUpUtil;
-	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * 
@@ -127,7 +126,7 @@ package org.openforis.collect.presenter
 			var searchText:String = _view.text;
 			var token:Object = {searchText: searchText};
 			var responder:IResponder = new AsyncResponder(searchResultHandler, searchFaultHandler, token);
-			var attributeDefnId:int = _view.attributeDefinition.id;
+			var attributeDefnId:int = _view.attributeUIModelObject.attributeDefinition.id;
 			var fieldIndex:int = _view.fieldIndex;
 			client.searchAutoCompleteValues(responder, attributeDefnId, fieldIndex, searchText);
 		}

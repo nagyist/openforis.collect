@@ -91,7 +91,7 @@ package org.openforis.collect.ui.component.input {
 		
 		private function createMenuItems(step:CollectRecord$Step):Array {
 			var items:Array = new Array();
-			var attrDefn:AttributeDefinitionProxy = _inputField.uiField.attributeDefinition;
+			var attrDefn:AttributeDefinitionProxy = _inputField.attributeUIModelObject.attributeDefinition;
 			switch(step) {
 				case CollectRecord$Step.ENTRY:
 					// REASON BLANK ITEMS
@@ -123,7 +123,7 @@ package org.openforis.collect.ui.component.input {
 			items.push(EDIT_REMARKS_MENU_ITEM);
 			
 			if(step != CollectRecord$Step.ANALYSIS) {
-				var def:AttributeDefinitionProxy = _inputField.uiField.attributeDefinition;
+				var def:AttributeDefinitionProxy = _inputField.attributeUIModelObject.attributeDefinition;
 				if(def.multiple && ! (def is CodeAttributeDefinitionProxy)) {
 					items.push(DELETE_ATTRIBUTE);
 				} else if(def.parentLayout == UIUtil.LAYOUT_TABLE) {
@@ -151,7 +151,7 @@ package org.openforis.collect.ui.component.input {
 		
 		public static function menuItemSelectHandler(event:ContextMenuEvent):void {
 			var inputField:InputField = event.contextMenuOwner as InputField;
-			var attrDefn:AttributeDefinitionProxy = inputField.uiField.attributeDefinition;
+			var attrDefn:AttributeDefinitionProxy = inputField.attributeUIModelObject.attributeDefinition;
 			var attribute:AttributeProxy = inputField.attribute;
 			var parentEntity:EntityProxy = inputField.parentEntity;
 			var parentEntityDefn:EntityDefinitionProxy = attrDefn.parent;
@@ -222,7 +222,7 @@ package org.openforis.collect.ui.component.input {
 		
 		private static function createNodeEvent(type:String, inputField:InputField):NodeEvent {
 			var event:NodeEvent = new NodeEvent(type);
-			var attrDefn:AttributeDefinitionProxy = inputField.uiField.attributeDefinition;
+			var attrDefn:AttributeDefinitionProxy = inputField.attributeUIModelObject.attributeDefinition;
 			if(attrDefn.multiple && inputField is CodeInputField) {
 				event.nodes = inputField.parentEntity.getChildren(attrDefn.name);
 			} else {

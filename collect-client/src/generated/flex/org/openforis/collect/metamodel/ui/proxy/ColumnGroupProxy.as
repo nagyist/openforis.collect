@@ -20,5 +20,18 @@ package org.openforis.collect.metamodel.ui.proxy {
 				child.traverse(funct);
 			}
 		}
+		
+		public function get parentTable():TableProxy {
+			var currentParent:UIModelObjectProxy = parent;
+			while ( currentParent != null ) {
+				if ( currentParent is TableProxy ) {
+					return TableProxy(currentParent);
+				} else {
+					currentParent = currentParent.parent;
+				}
+			}
+			return null;
+		}
+		
     }
 }

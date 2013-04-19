@@ -9,6 +9,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeAddRequestProxy;
 	import org.openforis.collect.model.proxy.EntityUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateResponseProxy;
@@ -60,7 +61,7 @@ package org.openforis.collect.presenter
 		
 		protected function inputFieldVisitedHandler(event:InputFieldEvent):void {
 			var inputField:InputField = event.inputField;
-			if(inputField != null && inputField.parentEntity != null && inputField.attributeDefinition == view.attributeDefinition) {
+			if(inputField != null && inputField.parentEntity != null && inputField.attributeUIModelObject == view.attributeUIModelObject) {
 				updateValidationDisplayManager();
 			}
 		}
@@ -75,7 +76,7 @@ package org.openforis.collect.presenter
 
 		protected function getAttributes():IList {
 			if(view.dataGroup != null && view.parentEntity != null) {
-				var name:String = view.attributeDefinition.name;
+				var name:String = view.attributeUIModelObject.attributeDefinition.name;
 				var attributes:IList = view.parentEntity.getChildren(name);
 				return attributes;
 			} else {
@@ -89,15 +90,16 @@ package org.openforis.collect.presenter
 		
 		protected function addButtonClickHandler(event:MouseEvent):void {
 			var attributes:IList = getAttributes();
-			var maxCount:Number = view.attributeDefinition.maxCount
+			var attrDefn:AttributeDefinitionProxy = view.attributeUIModelObject.attributeDefinition;
+			var maxCount:Number = attrDefn.maxCount
 			if(isNaN(maxCount) || CollectionUtil.isEmpty(attributes) || attributes.length < maxCount) {
 				var r:AttributeAddRequestProxy = new AttributeAddRequestProxy();
 				r.parentEntityId = view.parentEntity.id;
-				r.nodeName = view.attributeDefinition.name;
+				r.nodeName = attrDefn.name;
 				var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(r);
 				ClientFactory.dataClient.updateActiveRecord(reqSet, addResultHandler, faultHandler);
 			} else {
-				var labelText:String = view.attributeDefinition.getInstanceOrHeadingLabelText();
+				var labelText:String = attrDefn.getInstanceOrHeadingLabelText();
 				AlertUtil.showError("edit.maxCountExceed", [maxCount, labelText]);
 			}	
 		}
@@ -111,24 +113,23 @@ package org.openforis.collect.presenter
 		override protected function initValidationDisplayManager():void {
 			super.initValidationDisplayManager();
 			_validationDisplayManager.showMinMaxCountErrors = true;
-			if(view.attributeDefinition != null) {
-				updateValidationDisplayManager();
-			}
+			updateValidationDisplayManager();
 		}
 		
 		override protected function updateRelevanceDisplayManager():void {
-			_relevanceDisplayManager.displayNodeRelevance(view.parentEntity, view.attributeDefinition);
+			_relevanceDisplayManager.displayNodeRelevance(view.parentEntity, view.attributeUIModelObject.attributeDefinition);
 		}
 		
 		override protected function updateValidationDisplayManager():void {
 			super.updateValidationDisplayManager();
+			var attrDefn:AttributeDefinitionProxy = view.attributeUIModelObject.attributeDefinition;
 			if(_view.parentEntity != null) {
-				var attributeName:String = view.attributeDefinition.name;
+				var attributeName:String = attrDefn.name;
 				var visited:Boolean = _view.parentEntity.isErrorOnChildVisible(attributeName);
 				var active:Boolean = visited;
 				if(active) {
 					_validationDisplayManager.active = true;
-					_validationDisplayManager.displayMinMaxCountValidationErrors(view.parentEntity, view.attributeDefinition);
+					_validationDisplayManager.displayMinMaxCountValidationErrors(view.parentEntity, attrDefn);
 				} else {
 					_validationDisplayManager.active = false;
 					_validationDisplayManager.reset();

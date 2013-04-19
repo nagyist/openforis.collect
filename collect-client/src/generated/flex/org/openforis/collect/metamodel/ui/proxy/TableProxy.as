@@ -6,9 +6,15 @@
  */
 
 package org.openforis.collect.metamodel.ui.proxy {
+	import mx.collections.ArrayCollection;
+	import mx.collections.IList;
+	
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SchemaProxy;
+	import org.openforis.collect.util.ArrayUtil;
+	import org.openforis.collect.util.CollectionUtil;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.ui.proxy.TableProxy")]
@@ -29,5 +35,41 @@ package org.openforis.collect.metamodel.ui.proxy {
 			var defn:NodeDefinitionProxy = schema.getDefinitionById(entityId);
 			return defn as EntityDefinitionProxy;
 		}
-    }
+		
+		public function getHeadingComponentsInVersion(version:ModelVersionProxy):IList {
+			return _getHeadingComponentsInVersion(headingComponents, version);
+		}
+		
+		protected function _getHeadingComponentsInVersion(list:IList, version:ModelVersionProxy):IList {
+			var result:IList = new ArrayCollection();
+			for each(var headComp:TableHeadingComponentProxy in list) {
+				if ( headComp is ColumnProxy && (version == null || version.isApplicable(ColumnProxy(headComp).attributeDefinition)) ) {
+					result.addItem(headComp);
+				} else if ( headComp is ColumnGroupProxy ) {
+					var groupItems:IList = _getHeadingComponentsInVersion(ColumnGroupProxy(headComp).headingComponents, version);
+					if ( CollectionUtil.isNotEmpty(groupItems) ) {
+						result.addItem(headComp);
+					}
+				}
+			}
+			return result;
+		}
+		
+		public function getLeafColumnsInVersion(version:ModelVersionProxy):IList {
+			var result:IList = new ArrayCollection();
+			var stack:Array = new Array();
+			var headingCompInVersion:IList = getHeadingComponentsInVersion(version);
+			ArrayUtil.addAll(stack, headingCompInVersion.toArray());
+			while ( stack.length > 0 ) {
+				var headComp:TableHeadingComponentProxy = stack.pop();
+				if ( headComp is ColumnProxy ) {
+					result.addItem(headComp);
+				} else if ( headComp is ColumnGroupProxy ) {
+					var groupItems:IList = _getHeadingComponentsInVersion(ColumnGroupProxy(headComp).headingComponents, version);
+					ArrayUtil.addAll(stack, groupItems.toArray());
+				}
+			}
+			return result;
+		}
+	}
 }

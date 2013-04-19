@@ -11,6 +11,8 @@ package org.openforis.collect.metamodel.ui.proxy {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
+	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 
@@ -41,9 +43,9 @@ package org.openforis.collect.metamodel.ui.proxy {
 		}
 		
 		public function get entityDefinition():EntityDefinitionProxy {
-			//TODO
-			return null;
+			var schema:SchemaProxy = survey.schema;
+			var defn:NodeDefinitionProxy = schema.getDefinitionById(entityId);
+			return defn as EntityDefinitionProxy;
 		}
-		
     }
 }

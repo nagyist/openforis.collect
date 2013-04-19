@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<detail:EntityFormItem xmlns:fx="http://ns.adobe.com/mxml/2009"
+<detail:CollectFormItem xmlns:fx="http://ns.adobe.com/mxml/2009"
 					   xmlns:s="library://ns.adobe.com/flex/spark"
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
 					   xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
@@ -10,10 +10,12 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.binding.utils.BindingUtils;
+			import mx.collections.IList;
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.Application;
 			import org.openforis.collect.i18n.Message;
+			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 			import org.openforis.collect.metamodel.ui.proxy.TableProxy;
 			import org.openforis.collect.presenter.TableFormItemPresenter;
@@ -27,6 +29,8 @@
 			
 			private var _entitiesDirection:String = DIRECTION_BY_ROWS;
 			private var _table:TableProxy;
+			private var _modelVersion:ModelVersionProxy;
+			private var _headingComponents:IList;
 			
 			override protected function creationCompleteHandler(event:FlexEvent):void {
 				super.creationCompleteHandler(event);
@@ -71,6 +75,24 @@
 			override public function get nodeDefinition():NodeDefinitionProxy {
 				return _table == null ? null: _table.entityDefinition;
 			}
+			
+			[Bindable]
+			public function get modelVersion():ModelVersionProxy {
+				return _modelVersion;
+			}
+			
+			public function set modelVersion(value:ModelVersionProxy):void {
+				_modelVersion = value;
+			}
+
+			[Bindable]
+			public function get headingComponents():IList {
+				return _headingComponents;
+			}
+
+			public function set headingComponents(value:IList):void {
+				_headingComponents = value;
+			}
 
 		]]>
 	</fx:Script>
@@ -95,7 +117,7 @@
 
 		<detail:FormItemLabel id="formItemLabel"
 							  showHeadingLabel="true"
-			  				  nodeDefinition="{entityDefinition}"
+			  				  nodeDefinition="{table.entityDefinition}"
 							  visible="{! occupyEntirePage}"
 							  includeInLayout="{! occupyEntirePage}"
 							  />
@@ -128,15 +150,15 @@
 					</s:layout.byRows>
 					
 					<s:Spacer id="dragAnchorSpacer"
-							  includeInLayout="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
+							  includeInLayout="{Application.activeRecordEditable &amp;&amp; ! table.entityDefinition.enumerable}"
 							  width="11" />
 					<s:Spacer id="rowNumberSpacer"
-							  includeInLayout="{entityDefinition.showRowNumbers}"
+							  includeInLayout="{table.showRowNumbers}"
 							  width="20" />
 					<datagroup:DataGroupHeader id="header" 
 											   styleName="{entitiesDirection == TableFormItem.DIRECTION_BY_ROWS ? 
 												   'horizontal': 'vertical'}"
-											   nodeDefinitions="{nodeDefinitions}"
+											   headingComponents="{headingComponents}"
 											   parentEntity="{parentEntity}"
 											   labelsDirection="{entitiesDirection == TableFormItem.DIRECTION_BY_ROWS ? 
 											   		DataGroupHeader.DIRECTION_HORIZONTAL: DataGroupHeader.DIRECTION_VERTICAL}"
@@ -161,20 +183,19 @@
 					</s:layout.byRows> 
 					<s:itemRenderer>
 						<fx:Component>
-							<detail:TableItemRenderer
-								entityDefinition="{outerDocument.entityDefinition}"
+							<detail:TableRowItemRenderer
+								table="{outerDocument.table}"
 								entity="{data as EntityProxy}"
 								modelVersion="{outerDocument.modelVersion}"
-								nodeDefinitions="{outerDocument.nodeDefinitions}"
 								dragEnabled="{Application.activeRecordEditable &amp;&amp; ! outerDocument.table.entityDefinition.enumerable}"
 								nodesDirection="{outerDocument.entitiesDirection == TableFormItem.DIRECTION_BY_COLUMNS ? 
-									TableItemRenderer.DIRECTION_VERTICAL: TableItemRenderer.DIRECTION_HORIZONTAL}">
+									TableRowItemRenderer.DIRECTION_VERTICAL: TableRowItemRenderer.DIRECTION_HORIZONTAL}">
 								<fx:Script>
 									<![CDATA[
 										import org.openforis.collect.Application;
 									]]>
 								</fx:Script>
-							</detail:TableItemRenderer>
+							</detail:TableRowItemRenderer>
 						</fx:Component>
 					</s:itemRenderer>
 				</s:DataGroup>
@@ -187,12 +208,12 @@
 				icon="{Images.ADD}" 
 				labelPlacement="left" 
 				useHandCursor="true"
-				visible="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
-				includeInLayout="{Application.activeRecordEditable &amp;&amp; ! entityDefinition.enumerable}"
+				visible="{Application.activeRecordEditable &amp;&amp; ! table.entityDefinition.enumerable}"
+				includeInLayout="{Application.activeRecordEditable &amp;&amp; ! table.entityDefinition.enumerable}"
 				/>
 		</s:Group>
 		
 			
 	</s:BorderContainer>
 	
-</detail:EntityFormItem>
+</detail:CollectFormItem>

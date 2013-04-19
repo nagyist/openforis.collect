@@ -342,7 +342,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function keyDownHandler(event:KeyboardEvent):void {
-			var attrDefn:AttributeDefinitionProxy = _view.uiField.attributeDefinition;
+			var attrDefn:AttributeDefinitionProxy = _view.attributeUIModelObject.attributeDefinition;
 			var directionByColumns:Boolean = attrDefn.parent != null && attrDefn.parent.direction == UIOptions$Direction.BY_COLUMNS;
 			var keyCode:uint = event.keyCode;
 			var offset:int = 0;
@@ -377,7 +377,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected function handleTabKey(shiftKey:Boolean = false):void {
-			var attrDefn:AttributeDefinitionProxy = _view.uiField.attributeDefinition;
+			var attrDefn:AttributeDefinitionProxy = _view.attributeUIModelObject.attributeDefinition;
 			var directionByColumns:Boolean = attrDefn.parent != null && attrDefn.parent.direction == UIOptions$Direction.BY_COLUMNS;
 			var focusChanged:Boolean = false;
 			if ( directionByColumns ) {
@@ -517,7 +517,7 @@ package org.openforis.collect.presenter {
 		
 		protected function setFocusOnSiblingEntity(offset:int, circularLookup:Boolean = false, sameFieldIndex:Boolean = true):Boolean {
 			var attributeToFocusIn:AttributeProxy;
-			var attrDefn:AttributeDefinitionProxy = _view.uiField.attributeDefinition;
+			var attrDefn:AttributeDefinitionProxy = _view.attributeUIModelObject.attributeDefinition;
 			if ( attrDefn.multiple ) {
 				var attribute:AttributeProxy = _view.attribute;
 				attributeToFocusIn = AttributeProxy(attribute.getSibling(offset));
@@ -567,7 +567,7 @@ package org.openforis.collect.presenter {
 		public function createAttributeAddRequest(value:String = null, symbol:FieldSymbol = null, remarks:String = null):AttributeAddRequestProxy {
 			var r:AttributeAddRequestProxy = new AttributeAddRequestProxy();
 			r.parentEntityId = _view.parentEntity.id;
-			r.nodeName = _view.uiField.attributeDefinition.name;
+			r.nodeName = _view.attributeUIModelObject.attributeDefinition.name;
 			r.value = value;
 			r.symbol = symbol;
 			r.remarks = remarks;
@@ -641,7 +641,7 @@ package org.openforis.collect.presenter {
 		protected function updateView():void {
 			//update view according to attribute (generic text value)
 			var hasRemarks:Boolean = false;
-			if(_view.uiField.attributeDefinition != null) {
+			if(_view.attributeUIModelObject.attributeDefinition != null) {
 				var text:String = getTextFromValue();
 				if ( ! _view.changed ) {
 					_view.text = text;

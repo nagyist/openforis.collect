@@ -7,6 +7,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
+	import org.openforis.collect.metamodel.ui.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.AttributeUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.FieldUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;

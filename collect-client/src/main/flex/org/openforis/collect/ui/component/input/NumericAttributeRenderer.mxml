@@ -51,7 +51,7 @@
 	<s:HGroup gap="2" 
 			  verticalAlign="middle">
 		<input:NumericInputField id="numericInputField" 
-								 attributeDefinition="{attributeDefinition}"
+								 attributeUIModelObject="{attributeUIModelObject}"
 								 parentEntity="{parentEntity}"
 								 attribute="{attribute}"
 								 fieldIndex="0"
@@ -60,7 +60,7 @@
 		
 		<input:DropDownInputField id="unitInputField" 
 								  includeIn="multipleUnits"
-								  attributeDefinition="{attributeDefinition}"
+								  attributeUIModelObject="{attributeUIModelObject}"
 								  parentEntity="{parentEntity}"
 								  attribute="{attribute}"
 								  fieldIndex="2"

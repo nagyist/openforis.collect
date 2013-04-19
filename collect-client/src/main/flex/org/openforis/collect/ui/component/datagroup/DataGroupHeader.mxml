@@ -13,8 +13,10 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
-			import org.openforis.collect.model.proxy.EntityProxy;
 			import mx.collections.IList;
+			
+			import org.openforis.collect.model.proxy.EntityProxy;
+			
 			import spark.layouts.ConstraintLayout;
 			
 			public static const DIRECTION_VERTICAL:String = "vertical";
@@ -24,23 +26,13 @@
 			public static const STATE_HORIZONTAL:String = "horizontal";
 			
 			private var _parentEntity:EntityProxy;
-			private var _nodeDefinitions:IList;
 			private var _labelsDirection:String = DIRECTION_VERTICAL;
+			private var _headingComponents:IList;
 			
 			protected function updateCurrentState():void {
 				currentState = _labelsDirection == DIRECTION_VERTICAL ? STATE_VERTICAL: STATE_HORIZONTAL;
 			}
-			//private var _constraintLayout:ConstraintLayout;
 			
-			[Bindable]
-			public function get nodeDefinitions():IList {
-				return _nodeDefinitions;
-			}
-			
-			public function set nodeDefinitions(value:IList):void {
-				_nodeDefinitions = value;
-			}
-
 			[Bindable]
 			public function get parentEntity():EntityProxy {
 				return _parentEntity;
@@ -59,6 +51,15 @@
 				_labelsDirection = value;
 				dispatchEvent(new Event("labelsDirectionChange"));
 				updateCurrentState();
+			}
+			
+			[Bindable]
+			public function get headingComponents():IList {
+				return _headingComponents;
+			}
+			
+			public function set headingComponents(value:IList):void {
+				_headingComponents = value;
 			}
 			/*
 			[Bindable]
@@ -79,7 +80,7 @@
 		<s:State name="horizontal" />
 	</s:states>
 	
-	<s:DataGroup dataProvider="{nodeDefinitions}"
+	<s:DataGroup dataProvider="{headingComponents}"
 				 height.horizontal="100%"
 				 height.vertical="{NaN}">
 		<s:layout.horizontal>

@@ -16,16 +16,13 @@
 			import mx.core.UIComponent;
 			import mx.events.FlexEvent;
 			
-			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
-			import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
-			import org.openforis.collect.metamodel.proxy.CoordinateAttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-			import org.openforis.collect.metamodel.proxy.TaxonAttributeDefinitionProxy;
 			import org.openforis.collect.metamodel.ui.proxy.FieldProxy;
 			import org.openforis.collect.metamodel.ui.proxy.FormSectionProxy;
 			import org.openforis.collect.metamodel.ui.proxy.TableProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.model.proxy.NodeProxy;
+			import org.openforis.collect.ui.UIBuilder;
 			import org.openforis.collect.util.UIUtil;
 			
 			private var _parentEntity:EntityProxy;
@@ -43,16 +40,18 @@
 				if(data != null) {
 					var formItem:CollectFormItem;
 					if(data is FieldProxy) {
-						formItem = createAttributeFormItem(FieldProxy(data));
+						formItem = UIBuilder.createAttributeFormItem(FieldProxy(data));
 					} else if(data is TableProxy) {
-						formItem = createTableFormItem(TableProxy(data));
+						formItem = UIBuilder.createTableFormItem(TableProxy(data));
 					} else if(data is FormSectionProxy) {
-						formItem = createFormSectionFormItem(FormSectionProxy(data));
+						formItem = UIBuilder.createFormSectionFormItem(FormSectionProxy(data));
+						BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");
 					} else {
 						throw new Error("Unsupported child type: " + data.toString());
 					}
+					formItem.labelWidth = labelWidth;
 					addElement(formItem);
-					BindingUtils.bindProperty(formItem, "parentEntity", this, "entity");
+					BindingUtils.bindProperty(formItem, "parentEntity", this, "effectiveParentEntity");
 					BindingUtils.bindProperty(formItem, "occupyEntirePage", this, "occupyEntirePage");
 				}
 			}
@@ -90,41 +89,6 @@
 				}
 			}
 
-			public function createAttributeFormItem(field:FieldProxy):AttributeFormItem {
-				var def:AttributeDefinitionProxy = field.attributeDefinition;
-				var parentLayout:String = def.parentLayout;
-				var formItem:AttributeFormItem = null;
-				if(def is CodeAttributeDefinitionProxy) {
-					formItem = new CodeAttributeFormItem();
-				} else if(def is CoordinateAttributeDefinitionProxy || def is TaxonAttributeDefinitionProxy) {
-					formItem = new CompositeAttributeFormItem();
-				} else if(def.multiple) {
-					if(parentLayout == UIUtil.LAYOUT_TABLE){
-						formItem = new MultipleAttributeDataGroupFormItem();
-					} else {
-						formItem = new MultipleAttributeFormItem();
-					}
-				} else {
-					formItem = new SingleAttributeFormItem();
-				}
-				formItem.field = field;
-				formItem.labelWidth = labelWidth;
-				return formItem;
-			}
-			
-			private function createTableFormItem(param0:TableProxy):TableFormItem {
-				var result:TableFormItem = new TableFormItem();
-				result.table = TableProxy(data);
-				return result;
-			}
-			
-			private function createFormSectionFormItem(param0:FormSectionProxy):CollectFormItem {
-				var formItem:FormSectionFormItem = new FormSectionFormItem();
-				BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");
-				return formItem;
-			}
-			
-
 			[Bindable]
 			public function get parentEntity():EntityProxy {
 				return _parentEntity;
@@ -136,7 +100,7 @@
 			}
 			
 			[Bindable(event="parentEntityChange")]
-			public function get entity():EntityProxy {
+			public function get effectiveParentEntity():EntityProxy {
 				if ( parentEntity == null ) {
 					return null;
 				} else {

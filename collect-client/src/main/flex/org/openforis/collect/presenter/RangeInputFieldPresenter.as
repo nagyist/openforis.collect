@@ -47,7 +47,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function setRestriction():void {
-			var integer:Boolean = RangeAttributeDefinitionProxy(_view.attributeDefinition).integer;
+			var integer:Boolean = RangeAttributeDefinitionProxy(_view.attributeUIModelObject.attributeDefinition).integer;
 			_view.restrict = integer ? INTEGER_RESTRICT_PATTERN: RESTRICT_PATTERN;
 		}
 		

@@ -23,6 +23,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.util.UIUtil;
 	
 	import spark.events.IndexChangeEvent;
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 
 
 	/**
@@ -30,7 +31,7 @@ package org.openforis.collect.presenter
 	 * @author S. Ricci
 	 *  
 	 */
-	public class FormContainerFormItemPresenter extends EntityFormItemPresenter {
+	public class FormContainerFormItemPresenter extends FormItemPresenter {
 		
 		private var _keyTextChangeWatchers:Array;
 		
@@ -68,8 +69,8 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updateView():void {
-			if(view.entityDefinition != null
-					&& view.entityDefinition.multiple
+			if(view.form != null
+					&& view.form.entityDefinition.multiple
 					&& view.parentEntity != null) {
 				var entities:IList = getEntities();
 				view.entities = EntityProxy.sortEntitiesByKey(entities);
@@ -79,7 +80,7 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function getEntities():IList {
-			var name:String = view.entityDefinition.name;
+			var name:String = view.form.entityDefinition.name;
 			var entities:IList = null;
 			if(view.parentEntity != null) {
 				entities = view.parentEntity.getChildren(name);
@@ -112,27 +113,28 @@ package org.openforis.collect.presenter
 
 		protected function addButtonClickHandler(event:MouseEvent):void {
 			var entities:IList = getEntities();
-			var maxCount:Number = view.entityDefinition.maxCount
+			var entityDefn:EntityDefinitionProxy = view.form.entityDefinition;
+			var maxCount:Number = entityDefn.maxCount
 			if(isNaN(maxCount) || CollectionUtil.isEmpty(entities) || entities.length < maxCount) {
 				var r:EntityAddRequestProxy = new EntityAddRequestProxy();
 				r.parentEntityId = view.parentEntity.id;
-				r.nodeName = view.entityDefinition.name;
+				r.nodeName = entityDefn.name;
 				var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(r);
 				ClientFactory.dataClient.updateActiveRecord(reqSet, addResultHandler, faultHandler);
 			} else {
-				var labelText:String = view.entityDefinition.getInstanceOrHeadingLabelText();
+				var labelText:String = entityDefn.getInstanceOrHeadingLabelText();
 				AlertUtil.showError("edit.maxCountExceed", [maxCount, labelText]);
 			}
 		}
 		
 		protected function deleteButtonClickHandler(event:MouseEvent):void {
-			AlertUtil.showConfirm("global.confirmDelete", [view.entityDefinition.getInstanceOrHeadingLabelText()], 
+			AlertUtil.showConfirm("global.confirmDelete", [view.form.entityDefinition.getInstanceOrHeadingLabelText()], 
 				"global.confirmAlertTitle", performDeletion);
 		}
 		
 		protected function performDeletion():void {
 			var r:NodeDeleteRequestProxy = new NodeDeleteRequestProxy();
-			r.nodeId = view.entity.id;
+			r.nodeId = view.selectedEntity.id;
 			var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(r);
 			ClientFactory.dataClient.updateActiveRecord(reqSet, deleteResultHandler, faultHandler);
 		}
@@ -153,12 +155,13 @@ package org.openforis.collect.presenter
 		override protected function updateValidationDisplayManager():void {
 			super.updateValidationDisplayManager();
 			if(view.parentEntity != null) {
-				var name:String = view.entityDefinition.name;
+				var entityDefn:EntityDefinitionProxy = view.form.entityDefinition;
+				var name:String = entityDefn.name;
 				var visited:Boolean = view.parentEntity.isErrorOnChildVisible(name);
 				var active:Boolean = visited;
 				if(active) {
 					_validationDisplayManager.active = true;
-					_validationDisplayManager.displayMinMaxCountValidationErrors(view.parentEntity, view.entityDefinition);
+					_validationDisplayManager.displayMinMaxCountValidationErrors(view.parentEntity, entityDefn);
 				} else {
 					_validationDisplayManager.active = false;
 					_validationDisplayManager.reset();
@@ -192,7 +195,7 @@ package org.openforis.collect.presenter
 		
 		protected function selectEntity(entity:EntityProxy, resetView:Boolean = false):void {
 			view.addSection.dropDownList.selectedItem = entity;
-			view.entity = entity;
+			view.selectedEntity = entity;
 			view.internalContainer.reset();
 			if(entity != null) {
 				if(view.internalContainer.visible) {

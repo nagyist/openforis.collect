@@ -26,6 +26,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.StringUtil;
 	
 	import spark.components.RadioButton;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	
 	/**
 	 * 
@@ -135,12 +136,12 @@ package org.openforis.collect.presenter {
 		
 		protected function okButtonClickHandler(event:Event = null):void {
 			if(remarksChanged) {
+				var attrDefn:AttributeDefinitionProxy = _inputField.attributeUIModelObject.attributeDefinition;
 				var remarks:String = StringUtil.trim(view.remarksTextArea.text);
 				var nodeEvent:NodeEvent = new NodeEvent(NodeEvent.UPDATE_REMARKS);
 				nodeEvent.remarks = remarks;
-				if(_inputField.attributeDefinition.multiple && _inputField is CodeInputField) {
-					var attrName:String = _inputField.attributeDefinition.name;
-					nodeEvent.nodes = _inputField.parentEntity.getChildren(attrName);
+				if(attrDefn.multiple && _inputField is CodeInputField) {
+					nodeEvent.nodes = _inputField.parentEntity.getChildren(attrDefn.name);
 				} else {
 					nodeEvent.node = _inputField.attribute;
 					nodeEvent.fieldIdx = _inputField.fieldIndex;
