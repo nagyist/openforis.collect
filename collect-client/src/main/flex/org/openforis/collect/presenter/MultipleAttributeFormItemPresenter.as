@@ -11,6 +11,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeAddRequestProxy;
+	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.EntityUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.NodeUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
@@ -76,8 +77,9 @@ package org.openforis.collect.presenter
 
 		protected function getAttributes():IList {
 			if(view.dataGroup != null && view.parentEntity != null) {
-				var name:String = view.attributeUIModelObject.attributeDefinition.name;
-				var attributes:IList = view.parentEntity.getChildren(name);
+				var attrDefn:AttributeDefinitionProxy = view.attributeDefinition;
+				var nearestParentEntity:EntityProxy = view.parentEntity.getDescendantNearestParentEntity(attrDefn);
+				var attributes:IList = nearestParentEntity.getChildren(attrDefn.name);
 				return attributes;
 			} else {
 				return null;
@@ -117,7 +119,7 @@ package org.openforis.collect.presenter
 		}
 		
 		override protected function updateRelevanceDisplayManager():void {
-			_relevanceDisplayManager.displayNodeRelevance(view.parentEntity, view.attributeUIModelObject.attributeDefinition);
+			_relevanceDisplayManager.displayNodeRelevance(view.parentEntity, view.attributeDefinition);
 		}
 		
 		override protected function updateValidationDisplayManager():void {

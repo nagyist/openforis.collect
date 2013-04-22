@@ -7,13 +7,12 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
-	import org.openforis.collect.metamodel.ui.proxy.FieldProxy;
+	import org.openforis.collect.metamodel.ui.proxy.ColumnProxy;
 	import org.openforis.collect.model.proxy.AttributeUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.FieldUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.input.RangeAttributeRenderer;
-	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * 
@@ -89,7 +88,7 @@ package org.openforis.collect.presenter {
 			var units:IList = attrDefn.units;
 			if(units.length > 0) {
 				if(units.length == 1) {
-					if ( attrDefn.parentLayout == UIUtil.LAYOUT_FORM ) {
+					if ( view.attributeUIModelObject is ColumnProxy ) {
 						view.currentState = RangeAttributeRenderer.SINGLE_UNIT_STATE;
 						var unit:UnitProxy = UnitProxy(units.getItemAt(0));
 						view.unitLabel.text = unit.getAbbreviation();

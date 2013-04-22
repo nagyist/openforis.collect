@@ -9,15 +9,27 @@ package org.openforis.collect.metamodel.ui.proxy {
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SchemaProxy;
+	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.ui.proxy.ColumnProxy")]
     public class ColumnProxy extends ColumnProxyBase {
 		
+		[Bindable(event="surveyChange")]
 		override public function get attributeDefinition():AttributeDefinitionProxy {
 			var schema:SchemaProxy = survey.schema;
 			var defn:NodeDefinitionProxy = schema.getDefinitionById(attributeId);
 			return defn as AttributeDefinitionProxy;
 		}
+		
+		[Bindable(event="parentChange")]
+		public function get parentTable():TableProxy {
+			var currentParent:UIModelObjectProxy = this.parent;
+			while ( currentParent != null && ! (currentParent is TableProxy) ) {
+				currentParent = currentParent.parent;
+			}
+			return currentParent as TableProxy;
+		}
+		
     }
 }

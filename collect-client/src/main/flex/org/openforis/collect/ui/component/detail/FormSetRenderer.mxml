@@ -16,7 +16,7 @@
 			 * Return true if the form for teh specified version / entity definition has been generated
 			 * */
 			public function contatinsForm(version:ModelVersionProxy, entity:EntityDefinitionProxy):Boolean {
-				var form:FormContainer = getForm(version, entity);
+				var form:FormContainerRenderer = getForm(version, entity);
 				var containsForm:Boolean = form != null;
 				return containsForm;
 			}
@@ -24,7 +24,7 @@
 			/**
 			 * Add the form to the stack
 			 * */
-			public function addForm(form:FormContainer, version:ModelVersionProxy, entity:EntityDefinitionProxy):void {
+			public function addForm(form:FormContainerRenderer, version:ModelVersionProxy, entity:EntityDefinitionProxy):void {
 				var name:String = getFormName(version,entity);
 				_forms[name] = form; 
 				this.addElement(form);
@@ -33,17 +33,17 @@
 			/**
 			 * Return the form for the given version and entity definition, null if it has not been created yet. 
 			 * */
-			public function getForm(version:ModelVersionProxy, entity:EntityDefinitionProxy):FormContainer{
+			public function getForm(version:ModelVersionProxy, entity:EntityDefinitionProxy):FormContainerRenderer{
 				var name:String = getFormName(version,entity);
-				var form:FormContainer = _forms[name] as FormContainer;
+				var form:FormContainerRenderer = _forms[name] as FormContainerRenderer;
 				return form;
 			}
 			
 			/**
 			 * Show the the form for the given version and entity definition
 			 * */
-			public function setActiveForm(version:ModelVersionProxy, entity:EntityDefinitionProxy):FormContainer {
-				var form:FormContainer = getForm(version, entity);
+			public function setActiveForm(version:ModelVersionProxy, entity:EntityDefinitionProxy):FormContainerRenderer {
+				var form:FormContainerRenderer = getForm(version, entity);
 				this.selectedChild = form;
 				return form;
 			}

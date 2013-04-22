@@ -9,6 +9,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.NodeEvent;
+	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
@@ -69,7 +70,7 @@ package org.openforis.collect.presenter
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
 			BindingUtils.bindSetter(parentEntitySetter, _view, "parentEntity");
-			//ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
+			BindingUtils.bindSetter(setModelVersion, _view, "modelVersion");
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
@@ -93,6 +94,10 @@ package org.openforis.collect.presenter
 		
 		protected function askForSubmitHandler(event:ApplicationEvent):void {
 			updateValidationDisplayManager();
+		}
+		
+		protected function setModelVersion(version:ModelVersionProxy):void {
+			updateView();
 		}
 		
 		protected function parentEntitySetter(parentEntity:EntityProxy):void {

@@ -23,7 +23,6 @@
 			
 			private var _parentEntity:EntityProxy;
 			private var _modelVersion:ModelVersionProxy;
-			private var _attributeUIModelObject:AttributeModelObjectProxy;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
 			}
@@ -38,7 +37,7 @@
 						throw new Error("Unsupported child type: " + data.toString());
 					}
 					addElement(formItem);
-					BindingUtils.bindProperty(formItem, "parentEntity", this, "parentEntity");
+					BindingUtils.bindProperty(formItem, "parentEntity", this, "entity");
 				}
 			}
 			
@@ -48,7 +47,7 @@
 				initialize();
 			}
 			
-			[Bindable]
+			[Bindable(event="parentEntityChange")]
 			public function get parentEntity():EntityProxy {
 				return _parentEntity;
 			}

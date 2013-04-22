@@ -29,7 +29,6 @@
 			
 			private var _entitiesDirection:String = DIRECTION_BY_ROWS;
 			private var _table:TableProxy;
-			private var _modelVersion:ModelVersionProxy;
 			private var _headingComponents:IList;
 			
 			override protected function creationCompleteHandler(event:FlexEvent):void {
@@ -63,28 +62,21 @@
 				updateCurrentState();
 			}
 			
-			[Bindable]
+			[Bindable(event="tableChange")]
 			public function get table():TableProxy {
 				return _table;
 			}
 			
 			public function set table(value:TableProxy):void {
 				_table = value;
+				dispatchEvent(new Event("tableChange"));
 			}
 			
+			[Bindable(event="tableChange")]
 			override public function get nodeDefinition():NodeDefinitionProxy {
 				return _table == null ? null: _table.entityDefinition;
 			}
 			
-			[Bindable]
-			public function get modelVersion():ModelVersionProxy {
-				return _modelVersion;
-			}
-			
-			public function set modelVersion(value:ModelVersionProxy):void {
-				_modelVersion = value;
-			}
-
 			[Bindable]
 			public function get headingComponents():IList {
 				return _headingComponents;
@@ -117,7 +109,7 @@
 
 		<detail:FormItemLabel id="formItemLabel"
 							  showHeadingLabel="true"
-			  				  nodeDefinition="{table.entityDefinition}"
+			  				  nodeDefinition="{nodeDefinition}"
 							  visible="{! occupyEntirePage}"
 							  includeInLayout="{! occupyEntirePage}"
 							  />
@@ -185,7 +177,6 @@
 						<fx:Component>
 							<detail:TableRowItemRenderer
 								table="{outerDocument.table}"
-								entity="{data as EntityProxy}"
 								modelVersion="{outerDocument.modelVersion}"
 								dragEnabled="{Application.activeRecordEditable &amp;&amp; ! outerDocument.table.entityDefinition.enumerable}"
 								nodesDirection="{outerDocument.entitiesDirection == TableFormItem.DIRECTION_BY_COLUMNS ? 

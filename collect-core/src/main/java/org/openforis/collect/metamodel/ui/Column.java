@@ -19,7 +19,7 @@ public class Column extends TableHeadingComponent {
 		super(table, id);
 	}
 
-	public AttributeDefinition getAttributeDefinition() {
+	public AttributeDefinition getAttribute() {
 		return (AttributeDefinition) getNodeDefinition(attributeId);
 	}
 
@@ -51,6 +51,11 @@ public class Column extends TableHeadingComponent {
 		if (attributeId != other.attributeId)
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Attribute: " + getAttribute().getPath();
 	}
 
 }

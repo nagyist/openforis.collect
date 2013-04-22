@@ -6,6 +6,8 @@
  */
 
 package org.openforis.collect.model.proxy {
+	import mx.collections.IList;
+	
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.util.CollectionUtil;
 
@@ -83,6 +85,16 @@ package org.openforis.collect.model.proxy {
 				p = p.parent;
 			}
 			return null;
+		}
+		
+		public function getNearestParentEntity(ancestor:EntityProxy):EntityProxy {
+			var parentDefn:EntityDefinitionProxy = EntityDefinitionProxy(parent.definition);
+			var effectiveParentEntities:IList = ancestor.getDescendants(parentDefn);
+			if ( effectiveParentEntities.length == 1 ) {
+				return EntityProxy(effectiveParentEntities.getItemAt(0));
+			} else {
+				return null;
+			}
 		}
 		
 	}

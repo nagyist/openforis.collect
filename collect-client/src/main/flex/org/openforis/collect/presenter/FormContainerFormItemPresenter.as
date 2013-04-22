@@ -4,6 +4,7 @@ package org.openforis.collect.presenter
 	import flash.events.MouseEvent;
 	
 	import mx.binding.utils.ChangeWatcher;
+	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.events.PropertyChangeEvent;
 	import mx.rpc.events.ResultEvent;
@@ -11,6 +12,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.proxy.EntityAddRequestProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.NodeDeleteRequestProxy;
@@ -23,7 +25,6 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.util.UIUtil;
 	
 	import spark.events.IndexChangeEvent;
-	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 
 
 	/**
@@ -34,6 +35,7 @@ package org.openforis.collect.presenter
 	public class FormContainerFormItemPresenter extends FormItemPresenter {
 		
 		private var _keyTextChangeWatchers:Array;
+		private var _addSectionInited:Boolean = false;
 		
 		public function FormContainerFormItemPresenter(view:FormContainerFormItem) {
 			super(view);
@@ -43,12 +45,15 @@ package org.openforis.collect.presenter
 			super.initEventListeners();
 			
 			eventDispatcher.addEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
-			
+		}
+
+		protected function initAddSection():void {
 			view.addSection.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
 			view.addSection.addButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
 			view.addSection.deleteButton.addEventListener(MouseEvent.CLICK, deleteButtonClickHandler);
 			view.addSection.deleteButton.addEventListener(FocusEvent.FOCUS_IN, buttonFocusInHandler);
 			view.addSection.dropDownList.addEventListener(IndexChangeEvent.CHANGE, dropDownListChangeHandler);
+			_addSectionInited = true;
 		}
 		
 		private function get view():FormContainerFormItem {
@@ -59,22 +64,31 @@ package org.openforis.collect.presenter
 			UIUtil.ensureElementIsVisible(event.target);
 		}
 		
-		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
-			super.updateResponseReceivedHandler(event);
-		}
-		
 		override protected function initValidationDisplayManager():void {
 			super.initValidationDisplayManager();
 			_validationDisplayManager.showMinMaxCountErrors = true;
 		}
 		
 		override protected function updateView():void {
-			if(view.form != null
-					&& view.form.entityDefinition.multiple
-					&& view.parentEntity != null) {
+			if ( view.form.multiple ) {
+				view.currentState = FormContainerFormItem.STATE_MULTIPLE;
+				if ( ! _addSectionInited ) {
+					initAddSection();
+				}
+			} else {
+				view.currentState = FormContainerFormItem.STATE_SINGLE; 
+			}
+			if(view.form != null && view.parentEntity != null) {
 				var entities:IList = getEntities();
-				view.entities = EntityProxy.sortEntitiesByKey(entities);
-				selectEntity(null);
+				if ( view.form.multiple) {
+					view.entities = EntityProxy.sortEntitiesByKey(entities);
+					selectEntity(null);
+				} else {
+					view.entities = null;
+					if ( entities.length == 1 ) {
+						selectEntity(EntityProxy(entities.getItemAt(0)));
+					}
+				}
 			}
 			super.updateView();
 		}
@@ -82,8 +96,13 @@ package org.openforis.collect.presenter
 		protected function getEntities():IList {
 			var name:String = view.form.entityDefinition.name;
 			var entities:IList = null;
-			if(view.parentEntity != null) {
-				entities = view.parentEntity.getChildren(name);
+			if ( view.parentEntity != null ) {
+				if ( view.parentEntity.definition == view.form.entityDefinition ) {
+					entities = new ArrayList();
+					entities.addItem(view.parentEntity);
+				} else {
+					entities = view.parentEntity.getChildren(name);
+				}
 			}
 			return entities;
 		}
@@ -194,19 +213,29 @@ package org.openforis.collect.presenter
 		}
 		
 		protected function selectEntity(entity:EntityProxy, resetView:Boolean = false):void {
-			view.addSection.dropDownList.selectedItem = entity;
-			view.selectedEntity = entity;
-			view.internalContainer.reset();
-			if(entity != null) {
-				if(view.internalContainer.visible) {
-					//internal container already visible, call programmatically the showEffect
-					view.showFormEffect.play([view.internalContainer]);
-				} else {
-					view.internalContainer.visible = true;
-				}
-			} else {
-				view.internalContainer.visible = false;
+			if ( view.currentState == FormContainerFormItem.STATE_MULTIPLE ) {
+				view.addSection.dropDownList.selectedItem = entity;
 			}
+			view.internalContainer.reset();
+			view.selectedEntity = entity;
+			if(entity != null) {
+				showInternalContainer();
+			} else {
+				hideInternalContainer();
+			}
+		}
+		
+		protected function showInternalContainer():void {
+			if(view.internalContainer.visible) {
+				//internal container already visible, call programmatically the showEffect
+				view.showFormEffect.play([view.internalContainer]);
+			} else {
+				view.internalContainer.visible = true;
+			}
+		}
+		
+		protected function hideInternalContainer():void {
+			view.internalContainer.visible = false;
 		}
 		
 	}

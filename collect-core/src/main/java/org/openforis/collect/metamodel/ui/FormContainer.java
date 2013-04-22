@@ -126,4 +126,9 @@ public abstract class FormContainer extends UIModelObject {
 		return true;
 	}
 	
+	@Override
+	public String toString() {
+		return "Entity: " + getEntity().getPath();
+	}
+	
 }

@@ -7,13 +7,13 @@
 
 package org.openforis.collect.metamodel.proxy {
 	import mx.collections.ArrayCollection;
+	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	
 	import org.openforis.collect.Application;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
 	import org.openforis.collect.util.TextUtil;
-	import org.openforis.collect.util.UIUtil;
 	
 	/**
 	 * @author M. Togna
@@ -56,7 +56,7 @@ package org.openforis.collect.metamodel.proxy {
 		public function getSpecificLabelText(typesStack:Array, nameIfNotFound:Boolean = true):String {
 			var label:NodeLabelProxy = null;
 			for each (var type:NodeLabelProxy$Type in typesStack) {
-				label = getLabel(type);
+				label = getLabel(type, true);
 				if(label != null) {
 					break;
 				}
@@ -70,15 +70,24 @@ package org.openforis.collect.metamodel.proxy {
 			}
 		}
 		
-		public function getLabel(type:NodeLabelProxy$Type):NodeLabelProxy {
+		public function getLabel(type:NodeLabelProxy$Type, defaultIfNotFound:Boolean = false):NodeLabelProxy {
 			if(CollectionUtil.isNotEmpty(labels)) {
-				var labelsPerType:IList = getLabelsByType(type);
-				var langCode:String = Application.localeLanguageCode;
-				var isDefaultLang:Boolean = langCode == Application.activeSurvey.defaultLanguageCode;
-				for each(var label:NodeLabelProxy in labelsPerType) {
-					if ( label.language == null && isDefaultLang || label.language == langCode) {
-						return label;
-					}
+				var defaultLangCode:String = Application.activeSurvey.defaultLanguageCode;
+				var label:NodeLabelProxy = getLabelByLanguage(type, Application.localeLanguageCode, defaultLangCode);
+				if ( label == null && defaultIfNotFound ) {
+					label = getLabelByLanguage(type, defaultLangCode, defaultLangCode);
+				}
+				return label;
+			} else {
+				return null;
+			}
+		}
+		
+		public function getLabelByLanguage(type:NodeLabelProxy$Type, langCode:String, defaultLangCode:String):NodeLabelProxy {
+			var labelsPerType:IList = getLabelsByType(type);
+			for each(var label:NodeLabelProxy in labelsPerType) {
+				if ( label.language == null && langCode == defaultLangCode || label.language == langCode) {
+					return label;
 				}
 			}
 			return null;
@@ -96,7 +105,7 @@ package org.openforis.collect.metamodel.proxy {
 		
 		public function getDescription():String {
 			var langCode:String = Application.localeLanguageCode;
-			var result:String = LanguageSpecificTextProxy.getLocalizedText(descriptions, langCode);
+			var result:String = LanguageSpecificTextProxy.getLocalizedText(descriptions, langCode, survey.defaultLanguageCode);
 			result = TextUtil.trimLeadingWhitespace(result);
 			return result;
 		}
@@ -112,13 +121,15 @@ package org.openforis.collect.metamodel.proxy {
 			return parentEntity;
 		}
 		
-		[Bindable]
-		public function get parentLayout():String {
-			if(parent != null) {
-				return parent.layout;
-			} else {
-				return UIUtil.LAYOUT_FORM;
+		public function getRelativePath(ancestor:EntityDefinitionProxy):String {
+			var parts:IList = new ArrayList();
+			parts.addItem(name);
+			var currentParent:EntityDefinitionProxy = parent;
+			while ( currentParent != null && currentParent != ancestor ) {
+				parts.addItemAt(currentParent.name, 0);
+				currentParent = currentParent.parent;
 			}
+			return StringUtil.concat("/", parts.toArray());
 		}
 		
 		public function get survey():SurveyProxy {
@@ -127,6 +138,10 @@ package org.openforis.collect.metamodel.proxy {
 		
 		public function set survey(value:SurveyProxy):void {
 			_survey = value;
+		}
+		
+		public function toString():String {
+			return "Path: " + path;
 		}
     }
 }

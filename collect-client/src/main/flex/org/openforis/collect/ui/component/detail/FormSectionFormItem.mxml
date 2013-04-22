@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<detail:FormComponentFormItem 
+<detail:CollectFormItem 
 		xmlns:fx="http://ns.adobe.com/mxml/2009" 
 		xmlns:s="library://ns.adobe.com/flex/spark" 
 		xmlns:mx="library://ns.adobe.com/flex/mx"
@@ -10,15 +10,15 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.IList;
-			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.metamodel.ui.proxy.FormSectionProxy;
+			import org.openforis.collect.presenter.FormSectionFormItemPresenter;
 			
 			private var _formSection:FormSectionProxy;
 			private var _items:IList;
 			
-			override protected function creationCompleteHandler(event:FlexEvent):void {
-				super.creationCompleteHandler(event);
+			override protected function initPresenter():void {
+				_presenter = new FormSectionFormItemPresenter(this);
 			}
 
 			[Bindable]
@@ -68,4 +68,4 @@
 		</s:itemRenderer>
 	</s:DataGroup>
 	
-</detail:FormComponentFormItem>
+</detail:CollectFormItem>

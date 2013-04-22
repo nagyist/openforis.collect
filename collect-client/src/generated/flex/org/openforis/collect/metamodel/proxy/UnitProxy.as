@@ -13,15 +13,13 @@ package org.openforis.collect.metamodel.proxy {
     public class UnitProxy extends UnitProxyBase {
 		
 		public function getLabelText():String {
-			var langCode:String = Application.localeLanguageCode;
-			var defaultLanguage:Boolean = Application.activeSurvey.defaultLanguageCode == langCode;
-			return LanguageSpecificTextProxy.getLocalizedText(labels, langCode, defaultLanguage);
+			return LanguageSpecificTextProxy.getLocalizedText(labels, 
+				Application.localeLanguageCode, Application.activeSurvey.defaultLanguageCode);
 		}
 		
 		public function getAbbreviation():String {
-			var langCode:String = Application.localeLanguageCode;
-			var defaultLanguage:Boolean = Application.activeSurvey.defaultLanguageCode == langCode;
-			var result:String = LanguageSpecificTextProxy.getLocalizedText(abbreviations, langCode, defaultLanguage);
+			var result:String = LanguageSpecificTextProxy.getLocalizedText(abbreviations, 
+				Application.localeLanguageCode, Application.activeSurvey.defaultLanguageCode);
 			if ( result == null ) {
 				result = name;
 			}

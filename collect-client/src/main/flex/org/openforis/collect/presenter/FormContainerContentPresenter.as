@@ -4,22 +4,22 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+	import org.openforis.collect.metamodel.proxy.SurveyProxy;
 	import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 	import org.openforis.collect.metamodel.ui.proxy.FormContainerProxy;
 	import org.openforis.collect.metamodel.ui.proxy.FormProxy;
-	import org.openforis.collect.ui.component.detail.TabbedFormContainer;
-	import org.openforis.collect.metamodel.proxy.SurveyProxy;
+	import org.openforis.collect.ui.component.detail.FormContainerContentRenderer;
 	
 	/**
 	 * 
 	 * @author S. Ricci
 	 * 
 	 */
-	public class TabbedFormPresenter extends AbstractPresenter {
+	public class FormContainerContentPresenter extends AbstractPresenter {
 		
-		private var _view:TabbedFormContainer;
+		private var _view:FormContainerContentRenderer;
 		
-		public function TabbedFormPresenter(view:TabbedFormContainer) {
+		public function FormContainerContentPresenter(view:FormContainerContentRenderer) {
 			_view = view;
 			super();
 			buildView();
@@ -41,6 +41,17 @@ package org.openforis.collect.presenter {
 		
 		protected function buildView():void {
 			_view.innerForms = _view.formContainer == null ? null: _view.formContainer.forms;
+			if ( _view.formContainer is FormProxy ) {
+				if ( _view.hasItemsPerCurrentForm ) {
+					if ( _view.hasInnerForms ) {
+						_view.currentState = FormContainerContentRenderer.STATE_COMPLETE;
+					} else {
+						_view.currentState = FormContainerContentRenderer.STATE_DEFAULT;
+					}
+				} else if ( _view.hasInnerForms ) {
+					_view.currentState = FormContainerContentRenderer.STATE_INNER_FORMS;
+				}
+			}
 		}
 	}
 }

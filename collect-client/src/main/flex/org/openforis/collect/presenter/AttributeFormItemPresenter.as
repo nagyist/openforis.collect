@@ -8,6 +8,7 @@ package org.openforis.collect.presenter
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.detail.AttributeFormItem;
@@ -22,8 +23,6 @@ package org.openforis.collect.presenter
 		
 		public function AttributeFormItemPresenter(view:AttributeFormItem) {
 			super(view);
-			
-			assignAttribute();
 		}
 		
 		override internal function initEventListeners():void {
@@ -69,14 +68,16 @@ package org.openforis.collect.presenter
 		 * get the attribute (or attributes) from the parentEntity
 		 */
 		protected function assignAttribute():void {
-			if (view.parentEntity != null ) {
-				var attrDefn:AttributeDefinitionProxy = view.attributeUIModelObject.attributeDefinition;
+			var parentEntity:EntityProxy = view.parentEntity;
+			if (parentEntity != null ) {
+				var attrDefn:AttributeDefinitionProxy = view.attributeDefinition;
 				var name:String = attrDefn.name;
+				var nearestParentEntity:EntityProxy = parentEntity.getDescendantNearestParentEntity(attrDefn);
 				if (attrDefn.multiple) {
-					var attributes:IList = view.parentEntity.getChildren(name);
+					var attributes:IList = nearestParentEntity.getChildren(name);
 					view.attributes = attributes;
 				} else {
-					var attribute:AttributeProxy = view.parentEntity.getSingleAttribute(name);
+					var attribute:AttributeProxy = nearestParentEntity.getSingleAttribute(name);
 					view.attribute = attribute;
 				}
 			} else {

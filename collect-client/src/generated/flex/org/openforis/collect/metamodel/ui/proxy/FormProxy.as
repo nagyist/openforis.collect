@@ -6,14 +6,6 @@
  */
 
 package org.openforis.collect.metamodel.ui.proxy {
-	import mx.collections.IList;
-	
-	import org.openforis.collect.Application;
-	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
-	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.SchemaProxy;
-	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 
     [Bindable]
@@ -34,6 +26,7 @@ package org.openforis.collect.metamodel.ui.proxy {
 			}
 		}
 		
+		[Bindable(event="formSectionsChange")]
 		public function get formSection():FormSectionProxy {
 			if ( CollectionUtil.isEmpty(formSections) ) {
 				return null;
@@ -42,10 +35,5 @@ package org.openforis.collect.metamodel.ui.proxy {
 			}
 		}
 		
-		public function get entityDefinition():EntityDefinitionProxy {
-			var schema:SchemaProxy = survey.schema;
-			var defn:NodeDefinitionProxy = schema.getDefinitionById(entityId);
-			return defn as EntityDefinitionProxy;
-		}
     }
 }

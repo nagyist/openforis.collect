@@ -2,7 +2,6 @@ package org.openforis.collect.metamodel.ui;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Stack;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
@@ -49,42 +48,76 @@ public class UIOptionsMigrator {
 	protected void createForm(FormContainer parent, UITab tab) {
 		UIOptions oldUIOptions = tab.getUIOptions();
 		Form form = parent.createForm();
-		EntityDefinition tabAssignedEntityDefn = findAssignedEntityDefinition(parent, tab);
-		form.setEntityId(tabAssignedEntityDefn.getId());
+		EntityDefinition tabAssignedEntityDefn = findAssignedEntityDefinition(tab);
+		if ( tabAssignedEntityDefn != null && 
+				oldUIOptions.getLayout(tabAssignedEntityDefn) == Layout.FORM) {
+			form.setEntityId(tabAssignedEntityDefn.getId());
+			form.setMultiple(tabAssignedEntityDefn.isMultiple());
+		} else {
+			form.setEntityId(parent.getEntityId());
+		}
 		copyLabels(tab, form);
-		FormSection mainFormSection = form.createFormSection();
-		form.addFormSection(mainFormSection);
-		List<NodeDefinition> nodes = oldUIOptions.getNodesPerTab(tab, false);
-		for (NodeDefinition nodeDefn : nodes) {
-			createFormSectionComponent(tab, mainFormSection, nodeDefn);
-		}
-		List<UITab> innerTabs = tab.getTabs();
-		for (UITab innerTab : innerTabs) {
-			createForm(form, innerTab);
-		}
+		createMainFormSection(tab, form);
+		createInnerForms(tab, form);
 		parent.addForm(form);
 	}
 
-	protected EntityDefinition findAssignedEntityDefinition(FormContainer parent,
-			UITab tab) {
+	protected void createMainFormSection(UITab tab, Form form) {
 		UIOptions oldUIOptions = tab.getUIOptions();
-		Stack<NodeDefinition> stack = new Stack<NodeDefinition>();
-		stack.push(parent.getEntity());
-		while ( ! stack.isEmpty() ) {
-			NodeDefinition nodeDefn = stack.pop();
-			if ( nodeDefn instanceof EntityDefinition ) {
-				UITab assignedTab = oldUIOptions.getAssignedTab(nodeDefn, true);
-				if ( assignedTab.equals(tab) ) {
-					return (EntityDefinition) nodeDefn;
-				} else {
-					stack.addAll(((EntityDefinition) nodeDefn).getChildDefinitions());
-				}
-			}
-		}
-		return parent.getEntity();
+		List<NodeDefinition> nodes = oldUIOptions.getNodesPerTab(tab, false);
+		createMainFormSection(form, oldUIOptions, nodes);
 	}
 
-	protected void createFormSectionComponent(UITab tab,
+	protected void createMainFormSection(Form form, UIOptions oldUIOptions,
+			List<NodeDefinition> nodes) {
+		FormSection mainFormSection = form.createFormSection();
+		for (NodeDefinition nodeDefn : nodes) {
+			createFormSectionComponent(oldUIOptions, mainFormSection, nodeDefn);
+		}
+		form.addFormSection(mainFormSection);
+	}
+
+	protected void createInnerForms(UITab tab, Form parent) {
+//		UIOptions oldUIOptions = tab.getUIOptions();
+//		List<NodeDefinition> nodesPerTab = oldUIOptions.getNodesPerTab(tab, false);
+//		for (NodeDefinition nodeDefn : nodesPerTab) {
+//			if ( nodeDefn instanceof EntityDefinition && nodeDefn.isMultiple() && 
+//					oldUIOptions.getLayout((EntityDefinition) nodeDefn) == Layout.FORM ) {
+//				UITab assignedTab = oldUIOptions.getAssignedTab(nodeDefn);
+//				if ( assignedTab == tab ) {
+//					createFormFromFormEntity(assignedTab, parent, (EntityDefinition) nodeDefn);
+//				}
+//			}
+//		}
+		List<UITab> innerTabs = tab.getTabs();
+		for (UITab innerTab : innerTabs) {
+			createForm(parent, innerTab);
+		}
+	}
+
+//	protected void createFormFromFormEntity(UITab parentTab, Form parent, EntityDefinition entityDefn) {
+//		Form form = parent.createForm();
+//		copyLabels(entityDefn, form);
+//		form.setEntityId(entityDefn.getId());
+//		form.setMultiple(true);
+//		createMainFormSection(form, parentTab.getUIOptions(), entityDefn.getChildDefinitions());
+//		createInnerForms(parentTab, form);
+//		parent.addForm(form);
+//	}
+
+	protected EntityDefinition findAssignedEntityDefinition(UITab tab) {
+		UIOptions oldUIOptions = tab.getUIOptions();
+		List<NodeDefinition> nodesPerTab = oldUIOptions.getNodesPerTab(tab, false);
+		if ( nodesPerTab.size() == 1 ) {
+			NodeDefinition firstNode = nodesPerTab.get(0);
+			if ( firstNode instanceof EntityDefinition ) {
+				return (EntityDefinition) firstNode;
+			}
+		}
+		return null;
+	}
+
+	protected void createFormSectionComponent(UIOptions oldUIOptions,
 			FormSection parent, NodeDefinition nodeDefn) {
 		if ( nodeDefn instanceof AttributeDefinition ) {
 			Field field = createField(parent, nodeDefn);
@@ -92,7 +125,6 @@ public class UIOptionsMigrator {
 		} else if ( nodeDefn instanceof EntityDefinition ) {
 			EntityDefinition entityDefn = (EntityDefinition) nodeDefn;
 			if ( entityDefn.isMultiple() ) {
-				UIOptions oldUIOptions = tab.getUIOptions();
 				if ( oldUIOptions.getLayout(entityDefn) == Layout.TABLE ) {
 					Table table = createTable(parent, entityDefn);
 					parent.addChild(table);
@@ -191,6 +223,13 @@ public class UIOptionsMigrator {
 
 	protected void copyLabels(UITab tab, Form form) {
 		List<LanguageSpecificText> labels = tab.getLabels();
+		for (LanguageSpecificText lst : labels) {
+			form.setLabel(lst.getLanguage(), lst.getText());
+		}
+	}
+
+	protected void copyLabels(EntityDefinition entityDefn, Form form) {
+		List<NodeLabel> labels = getLabelsByType(entityDefn, Type.HEADING);
 		for (LanguageSpecificText lst : labels) {
 			form.setLabel(lst.getLanguage(), lst.getText());
 		}

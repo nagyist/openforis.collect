@@ -13,12 +13,14 @@
 			import mx.collections.IList;
 			
 			import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
+			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 			import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 			import org.openforis.collect.metamodel.ui.proxy.AttributeModelObjectProxy;
 			import org.openforis.collect.metamodel.ui.proxy.FieldProxy;
 			import org.openforis.collect.metamodel.ui.proxy.TableProxy;
 			import org.openforis.collect.metamodel.ui.proxy.UIModelObjectProxy;
 			import org.openforis.collect.model.proxy.AttributeProxy;
+			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.presenter.AttributeFormItemPresenter;
 			
 			private var _attributeUIModelObject:AttributeModelObjectProxy;
@@ -29,27 +31,26 @@
 				presenter = new AttributeFormItemPresenter(this);
 			}
 			
-			[Bindable(event="attributeModelObjectChange")]
+			[ChageEvent("attributeUIModelObject")]
 			override public function get nodeDefinition():NodeDefinitionProxy {
 				return _attributeUIModelObject == null ? null: _attributeUIModelObject.attributeDefinition;
 			}
 			
-			[Bindable(event="attributeModelObjectChange")]
+			[ChageEvent("attributeUIModelObject")]
 			public function get attributeDefinition():AttributeDefinitionProxy {
 				return _attributeUIModelObject == null ? null: _attributeUIModelObject.attributeDefinition;
 			}
 			
-			[Bindable(event="attributeModelObjectChange")]
+			[Bindable]
 			public function get attributeUIModelObject():AttributeModelObjectProxy {
 				return _attributeUIModelObject;
 			}
 			
 			public function set attributeUIModelObject(value:AttributeModelObjectProxy):void {
 				_attributeUIModelObject = value;
-				dispatchEvent(new Event("attributeModelObjectChange"));
 			}
 			
-			[Bindable(event="attributeModelObjectChange")]
+			[ChageEvent("attributeUIModelObject")]
 			public function get insideTable():Boolean {
 				return attributeUIModelObject == null ? false: UIModelObjectProxy(attributeUIModelObject).parent is TableProxy;
 			}

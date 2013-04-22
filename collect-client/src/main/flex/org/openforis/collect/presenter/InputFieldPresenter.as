@@ -21,6 +21,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.proxy.NumberAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.RangeAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
+	import org.openforis.collect.metamodel.ui.proxy.ColumnProxy;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeAddRequestProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
@@ -343,7 +344,8 @@ package org.openforis.collect.presenter {
 		
 		protected function keyDownHandler(event:KeyboardEvent):void {
 			var attrDefn:AttributeDefinitionProxy = _view.attributeUIModelObject.attributeDefinition;
-			var directionByColumns:Boolean = attrDefn.parent != null && attrDefn.parent.direction == UIOptions$Direction.BY_COLUMNS;
+			var directionByColumns:Boolean = _view.attributeUIModelObject is ColumnProxy && 
+				ColumnProxy(_view.attributeUIModelObject).parentTable.direction == UIOptions$Direction.BY_COLUMNS;
 			var keyCode:uint = event.keyCode;
 			var offset:int = 0;
 			var moveByEntity:Boolean = ! directionByColumns;
@@ -378,7 +380,8 @@ package org.openforis.collect.presenter {
 		
 		protected function handleTabKey(shiftKey:Boolean = false):void {
 			var attrDefn:AttributeDefinitionProxy = _view.attributeUIModelObject.attributeDefinition;
-			var directionByColumns:Boolean = attrDefn.parent != null && attrDefn.parent.direction == UIOptions$Direction.BY_COLUMNS;
+			var directionByColumns:Boolean = _view.attributeUIModelObject is ColumnProxy && 
+				ColumnProxy(_view.attributeUIModelObject).parentTable.direction == UIOptions$Direction.BY_COLUMNS;
 			var focusChanged:Boolean = false;
 			if ( directionByColumns ) {
 				var offset:int = shiftKey ? -1: 1;

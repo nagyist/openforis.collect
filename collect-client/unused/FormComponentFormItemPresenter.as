@@ -26,9 +26,5 @@ package org.openforis.collect.presenter
 			updateView();
 		}
 		
-		private function get view():FormComponentFormItem {
-			return FormComponentFormItem(_view);
-		}
-		
 	}
 }

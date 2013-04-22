@@ -13,10 +13,13 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.Application;
 	import org.openforis.collect.event.EventDispatcherFactory;
 	import org.openforis.collect.event.NodeEvent;
+	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
+	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
+	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.ui.component.input.CodeInputField;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.RemarksPopUp;
@@ -26,7 +29,6 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.util.StringUtil;
 	
 	import spark.components.RadioButton;
-	import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 	
 	/**
 	 * 
@@ -141,7 +143,8 @@ package org.openforis.collect.presenter {
 				var nodeEvent:NodeEvent = new NodeEvent(NodeEvent.UPDATE_REMARKS);
 				nodeEvent.remarks = remarks;
 				if(attrDefn.multiple && _inputField is CodeInputField) {
-					nodeEvent.nodes = _inputField.parentEntity.getChildren(attrDefn.name);
+					var nearestParentEntity:EntityProxy = _inputField.parentEntity.getDescendantNearestParentEntity(attrDefn);
+					nodeEvent.nodes = nearestParentEntity.getChildren(attrDefn.name);
 				} else {
 					nodeEvent.node = _inputField.attribute;
 					nodeEvent.fieldIdx = _inputField.fieldIndex;

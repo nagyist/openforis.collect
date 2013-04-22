@@ -3,11 +3,7 @@ package org.openforis.collect.presenter
 	import mx.binding.utils.BindingUtils;
 	import mx.collections.IList;
 	
-	import org.openforis.collect.event.ApplicationEvent;
-	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
-	import org.openforis.collect.model.proxy.EntityProxy;
-	import org.openforis.collect.ui.component.detail.EntityFormItem;
+	import org.openforis.collect.metamodel.ui.proxy.FormSectionProxy;
 	import org.openforis.collect.ui.component.detail.FormSectionFormItem;
 	
 	/**
@@ -25,14 +21,10 @@ package org.openforis.collect.presenter
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			BindingUtils.bindSetter(setEntityDefinition, view, "entityDefinition");
+			BindingUtils.bindSetter(setFormSection, view, "formSection");
 		}
 		
-		protected function setEntityDefinition(entityDefinition:EntityDefinitionProxy):void {
-			updateView();
-		}
-		
-		protected function setModelVersion(version:ModelVersionProxy):void {
+		protected function setFormSection(formSection:FormSectionProxy):void {
 			updateView();
 		}
 		

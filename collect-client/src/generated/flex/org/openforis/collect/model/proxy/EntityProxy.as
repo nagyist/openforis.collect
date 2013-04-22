@@ -7,6 +7,7 @@
 
 package org.openforis.collect.model.proxy {
 	import mx.collections.ArrayCollection;
+	import mx.collections.ArrayList;
 	import mx.collections.IList;
 	import mx.collections.ListCollectionView;
 	import mx.collections.Sort;
@@ -144,8 +145,27 @@ package org.openforis.collect.model.proxy {
 						result.addAll(childrenPart);
 					}
 				}
-			}
+			} 
 			return result;
+		}
+		
+		public function getDescendants(descendantDefn:NodeDefinitionProxy):IList {
+			var relativePath:String = descendantDefn.getRelativePath(EntityDefinitionProxy(this.definition));
+			var parts:Array = relativePath.split("/");
+			var currentLevelNodes:IList = new ArrayList();
+			for each (var part:String in parts) {
+				var nextLevelNodes:IList = new ArrayList();
+				for each (var currentNode:NodeProxy in currentLevelNodes) {
+					if ( currentNode is EntityProxy ) {
+						var childrenPart:IList = EntityProxy(currentNode).getChildren(part);
+						CollectionUtil.addAll(nextLevelNodes, childrenPart);
+					} else {
+						throw new Error("Entity expected, found: " + currentNode);
+					}
+				}
+				currentLevelNodes = nextLevelNodes;
+			}
+			return currentLevelNodes;
 		}
 		
 		public function getLeafAttributes():IList {
@@ -164,6 +184,21 @@ package org.openforis.collect.model.proxy {
 			}
 			return result;
 		}
+		
+		public function getDescendantNearestParentEntity(descendantDefn:NodeDefinitionProxy):EntityProxy {
+			var nearestParentDefn:EntityDefinitionProxy = descendantDefn.parent;
+			if ( this.definition == nearestParentDefn ) {
+				return this;
+			} else {
+				var effectiveParentEntities:IList = this.getDescendants(nearestParentDefn);
+				if ( effectiveParentEntities.length == 1 ) {
+					return EntityProxy(effectiveParentEntities.getItemAt(0));
+				} else {
+					return this;
+				}
+			}
+		}
+		
 		
 		public function getLeafFields():IList {
 			var result:IList = new ArrayCollection();

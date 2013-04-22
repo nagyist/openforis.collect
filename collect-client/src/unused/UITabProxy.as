@@ -14,9 +14,8 @@ package org.openforis.collect.metamodel.proxy {
     public class UITabProxy extends UITabProxyBase {
 		
 		public function get labelText():String {
-			var langCode:String = Application.localeLanguageCode;
-			var defaultLanguage:Boolean = Application.activeSurvey.defaultLanguageCode == langCode;
-			var result:String = LanguageSpecificTextProxy.getLocalizedText(this.labels, langCode, defaultLanguage);
+			var result:String = LanguageSpecificTextProxy.getLocalizedText(this.labels, 
+				Application.localeLanguageCode, Application.activeSurvey.defaultLanguageCode);
 			if ( result == null ) {
 				return name;
 			}

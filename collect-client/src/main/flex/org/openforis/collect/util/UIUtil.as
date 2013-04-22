@@ -29,9 +29,6 @@ package org.openforis.collect.util
 	 */
 	public class UIUtil {
 		
-		public static const LAYOUT_FORM:String = "form";
-		public static const LAYOUT_TABLE:String = "table";
-		
 		private static var fixedCodeTextFormat:UITextFormat
 		private static var unitTextFormat:UITextFormat;
 		private static var gridHeaderFormat:UITextFormat;

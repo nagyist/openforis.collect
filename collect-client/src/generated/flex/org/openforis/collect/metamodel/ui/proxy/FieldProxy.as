@@ -14,10 +14,16 @@ package org.openforis.collect.metamodel.ui.proxy {
     [RemoteClass(alias="org.openforis.collect.metamodel.ui.proxy.FieldProxy")]
     public class FieldProxy extends FieldProxyBase {
 		
+		[Bindable(event="surveyChange")]
 		override public function get attributeDefinition():AttributeDefinitionProxy {
 			var schema:SchemaProxy = survey.schema;
 			var defn:NodeDefinitionProxy = schema.getDefinitionById(attributeId);
 			return defn as AttributeDefinitionProxy;
 		}
+		
+		public function toString():String {
+			return "Attribute: " + attributeDefinition.path;
+		}
+		
     }
 }

@@ -13,16 +13,14 @@ package org.openforis.collect.metamodel.proxy {
     public class CodeListItemProxy extends CodeListItemProxyBase {
 		
 		public function getLabelText():String {
-			var langCode:String = Application.localeLanguageCode;
-			var defaultLanguage:Boolean = Application.activeSurvey.defaultLanguageCode == langCode;
-			var result:String = LanguageSpecificTextProxy.getLocalizedText(labels, langCode, defaultLanguage);
+			var result:String = LanguageSpecificTextProxy.getLocalizedText(labels, 
+				Application.localeLanguageCode, Application.activeSurvey.defaultLanguageCode);
 			return result;
 		}
 		
 		public function getDescriptionText():String {
-			var langCode:String = Application.localeLanguageCode;
-			var defaultLanguage:Boolean = Application.activeSurvey.defaultLanguageCode == langCode;
-			var result:String = LanguageSpecificTextProxy.getLocalizedText(descriptions, langCode, defaultLanguage);
+			var result:String = LanguageSpecificTextProxy.getLocalizedText(descriptions, 
+				Application.localeLanguageCode, Application.activeSurvey.defaultLanguageCode);
 			return result;
 		}
 		

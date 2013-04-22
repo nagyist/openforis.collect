@@ -3,14 +3,14 @@ package org.openforis.collect.presenter
 	import flash.events.FocusEvent;
 	import flash.events.MouseEvent;
 	
-	import mx.binding.utils.BindingUtils;
+	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.controls.Alert;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.InputFieldEvent;
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
-	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.model.proxy.EntityAddRequestProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
@@ -34,8 +34,6 @@ package org.openforis.collect.presenter
 		override internal function initEventListeners():void {
 			super.initEventListeners();
 			
-			BindingUtils.bindSetter(setModelVersion, _view, "modelVersion");
-
 			view.addButton.addEventListener(MouseEvent.CLICK, addButtonClickHandler);
 			view.addButton.addEventListener(FocusEvent.FOCUS_IN, addButtonFocusInHandler);
 			eventDispatcher.addEventListener(InputFieldEvent.VISITED, inputFieldVisitedHandler);
@@ -43,10 +41,6 @@ package org.openforis.collect.presenter
 		
 		private function get view():TableFormItem {
 			return TableFormItem(_view);
-		}
-		
-		protected function setModelVersion(version:ModelVersionProxy):void {
-			updateView();
 		}
 		
 		protected function initHeadingComponents():void {
@@ -64,26 +58,25 @@ package org.openforis.collect.presenter
 		
 		override protected function updateView():void {
 			initHeadingComponents();
+			var entities:IList = null;
 			if(view.parentEntity != null) {
-				var entities:IList = getEntities();
-				view.dataGroup.dataProvider = entities;
-			} else {
-				view.dataGroup.dataProvider = null;
+				entities = getEntities();
 			}
-			/*var entity:EntityProxy = null;
-			if(view.parentEntity != null && view.entityDefinition != null && ! view.entityDefinition.multiple) {
-				//assign entity
-				entity = view.parentEntity.getChild(view.entityDefinition.name, 0) as EntityProxy;
-			}
-			view.entity = entity;*/
+			view.dataGroup.dataProvider = entities;
 			super.updateView();
 		}
 		
 		protected function getEntities():IList {
-			var name:String = view.table.entityDefinition.name;
+			var name:String = view.nodeDefinition.name;
 			var entities:IList = null;
-			if(view.parentEntity != null) {
-				entities = view.parentEntity.getChildren(name);
+			var parentEntity:EntityProxy = view.parentEntity;
+			if( parentEntity != null) {
+				var nearestParentEntity:EntityProxy = parentEntity.getDescendantNearestParentEntity(view.nodeDefinition);
+				entities = nearestParentEntity.getChildren(name);
+				if ( entities == null ) {
+					Alert.show("Entity not found: " + name + " inside parent entity: " + parentEntity.name);
+					entities = new ArrayCollection();
+				}
 			}
 			return entities;
 		}

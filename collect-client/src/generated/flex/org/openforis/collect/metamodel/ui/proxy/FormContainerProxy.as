@@ -7,16 +7,26 @@
 
 package org.openforis.collect.metamodel.ui.proxy {
 	import org.openforis.collect.Application;
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
+	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 
     [Bindable]
     [RemoteClass(alias="org.openforis.collect.metamodel.ui.proxy.FormContainerProxy")]
     public class FormContainerProxy extends FormContainerProxyBase {
 		
+		[Bindable(event="surveyChange")]
+		public function get entityDefinition():EntityDefinitionProxy {
+			var schema:SchemaProxy = survey.schema;
+			var defn:NodeDefinitionProxy = schema.getDefinitionById(entityId);
+			return defn as EntityDefinitionProxy;
+		}
+		
+		[Bindable(event="localeChange")]
 		public function get labelText():String {
-			var langCode:String = Application.localeLanguageCode;
-			var defaultLanguage:Boolean = survey.defaultLanguageCode == langCode;
-			var result:String = LanguageSpecificTextProxy.getLocalizedText(this.labels, langCode, defaultLanguage);
+			var result:String = LanguageSpecificTextProxy.getLocalizedText(this.labels, 
+				Application.localeLanguageCode, survey.defaultLanguageCode);
 			if ( result == null ) {
 				return String(id);
 			} else {

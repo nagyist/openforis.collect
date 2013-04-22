@@ -21,10 +21,10 @@ package org.openforis.collect.metamodel.ui.proxy {
     [RemoteClass(alias="org.openforis.collect.metamodel.ui.proxy.FormSectionProxy")]
     public class FormSectionProxy extends FormSectionProxyBase {
 		
+		[Bindable(event="localeChange")]
 		public function get labelText():String {
-			var langCode:String = Application.localeLanguageCode;
-			var defaultLanguage:Boolean = survey.defaultLanguageCode == langCode;
-			var result:String = LanguageSpecificTextProxy.getLocalizedText(this.labels, langCode, defaultLanguage);
+			var result:String = LanguageSpecificTextProxy.getLocalizedText(this.labels, 
+				Application.localeLanguageCode, survey.defaultLanguageCode);
 			if ( result == null ) {
 				return String(id);
 			} else {

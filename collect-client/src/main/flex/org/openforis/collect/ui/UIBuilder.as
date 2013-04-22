@@ -2,7 +2,6 @@ package org.openforis.collect.ui {
 	import mx.binding.utils.BindingUtils;
 	import mx.collections.ArrayList;
 	import mx.collections.IList;
-	import mx.collections.ListCollectionView;
 	import mx.core.ClassFactory;
 	import mx.core.IFactory;
 	import mx.core.IVisualElement;
@@ -31,7 +30,6 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.ui.proxy.AttributeModelObjectProxy;
 	import org.openforis.collect.metamodel.ui.proxy.ColumnGroupProxy;
 	import org.openforis.collect.metamodel.ui.proxy.ColumnProxy;
-	import org.openforis.collect.metamodel.ui.proxy.FieldProxy;
 	import org.openforis.collect.metamodel.ui.proxy.FormSectionProxy;
 	import org.openforis.collect.metamodel.ui.proxy.FormSetProxy;
 	import org.openforis.collect.metamodel.ui.proxy.TableHeadingComponentProxy;
@@ -45,7 +43,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.AttributeItemRenderer;
 	import org.openforis.collect.ui.component.detail.CodeAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.CompositeAttributeFormItem;
-	import org.openforis.collect.ui.component.detail.FormContainer;
+	import org.openforis.collect.ui.component.detail.FormContainerRenderer;
 	import org.openforis.collect.ui.component.detail.FormSectionFormItem;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeDataGroupFormItem;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
@@ -100,8 +98,8 @@ package org.openforis.collect.ui {
 		public static const COMPOSITE_ATTRIBUTE_LABELS_V_GAP:int = 6;
 		public static const GROUPING_LABEL_PADDING_TOP:int = 4;
 		
-		public static function buildForm(rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
-			var formContainer:FormContainer = new FormContainer();
+		public static function buildForm(rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainerRenderer {
+			var formContainer:FormContainerRenderer = new FormContainerRenderer();
 			var survey:SurveyProxy = rootEntity.survey;
 			var uiOptions:UIOptionsProxy = survey.uiOptions;
 			var formSet:FormSetProxy = uiOptions.getFormSet(rootEntity.id);
@@ -167,15 +165,15 @@ package org.openforis.collect.ui {
 			return columns;
 		}
 		
-		public static function getInputFieldWidth(def:AttributeDefinitionProxy):Number {
-			var parentLayout:String = def.parentLayout;
+		public static function getInputFieldWidth(attributeUIModelObject:AttributeModelObjectProxy):Number {
+			var def:AttributeDefinitionProxy = attributeUIModelObject.attributeDefinition;
 			if(def is BooleanAttributeDefinitionProxy) {
 				var headerText:String = def.getInstanceOrHeadingLabelText();
 				var headerWidth:Number = UIUtil.measureGridHeaderWidth(headerText);
 				var width:Number = Math.max(headerWidth, 20);
 				return width;
 			} else if(def is CodeAttributeDefinitionProxy) {
-				if(parentLayout == UIUtil.LAYOUT_TABLE) {
+				if ( attributeUIModelObject is ColumnProxy ) {
 					if(def.key && def.parent.enumerable) {
 						//return NaN;
 						return 150;
@@ -186,7 +184,7 @@ package org.openforis.collect.ui {
 					return NaN;
 				}
 			} else if(def is CoordinateAttributeDefinitionProxy) {
-				if(parentLayout == UIUtil.LAYOUT_TABLE) {
+				if ( attributeUIModelObject is ColumnProxy ) {
 					return 100 + 70 + 70 + COMPOSITE_ATTRIBUTE_H_GAP * 2;
 				} else {
 					return 100;
@@ -203,14 +201,14 @@ package org.openforis.collect.ui {
 				var result:int = numericInputFieldWidth;
 				if(units.length > 1) {
 					result += gap + unitDropDownWidth;
-				} else if ( units.length == 1 && def.parentLayout == UIUtil.LAYOUT_FORM ) {
+				} else if ( units.length == 1 && ! (attributeUIModelObject is ColumnProxy) ) {
 					var unit:UnitProxy = units.getItemAt(0) as UnitProxy;
 					var unitWidth:Number = UIUtil.measureUnitWidth(unit.getAbbreviation());
 					result += gap + unitWidth;
 				}
 				return result;
 			} else if(def is TaxonAttributeDefinitionProxy) {
-				if(parentLayout == UIUtil.LAYOUT_TABLE) {
+				if ( attributeUIModelObject is ColumnProxy ) {
 					return 504;
 				} else {
 					return 100;
@@ -233,16 +231,17 @@ package org.openforis.collect.ui {
 			}
 		}
 		
-		public static function getAttributeDataGroupHeaderWidth(def:AttributeDefinitionProxy, ancestorEntity:EntityProxy):Number {
+		public static function getAttributeDataGroupHeaderWidth(col:ColumnProxy, ancestorEntity:EntityProxy):Number {
+			var def:AttributeDefinitionProxy = col.attributeDefinition;
 			var parentEntityDefn:EntityDefinitionProxy = def.parent;
-			var directionByColumns:Boolean = parentEntityDefn != null && parentEntityDefn.direction == UIOptions$Direction.BY_COLUMNS;
+			var directionByColumns:Boolean = col.parentTable.direction == UIOptions$Direction.BY_COLUMNS;
 			if(ancestorEntity != null && parentEntityDefn.enumerable && def.key && def is CodeAttributeDefinitionProxy) {
 				var width:Number = getEnumeratedCodeHeaderWidth(def, ancestorEntity);
 				return width + VALIDATION_DISPLAY_DOUBLE_BORDER_SIZE;
 			} else if ( directionByColumns ) {
 				return NaN;
 			} else {
-				var inputFieldWidth:Number = getInputFieldWidth(def);
+				var inputFieldWidth:Number = getInputFieldWidth(col);
 				if(!isNaN(inputFieldWidth)) {
 					return inputFieldWidth + VALIDATION_DISPLAY_DOUBLE_BORDER_SIZE;
 				} else {
@@ -251,9 +250,10 @@ package org.openforis.collect.ui {
 			}
 		}
 
-		public static function getAttributeDataGroupHeaderHeight(defn:AttributeDefinitionProxy, ancestorEntity:EntityProxy):Number {
+		public static function getAttributeDataGroupHeaderHeight(col:ColumnProxy, ancestorEntity:EntityProxy):Number {
 			var result:Number;
-			var directionByColumns:Boolean = defn.parent != null && defn.parent.direction == UIOptions$Direction.BY_COLUMNS;
+			var defn:AttributeDefinitionProxy = col.attributeDefinition;
+			var directionByColumns:Boolean = col.parentTable.direction == UIOptions$Direction.BY_COLUMNS;
 			if ( directionByColumns ) {
 				if ( defn is CoordinateAttributeDefinitionProxy ) {
 					result = 3 * ATTRIBUTE_INPUT_FIELD_HEIGHT + 3 * COMPOSITE_ATTRIBUTE_LABELS_V_GAP;
@@ -280,14 +280,13 @@ package org.openforis.collect.ui {
 		
 		public static function createAttributeFormItem(attrUIModelObj:AttributeModelObjectProxy):AttributeFormItem {
 			var def:AttributeDefinitionProxy = attrUIModelObj.attributeDefinition;
-			var parentLayout:String = def.parentLayout;
 			var formItem:AttributeFormItem = null;
 			if(def is CodeAttributeDefinitionProxy) {
 				formItem = new CodeAttributeFormItem();
 			} else if(def is CoordinateAttributeDefinitionProxy || def is TaxonAttributeDefinitionProxy) {
 				formItem = new CompositeAttributeFormItem();
 			} else if(def.multiple) {
-				if(parentLayout == UIUtil.LAYOUT_TABLE){
+				if(attrUIModelObj is ColumnProxy){
 					formItem = new MultipleAttributeDataGroupFormItem();
 				} else {
 					formItem = new MultipleAttributeFormItem();
@@ -313,13 +312,12 @@ package org.openforis.collect.ui {
 		
 		public static function createInputField(attributeUIModelObject:AttributeModelObjectProxy):InputField {
 			var def:AttributeDefinitionProxy = attributeUIModelObject.attributeDefinition;
-			var parentLayout:String = def.parentLayout;
 			var inputField:InputField = null;
 			if(def is BooleanAttributeDefinitionProxy) {
 				inputField = new BooleanInputField();
 			} else if(def is CodeAttributeDefinitionProxy) {
 				var codeDef:CodeAttributeDefinitionProxy = CodeAttributeDefinitionProxy(def);
-				if(parentLayout == UIUtil.LAYOUT_TABLE && codeDef.parent.enumerable && codeDef.key) {
+				if(attributeUIModelObject is ColumnProxy && codeDef.parent.enumerable && codeDef.key) {
 					inputField = new FixedCodeInputField();
 				} else if(def.multiple) {
 					inputField = new MultipleCodeInputField();
@@ -355,7 +353,7 @@ package org.openforis.collect.ui {
 						break;
 				}
 			}
-			inputField.width = getInputFieldWidth(def);
+			inputField.width = getInputFieldWidth(attributeUIModelObject);
 			inputField.attributeUIModelObject = attributeUIModelObject;
 			return inputField;
 		}
@@ -369,7 +367,7 @@ package org.openforis.collect.ui {
 				renderer = new DateAttributeRenderer();
 			} else if(def is NumericAttributeDefinitionProxy) {
 				renderer = def is NumberAttributeDefinitionProxy ? new NumericAttributeRenderer(): new RangeAttributeRenderer;
-				var width:Number = getInputFieldWidth(def);
+				var width:Number = getInputFieldWidth(attributeUIModelObject);
 				var borderWidth:Number = 1;
 				renderer.width = width + borderWidth * 2;
 			} else if(def is TaxonAttributeDefinitionProxy) {
@@ -452,11 +450,11 @@ package org.openforis.collect.ui {
 			var defn:AttributeDefinitionProxy = col.attributeDefinition;
 			var result:SkinnableContainer = new SkinnableContainer();
 			result.styleName = DATA_GROUP_HEADER_STYLE;
-			var width:Number = getAttributeDataGroupHeaderWidth(defn, parentEntity);
+			var width:Number = getAttributeDataGroupHeaderWidth(col, parentEntity);
 			result.width = width;
-			var directionByColumns:Boolean = defn.parent != null && defn.parent.direction == UIOptions$Direction.BY_COLUMNS;
+			var directionByColumns:Boolean = col.parentTable.direction == UIOptions$Direction.BY_COLUMNS;
 			if ( directionByColumns ) {
-				result.height = getAttributeDataGroupHeaderHeight(defn, parentEntity);
+				result.height = getAttributeDataGroupHeaderHeight(col, parentEntity);
 				var layout:HorizontalLayout = new HorizontalLayout();
 				layout.paddingTop = GROUPING_LABEL_PADDING_TOP;
 				result.layout = layout;

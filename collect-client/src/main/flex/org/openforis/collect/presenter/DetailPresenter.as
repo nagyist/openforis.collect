@@ -27,7 +27,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.UserProxy;
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.ErrorListPopUp;
-	import org.openforis.collect.ui.component.detail.FormContainer;
+	import org.openforis.collect.ui.component.detail.FormContainerRenderer;
 	import org.openforis.collect.ui.view.DetailView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.PopUpUtil;
@@ -94,7 +94,7 @@ package org.openforis.collect.presenter {
 			_view.saveButton.visible = canSave;
 			
 			var rootEntityDefn:EntityDefinitionProxy = Application.activeRootEntity;
-			var form:FormContainer = null;
+			var form:FormContainerRenderer = null;
 			if (_view.formsContainer.contatinsForm(version,rootEntityDefn)){
 				_view.currentState = DetailView.EDIT_STATE;
 				form = _view.formsContainer.getForm(version, rootEntityDefn);

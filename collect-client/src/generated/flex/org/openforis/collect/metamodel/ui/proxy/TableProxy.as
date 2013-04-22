@@ -13,6 +13,7 @@ package org.openforis.collect.metamodel.ui.proxy {
 	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.SchemaProxy;
+	import org.openforis.collect.model.Queue;
 	import org.openforis.collect.util.ArrayUtil;
 	import org.openforis.collect.util.CollectionUtil;
 
@@ -30,6 +31,7 @@ package org.openforis.collect.metamodel.ui.proxy {
 			}
 		}
 		
+		[Bindable(event="surveyChange")]
 		public function get entityDefinition():EntityDefinitionProxy {
 			var schema:SchemaProxy = survey.schema;
 			var defn:NodeDefinitionProxy = schema.getDefinitionById(entityId);
@@ -57,19 +59,24 @@ package org.openforis.collect.metamodel.ui.proxy {
 		
 		public function getLeafColumnsInVersion(version:ModelVersionProxy):IList {
 			var result:IList = new ArrayCollection();
-			var stack:Array = new Array();
+			var queue:Queue = new Queue();
 			var headingCompInVersion:IList = getHeadingComponentsInVersion(version);
-			ArrayUtil.addAll(stack, headingCompInVersion.toArray());
-			while ( stack.length > 0 ) {
-				var headComp:TableHeadingComponentProxy = stack.pop();
+			queue.pushAll(headingCompInVersion.toArray());
+			while ( ! queue.isEmpty() ) {
+				var headComp:TableHeadingComponentProxy = queue.pop();
 				if ( headComp is ColumnProxy ) {
 					result.addItem(headComp);
 				} else if ( headComp is ColumnGroupProxy ) {
 					var groupItems:IList = _getHeadingComponentsInVersion(ColumnGroupProxy(headComp).headingComponents, version);
-					ArrayUtil.addAll(stack, groupItems.toArray());
+					queue.pushAll(groupItems.toArray());
 				}
 			}
 			return result;
 		}
+		
+		public function toString():String {
+			return "Table: " + entityDefinition.path;
+		}
+		
 	}
 }

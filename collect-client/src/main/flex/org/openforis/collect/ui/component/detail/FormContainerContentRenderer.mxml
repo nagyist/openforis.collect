@@ -5,7 +5,7 @@
 		 width="100%" height="100%" 
 		 xmlns:detail="org.openforis.collect.ui.component.detail.*" xmlns:layout="org.openforis.collect.ui.layout.*"
 		 creationComplete="creationCompleteHandler(event)"
-		 currentState="{hasItemsPerCurrentForm &amp;&amp; hasInnerForms ? STATE_COMPLETE: hasInnerForms ? STATE_INNER_TABS: STATE_DEFAULT}">
+		 currentState="{hasItemsPerCurrentForm &amp;&amp; hasInnerForms ? STATE_COMPLETE: hasInnerForms ? STATE_INNER_FORMS: STATE_DEFAULT}">
 	
 	<fx:Script>
 		<![CDATA[
@@ -16,43 +16,44 @@
 			import org.openforis.collect.metamodel.ui.proxy.FormContainerProxy;
 			import org.openforis.collect.metamodel.ui.proxy.FormProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
-			import org.openforis.collect.presenter.TabbedFormPresenter;
+			import org.openforis.collect.presenter.FormContainerContentPresenter;
 			import org.openforis.collect.util.CollectionUtil;
 
-			private static const STATE_DEFAULT:String = "default";
-			private static const STATE_INNER_TABS:String = "innerTabs";
-			private static const STATE_COMPLETE:String = "complete";
+			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_INNER_FORMS:String = "innerForms";
+			public static const STATE_COMPLETE:String = "complete";
 			
 			private var _modelVersion:ModelVersionProxy;
 			private var _formContainer:FormContainerProxy;
 			private var _innerForms:IList;
 			private var _parentEntity:EntityProxy;
 			
-			private var _presenter:TabbedFormPresenter;
+			private var _presenter:FormContainerContentPresenter;
 			
 			protected function creationCompleteHandler(event:FlexEvent):void {
-				_presenter = new TabbedFormPresenter(this);
+				_presenter = new FormContainerContentPresenter(this);
 			}
 			
 			public function reset():void {
 				if ( tabBar != null ) {
 					resetTabBar();
 				}
-				resetScrollbars();
+				resetScrollBars();
 			}
 			
 			private function resetTabBar():void {
 				tabBar.selectedIndex = 0;
 			}
 			
-			public function resetScrollbars():void {
+			public function resetScrollBars():void {
 				if ( mainFormSectionRenderer != null ) {
 					mainFormSectionRenderer.resetScrollBars();
 				}
 				if ( viewStack != null ) {
 					var forms:Array = viewStack.getChildren();
 					if ( forms != null ) {
-						for each (var form:TabbedFormContainer in forms) {
+						for each (var extCanvas:Canvas in forms) {
+							var form:FormContainerFormItem = FormContainerFormItem(extCanvas.getChildAt(0));
 							form.resetScrollbars();
 						}
 					}
@@ -112,8 +113,8 @@
 	
 	<s:states>
 		<s:State name="default" />
-		<s:State name="innerTabs" />
-		<s:State name="complete" basedOn="innerTabs" />
+		<s:State name="innerForms" />
+		<s:State name="complete" basedOn="innerForms" />
 	</s:states>
 	
 	<s:VGroup width="100%" height="100%" 
@@ -130,7 +131,7 @@
 		<s:TabBar id="tabBar" 
 				  dataProvider="{viewStack}"
 				  width="100%"
-				  includeIn="innerTabs">
+				  includeIn="innerForms">
 			<s:layout>
 				<layout:FlowLayout />
 			</s:layout>
@@ -140,18 +141,17 @@
 			width="100%" 
 			height="100%"
 			styleName="entityForm"
-			includeIn="innerTabs">
+			includeIn="innerForms">
 			
 			<mx:ViewStack id="viewStack" width="100%" height="100%" 
 						  verticalGap="0">
 				<mx:Repeater id="innerFormsRP" dataProvider="{innerForms}">
-					<mx:Canvas>
+					<mx:Canvas label="{FormProxy(innerFormsRP.currentItem).labelText}">
 						<detail:FormContainerFormItem 
 							id="formContainsers"
 							modelVersion="{modelVersion}"
 							form="{FormProxy(innerFormsRP.currentItem)}"
 							parentEntity="{parentEntity}"
-							label="{FormProxy(innerFormsRP.currentItem).labelText}"
 							/>
 					</mx:Canvas>
 				</mx:Repeater>

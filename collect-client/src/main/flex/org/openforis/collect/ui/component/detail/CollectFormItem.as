@@ -1,6 +1,9 @@
 package org.openforis.collect.ui.component.detail {
+	import mx.collections.IList;
 	import mx.events.FlexEvent;
 	
+	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
+	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.presenter.FormItemPresenter;
@@ -15,6 +18,7 @@ package org.openforis.collect.ui.component.detail {
 	public class CollectFormItem extends Group {
 		
 		private var _parentEntity:EntityProxy;
+		private var _modelVersion:ModelVersionProxy;
 		private var _childrenAdded:Boolean = false;
 		private var _occupyEntirePage:Boolean = false;
 		private var _labelWidth:Number = 150;
@@ -47,6 +51,30 @@ package org.openforis.collect.ui.component.detail {
 			_parentEntity = value;
 		}
 		
+		protected function calculateEffectiveParentEntity(value:EntityProxy):EntityProxy {
+			if ( value != null ) {
+				var parentEntityDefn:EntityDefinitionProxy = EntityDefinitionProxy(value.definition);
+				var childDefns:IList = parentEntityDefn.getDefinitionsInVersion(modelVersion);
+				if ( childDefns.length == 1 ) {
+					var firstChildDefn:NodeDefinitionProxy = NodeDefinitionProxy(childDefns.getItemAt(0));
+					if ( firstChildDefn is EntityDefinitionProxy && !(firstChildDefn.multiple) ) {
+						var result:EntityProxy = value.getChild(firstChildDefn.name, 0) as EntityProxy;
+						return result;
+					}
+				}
+			}
+			return value;
+		}
+		
+		[Bindable]
+		public function get modelVersion():ModelVersionProxy {
+			return _modelVersion;
+		}
+		
+		public function set modelVersion(value:ModelVersionProxy):void {
+			_modelVersion = value;
+		}
+
 		//to be implemented in subclasses
 		public function get nodeDefinition():NodeDefinitionProxy {
 			return null;

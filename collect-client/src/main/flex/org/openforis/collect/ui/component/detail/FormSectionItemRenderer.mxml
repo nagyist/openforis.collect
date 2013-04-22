@@ -43,6 +43,7 @@
 						formItem = UIBuilder.createAttributeFormItem(FieldProxy(data));
 					} else if(data is TableProxy) {
 						formItem = UIBuilder.createTableFormItem(TableProxy(data));
+						BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");
 					} else if(data is FormSectionProxy) {
 						formItem = UIBuilder.createFormSectionFormItem(FormSectionProxy(data));
 						BindingUtils.bindProperty(formItem, "modelVersion", this, "modelVersion");
@@ -51,8 +52,8 @@
 					}
 					formItem.labelWidth = labelWidth;
 					addElement(formItem);
-					BindingUtils.bindProperty(formItem, "parentEntity", this, "effectiveParentEntity");
 					BindingUtils.bindProperty(formItem, "occupyEntirePage", this, "occupyEntirePage");
+					BindingUtils.bindProperty(formItem, "parentEntity", this, "effectiveParentEntity");
 				}
 			}
 			
@@ -89,7 +90,7 @@
 				}
 			}
 
-			[Bindable]
+			[Bindable(event="parentEntityChange")]
 			public function get parentEntity():EntityProxy {
 				return _parentEntity;
 			}

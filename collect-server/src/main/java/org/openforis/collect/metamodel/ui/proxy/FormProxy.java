@@ -31,5 +31,10 @@ public class FormProxy extends FormContainerProxy<Form> {
 	public List<FormSectionProxy> getFormSections() {
 		return FormSectionProxy.fromList(this, modelObject.getFormSections());
 	}
+	
+	@ExternalizedProperty
+	public boolean isMultiple() {
+		return modelObject.isMultiple();
+	}
 
 }

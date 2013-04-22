@@ -21,7 +21,6 @@
 			
 			private var _table:TableProxy;
 			private var _modelVersion:ModelVersionProxy;
-			private var _entity:EntityProxy;
 			private var _nodesDirection:String = DIRECTION_HORIZONTAL;
 			
 			override protected function createChildren():void {
@@ -54,13 +53,9 @@
 				return table.getLeafColumnsInVersion(modelVersion);
 			}
 			
-			[Bindable]
+			[Bindable(event="dataChange")]
 			public function get entity():EntityProxy {
-				return _entity;
-			}
-			
-			public function set entity(value:EntityProxy):void {
-				_entity = value;
+				return data as EntityProxy;
 			}
 			
 			[Bindable]
@@ -96,6 +91,7 @@
 			<s:itemRenderer>
 				<fx:Component>
 					<detail:TableCellItemRenderer
+						parentEntity="{parentDocument.entity}"
 						modelVersion="{parentDocument.modelVersion}"
 						/>
 				</fx:Component>

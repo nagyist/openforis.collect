@@ -62,7 +62,7 @@
 		]]>
 	</fx:Script>
 
-	<detail:TabbedFormContainer id="tabContentContainer"
+	<detail:FormContainerContentRenderer id="tabContentContainer"
 								formContainer="{formContainer}"
 								modelVersion="{version}"
 								parentEntity="{record.rootEntity}"

@@ -30,7 +30,7 @@ package org.openforis.collect.model {
 		/**
 		 * Returns the head of the queue and removes it
 		 * */
-		public function pop():Object {
+		public function pop():* {
 			if (isEmpty()) {
 				return null;
 			}
@@ -42,7 +42,7 @@ package org.openforis.collect.model {
 		/**
 		 * Returns the head of the queue without removing it
 		 */
-		public function get element():Object {
+		public function get element():* {
 			if (isEmpty()) {
 				return null;
 			}

@@ -1,6 +1,7 @@
 package org.openforis.collect.persistence.xml;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -138,7 +139,7 @@ public class UIOptionsBinderTest {
 				assertEquals(3, taskTableHeadingComps.size());
 				TableHeadingComponent typeColumn = taskTableHeadingComps.get(0);
 				assertTrue(typeColumn instanceof Column);
-				AttributeDefinition typeAttributeDefn = ((Column) typeColumn).getAttributeDefinition();
+				AttributeDefinition typeAttributeDefn = ((Column) typeColumn).getAttribute();
 				assertEquals("type", typeAttributeDefn.getName());
 			}
 			{
@@ -159,12 +160,15 @@ public class UIOptionsBinderTest {
 			Schema schema = survey.getSchema();
 			EntityDefinition plotEntity = (EntityDefinition) schema.getDefinitionByPath("cluster/plot");
 			assertEquals(plotEntity.getId(), form.getEntityId());
+			assertTrue(form.isMultiple());
 			String label = form.getLabel(null);
 			assertEquals("Plot", label);
 			List<Form> subForms = form.getForms();
 			assertEquals(6, subForms.size());
 			{
 				Form subForm = subForms.get(0);
+				assertEquals(plotEntity.getId(), subForm.getEntityId());
+				assertFalse(subForm.isMultiple());
 				String subFormLabel = subForm.getLabel(null);
 				assertEquals("Details (2)", subFormLabel);
 				FormSection mainFormSection = subForm.getFormSections().get(0);
@@ -182,6 +186,8 @@ public class UIOptionsBinderTest {
 			}
 			{
 				Form subForm = subForms.get(4);
+				assertFalse(subForm.isMultiple());
+				assertEquals(plotEntity.getId(), subForm.getEntityId());
 				String subFormLabel = subForm.getLabel(null);
 				assertEquals("Stumps (5b)", subFormLabel);
 				FormSection mainFormSection = subForm.getFormSections().get(0);

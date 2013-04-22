@@ -70,5 +70,10 @@ public class Field extends Component {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		return "Attribute: " + getAttribute().getPath();
+	}
 
 }

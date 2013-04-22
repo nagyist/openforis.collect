@@ -8,7 +8,6 @@ import java.util.List;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
 import org.openforis.collect.metamodel.ui.UIOptions;
-import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.metamodel.ui.proxy.FormSetProxy;
 
 /**
@@ -28,12 +27,6 @@ public class UIOptionsProxy implements Proxy {
 
 	public SurveyProxy getSurvey() {
 		return survey;
-	}
-	
-	@ExternalizedProperty
-	public List<UITabSetProxy> getTabSets() {
-		List<UITabSet> tabSets = uiOptions.getTabSets();
-		return UITabSetProxy.fromList(tabSets);
 	}
 	
 	@ExternalizedProperty

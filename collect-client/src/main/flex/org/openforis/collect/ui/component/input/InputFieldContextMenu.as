@@ -12,6 +12,8 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.FileAttributeDefinitionProxy;
 	import org.openforis.collect.metamodel.proxy.NodeDefinitionProxy;
+	import org.openforis.collect.metamodel.ui.proxy.AttributeModelObjectProxy;
+	import org.openforis.collect.metamodel.ui.proxy.TableProxy;
 	import org.openforis.collect.model.CollectRecord$Step;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
@@ -20,7 +22,6 @@ package org.openforis.collect.ui.component.input {
 	import org.openforis.collect.model.proxy.NodeProxy;
 	import org.openforis.collect.presenter.RemarksPopUpPresenter;
 	import org.openforis.collect.util.AlertUtil;
-	import org.openforis.collect.util.UIUtil;
 
 	/**
 	 * @author M. Togna
@@ -91,7 +92,8 @@ package org.openforis.collect.ui.component.input {
 		
 		private function createMenuItems(step:CollectRecord$Step):Array {
 			var items:Array = new Array();
-			var attrDefn:AttributeDefinitionProxy = _inputField.attributeUIModelObject.attributeDefinition;
+			var uiModelObj:AttributeModelObjectProxy = _inputField.attributeUIModelObject;
+			var attrDefn:AttributeDefinitionProxy = uiModelObj.attributeDefinition;
 			switch(step) {
 				case CollectRecord$Step.ENTRY:
 					// REASON BLANK ITEMS
@@ -123,11 +125,10 @@ package org.openforis.collect.ui.component.input {
 			items.push(EDIT_REMARKS_MENU_ITEM);
 			
 			if(step != CollectRecord$Step.ANALYSIS) {
-				var def:AttributeDefinitionProxy = _inputField.attributeUIModelObject.attributeDefinition;
-				if(def.multiple && ! (def is CodeAttributeDefinitionProxy)) {
+				if(attrDefn.multiple && ! (attrDefn is CodeAttributeDefinitionProxy)) {
 					items.push(DELETE_ATTRIBUTE);
-				} else if(def.parentLayout == UIUtil.LAYOUT_TABLE) {
-					var entityDef:EntityDefinitionProxy = def.parent;
+				} else if(uiModelObj is TableProxy) {
+					var entityDef:EntityDefinitionProxy = attrDefn.parent;
 					if(entityDef != null && entityDef.multiple) {
 						//var parentEntity:EntityProxy = _inputField.parentEntity;
 						switch(step) {

@@ -116,7 +116,7 @@ package org.openforis.collect.model.proxy {
 		public function set definition(value:NodeDefinitionProxy):void {
 			_definition = value;
 		}
-
+		
     }
 
 }

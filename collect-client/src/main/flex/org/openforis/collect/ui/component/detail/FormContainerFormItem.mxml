@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<detail:FormComponentFormItem xmlns:fx="http://ns.adobe.com/mxml/2009"
+<detail:CollectFormItem xmlns:fx="http://ns.adobe.com/mxml/2009"
 					   xmlns:s="library://ns.adobe.com/flex/spark"
 					   xmlns:mx="library://ns.adobe.com/flex/mx"
 					   xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
 					   xmlns:detail="org.openforis.collect.ui.component.detail.*"
 					   xmlns:component="org.openforis.collect.ui.component.*"
 					   xmlns:layout="org.openforis.collect.ui.layout.*" 
-					   width="100%" height="100%">
+					   width="100%" height="100%"
+					   currentState="{STATE_SINGLE}">
 	
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.IList;
 			import mx.events.FlexEvent;
 			
-			import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
-			import org.openforis.collect.metamodel.proxy.UITabProxy;
 			import org.openforis.collect.metamodel.ui.proxy.FormProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
 			import org.openforis.collect.presenter.FormContainerFormItemPresenter;
 			
+			public static const STATE_SINGLE:String = "single";
+			public static const STATE_MULTIPLE:String = "multiple";
+			
 			private var _entities:IList;
 			private var _selectedEntity:EntityProxy;
 			private var _form:FormProxy;
-			private var _label:String;
 			
 			override protected function initializeHandler(event:FlexEvent):void {
 			}
@@ -30,7 +31,13 @@
 			override protected function initPresenter():void {
 				presenter = new FormContainerFormItemPresenter(this);
 			}
-
+			
+			public function resetScrollbars():void {
+				if ( internalContainer != null ) {
+					internalContainer.resetScrollBars();
+				}
+			}
+			
 			[Bindable]
 			public function get form():FormProxy {
 				return _form;
@@ -38,15 +45,6 @@
 
 			public function set form(value:FormProxy):void {
 				_form = value;
-			}
-
-			[Bindable]
-			public function get label():String {
-				return _label;
-			}
-
-			public function set label(value:String):void {
-				_label = value;
 			}
 
 			[Bindable]
@@ -67,7 +65,6 @@
 				_selectedEntity = value;
 			}
 
-
 		]]>
 	</fx:Script>
 	
@@ -86,6 +83,11 @@
 		
 	</fx:Declarations>
 	
+	<detail:states>
+		<s:State name="single" />
+		<s:State name="multiple" />
+	</detail:states>
+	
 	<s:BorderContainer id="border" 
 					   height="100%" 
 					   width="100%"
@@ -96,9 +98,11 @@
 		</s:layout>
 
 		<component:AddEntityControlBar id="addSection"
+									   includeIn="multiple"
 									   entityDefinition="{form.entityDefinition}"
 									   entities="{entities}" />
-		<detail:TabbedFormContainer 
+		
+		<detail:FormContainerContentRenderer 
 			id="internalContainer" 
 			height="100%" width="100%"
 			modelVersion="{modelVersion}"
@@ -109,4 +113,4 @@
 			hideEffect="{hideFormEffect}"
 			/>
 	</s:BorderContainer>
-</detail:FormComponentFormItem>
+</detail:CollectFormItem>
