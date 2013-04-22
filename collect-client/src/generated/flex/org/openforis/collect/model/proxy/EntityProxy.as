@@ -152,9 +152,10 @@ package org.openforis.collect.model.proxy {
 		public function getDescendants(descendantDefn:NodeDefinitionProxy):IList {
 			var relativePath:String = descendantDefn.getRelativePath(EntityDefinitionProxy(this.definition));
 			var parts:Array = relativePath.split("/");
-			var currentLevelNodes:IList = new ArrayList();
+			var currentLevelNodes:IList = new ArrayCollection();
+			currentLevelNodes.addItem(this);
 			for each (var part:String in parts) {
-				var nextLevelNodes:IList = new ArrayList();
+				var nextLevelNodes:IList = new ArrayCollection();
 				for each (var currentNode:NodeProxy in currentLevelNodes) {
 					if ( currentNode is EntityProxy ) {
 						var childrenPart:IList = EntityProxy(currentNode).getChildren(part);
@@ -185,6 +186,10 @@ package org.openforis.collect.model.proxy {
 			return result;
 		}
 		
+		/**
+		 * For backwards compatibility: it can happen that the "parent" entity can be a single entity (deprecated),
+		 * so the effective parent entity must be this single entity and not the ancestor entity
+		 */
 		public function getDescendantNearestParentEntity(descendantDefn:NodeDefinitionProxy):EntityProxy {
 			var nearestParentDefn:EntityDefinitionProxy = descendantDefn.parent;
 			if ( this.definition == nearestParentDefn ) {

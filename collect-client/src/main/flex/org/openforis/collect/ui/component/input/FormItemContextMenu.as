@@ -67,13 +67,14 @@ package org.openforis.collect.ui.component.input {
 		}
 		
 		private function createMenuItems(step:CollectRecord$Step):Array {
-			var nodeDefinition:NodeDefinitionProxy = _formItem.nodeDefinition;
+			var nodeDefn:NodeDefinitionProxy = _formItem.nodeDefinition;
 			var items:Array = new Array();
-			if ( nodeDefinition != null ) {
+			if ( nodeDefn != null ) {
 				var parentEntity:EntityProxy = _formItem.parentEntity;
 				if(parentEntity != null) {
-					var nodeName:String = nodeDefinition.name;
-					var count:int = parentEntity.getCount(nodeName);
+					var nearestParentEntity:EntityProxy = parentEntity.getDescendantNearestParentEntity(nodeDefn);
+					var nodeName:String = nodeDefn.name;
+					var count:int = nearestParentEntity.getCount(nodeName);
 					var minCountValid:ValidationResultFlag = parentEntity.childrenMinCountValidationMap.get(nodeName);
 					if(count == 0 || minCountValid == ValidationResultFlag.ERROR) {
 						switch(step) {
@@ -86,12 +87,12 @@ package org.openforis.collect.ui.component.input {
 						}
 					}
 					if(step == CollectRecord$Step.ENTRY) {
-						if ( nodeDefinition is AttributeDefinitionProxy && ! nodeDefinition.multiple ) {
-							var attribute:AttributeProxy = parentEntity.getSingleAttribute(nodeDefinition.name);
+						if ( nodeDefn is AttributeDefinitionProxy && ! nodeDefn.multiple ) {
+							var attribute:AttributeProxy = nearestParentEntity.getSingleAttribute(nodeDefn.name);
 							var hasErrors:Boolean = attribute != null && attribute.hasErrors() &&
 								! CollectionUtil.containsItemWith(attribute.validationResults.errors, "ruleName", "SpecifiedValidator");
 							if(hasErrors) {
-								var hasConfirmedError:Boolean = parentEntity.hasConfirmedError(nodeDefinition.name);
+								var hasConfirmedError:Boolean = nearestParentEntity.hasConfirmedError(nodeDefn.name);
 								if(! hasConfirmedError) {
 									items.push(CONFIRM_ERROR);
 								}
@@ -107,26 +108,27 @@ package org.openforis.collect.ui.component.input {
 			var formItem:CollectFormItem = event.contextMenuOwner as CollectFormItem;
 			var parentEntity:EntityProxy = formItem.parentEntity;
 			var nodeDefinition:NodeDefinitionProxy = formItem.nodeDefinition;
+			var nearestParentEntity:EntityProxy = parentEntity.getDescendantNearestParentEntity(nodeDefinition);
 			var nodeEvent:NodeEvent = null; 
 			switch(event.target) {
 				case SET_BLANK_ON_FORM:
 				case APPROVE_MISSING:
 					nodeEvent = new NodeEvent(NodeEvent.APPROVE_MISSING);
-					nodeEvent.parentEntity = parentEntity;
+					nodeEvent.parentEntity = nearestParentEntity;
 					nodeEvent.nodeName = nodeDefinition.name;
 					break;
 				case CONFIRM_ERROR:
 					if(nodeDefinition is AttributeDefinitionProxy) {
 						if ( ! nodeDefinition.multiple || nodeDefinition is CodeAttributeDefinitionProxy) {
 							nodeEvent = new NodeEvent(NodeEvent.CONFIRM_ERROR);
-							nodeEvent.parentEntity = parentEntity;
+							nodeEvent.parentEntity = nearestParentEntity;
 							nodeEvent.nodeName = nodeDefinition.name;
 							
 							if ( ! nodeDefinition.multiple) {
 								nodeEvent.node = AttributeFormItem(formItem).attribute;
 							} else {
-								nodeEvent.parentEntity = parentEntity;
-								nodeEvent.nodes = parentEntity.getChildren(nodeDefinition.name);
+								nodeEvent.parentEntity = nearestParentEntity;
+								nodeEvent.nodes = nearestParentEntity.getChildren(nodeDefinition.name);
 							}
 						}
 					}

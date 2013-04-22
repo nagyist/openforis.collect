@@ -242,7 +242,8 @@ package org.openforis.collect.ui.component.input {
 		private static function checkCanDelete(node:NodeProxy, nodeDefn:NodeDefinitionProxy):Boolean {
 			var parent:EntityProxy = node.parent;
 			var label:String = nodeDefn.getInstanceOrHeadingLabelText();
-			var count:int = parent.getCount(nodeDefn.name);
+			var nearestParentEntity:EntityProxy = parent.getDescendantNearestParentEntity(nodeDefn);
+			var count:int = nearestParentEntity.getCount(nodeDefn.name);
 			var minCount:Number = nodeDefn.minCount;
 			if((isNaN(minCount) || minCount == 0) && node.parent.isRequired(nodeDefn.name)) {
 				minCount = 1;
