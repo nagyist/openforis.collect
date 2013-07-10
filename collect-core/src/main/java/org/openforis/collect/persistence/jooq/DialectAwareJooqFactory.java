@@ -5,6 +5,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 
 import org.jooq.SQLDialect;
+import org.jooq.Schema;
 import org.jooq.Sequence;
 import org.jooq.TableField;
 import org.jooq.conf.Settings;
@@ -20,7 +21,8 @@ public class DialectAwareJooqFactory extends Factory {
 	private enum Database {
 		POSTGRES("PostgreSQL", SQLDialect.POSTGRES),
 		DERBY("Apache Derby", SQLDialect.DERBY),
-		SQLITE("SQLite", SQLDialect.SQLITE);
+		SQLITE("SQLite", SQLDialect.SQLITE),
+		SQLITE_FOR_ANDROID("SQLite for Android", SQLDialect.SQLITE);
 		
 		private String productName;
 		private SQLDialect dialect;
@@ -89,6 +91,26 @@ public class DialectAwareJooqFactory extends Factory {
 		} else {
 			return nextval(idSequence).intValue();	
 		}	
+	}
+	
+	public void restartSequence(Sequence<?> sequence, Number restartValue) {
+		String name = sequence.getName();
+		String qualifiedName;
+		if ( sequence.getSchema() != null && getSettings().isRenderSchema() ) {
+			Schema schema = sequence.getSchema();
+			String schemaName = schema.getName();
+			qualifiedName = schemaName + "." + name;
+		} else {
+			qualifiedName = name;
+		}
+		switch (getDialect()) {
+		case POSTGRES:
+			execute("ALTER SEQUENCE " +  qualifiedName + " RESTART WITH " + restartValue);
+			break;
+		case SQLITE:
+			//sequences not handled
+			break;
+		}
 	}
 
 }

@@ -1,6 +1,7 @@
 package org.openforis.collect.presenter
 {
-	import mx.binding.utils.BindingUtils;
+	import mx.binding.utils.ChangeWatcher;
+	import mx.events.PropertyChangeEvent;
 	import mx.rpc.AsyncResponder;
 	import mx.rpc.IResponder;
 	import mx.rpc.events.ResultEvent;
@@ -9,13 +10,12 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.client.ClientFactory;
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.NodeEvent;
-	import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 	import org.openforis.collect.metamodel.proxy.SchemaProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
+	import org.openforis.collect.model.proxy.NodeChangeProxy;
+	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
-	import org.openforis.collect.model.proxy.NodeUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.RecordProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
 	import org.openforis.collect.ui.component.detail.CollectFormItem;
 	import org.openforis.collect.ui.component.detail.RelevanceDisplayManager;
 	import org.openforis.collect.ui.component.detail.ValidationDisplayManager;
@@ -43,7 +43,10 @@ package org.openforis.collect.presenter
 			updateRelevanceDisplayManager();
 			_contextMenu = new FormItemContextMenu(view);
 			super();
-			
+			onAfterCreation();
+		}
+		
+		protected function onAfterCreation():void {
 			updateView();
 		}
 		
@@ -69,16 +72,15 @@ package org.openforis.collect.presenter
 			eventDispatcher.addEventListener(ApplicationEvent.UPDATE_RESPONSE_RECEIVED, updateResponseReceivedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.RECORD_SAVED, recordSavedHandler);
 			eventDispatcher.addEventListener(ApplicationEvent.ASK_FOR_SUBMIT, askForSubmitHandler);
-			BindingUtils.bindSetter(parentEntitySetter, _view, "parentEntity");
-			BindingUtils.bindSetter(setModelVersion, _view, "modelVersion");
+			ChangeWatcher.watch(_view, "parentEntity", parentEntityChangeHandler);
 		}
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.parentEntity != null) {
-				var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
-				for each (var response:NodeUpdateResponseProxy in responseSet.responses) {
-					if ( response is NodeUpdateResponseProxy && 
-							NodeUpdateResponseProxy(response).nodeId == _view.parentEntity.id) {
+				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
+				for each (var change:NodeChangeProxy in changeSet.changes) {
+					if ( change is NodeChangeProxy && 
+							NodeChangeProxy(change).nodeId == _view.parentEntity.id) {
 						updateValidationDisplayManager();
 						updateRelevanceDisplayManager();
 						_contextMenu.updateItems();
@@ -96,11 +98,7 @@ package org.openforis.collect.presenter
 			updateValidationDisplayManager();
 		}
 		
-		protected function setModelVersion(version:ModelVersionProxy):void {
-			updateView();
-		}
-		
-		protected function parentEntitySetter(parentEntity:EntityProxy):void {
+		protected function parentEntityChangeHandler(event:PropertyChangeEvent):void {
 			updateView();
 		}
 		

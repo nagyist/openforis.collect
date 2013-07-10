@@ -35,4 +35,9 @@ public class FieldProxy extends ComponentProxy<Field> implements FormSectionComp
 		return modelObject.getAutoCompleteGroup();
 	}
 	
+	@ExternalizedProperty
+	public Enum<?> getFieldsOrder() {
+		return modelObject.getFieldsOrder();
+	}
+	
 }

@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.openforis.collect.designer.model.LabelKeys;
-import org.openforis.collect.designer.model.SurveyManagerUtil;
-import org.openforis.collect.designer.model.SurveyWorkSummary;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
@@ -18,6 +16,7 @@ import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -55,6 +54,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 	public static final String SHOW_PREVIEW_POP_UP_GLOBAL_COMMAND = "showPreview";
 	private static final String SURVEY_SUCCESSFULLY_SAVED_MESSAGE_KEY = "survey.successfully_saved";
 //	private static final String SURVEY_SUCCESSFULLY_PUBLISHED_MESSAGE_KEY = "survey.successfully_published";
+	private static final String CODE_LISTS_POP_UP_CLOSED_COMMAND = "codeListsPopUpClosed";
 	
 	private Window selectLanguagePopUp;
 	private Window previewPreferencesPopUp;
@@ -123,17 +123,22 @@ public class SurveyEditVM extends SurveyBaseVM {
 	}
 	
 	@GlobalCommand
-	public void openCodeListsManagerPopUp(@BindingParam("selectedCodeList") CodeList selectedCodeList) {
+	public void openCodeListsManagerPopUp(
+			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
+			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {
 		if ( codeListsPopUp == null ) { 
 			dispatchCurrentFormValidatedCommand(true);
 			Map<String, Object> args = new HashMap<String, Object>();
-			args.put("selectedCodeList", selectedCodeList);
+			args.put(CodeListsVM.EDITING_ATTRIBUTE_PARAM, editingAttribute);
+			args.put(CodeListsVM.SELECTED_CODE_LIST_PARAM, selectedCodeList);
 			codeListsPopUp = openPopUp(Resources.Component.CODE_LISTS_POPUP.getLocation(), true, args);
 		}
 	}
 
 	@GlobalCommand
-	public void closeCodeListsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder) {
+	public void closeCodeListsManagerPopUp(@ContextParam(ContextType.BINDER) Binder binder,
+			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) final Boolean editingAttribute,
+			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) final CodeList selectedCodeList) {
 		if ( codeListsPopUp != null ) {
 			checkCanLeaveForm(new CanLeaveFormConfirmHandler() {
 				@Override
@@ -141,9 +146,17 @@ public class SurveyEditVM extends SurveyBaseVM {
 					closePopUp(codeListsPopUp);
 					codeListsPopUp = null;
 					dispatchCurrentFormValidatedCommand(true);
+					dispatchCodeListsPopUpClosedCommand(editingAttribute, selectedCodeList);
 				}
 			});
 		}
+	}
+
+	public void dispatchCodeListsPopUpClosedCommand(Boolean editingAttribute, CodeList selectedCodeList) {
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put(CodeListsVM.EDITING_ATTRIBUTE_PARAM, editingAttribute);
+		args.put(CodeListsVM.SELECTED_CODE_LIST_PARAM, selectedCodeList);
+		BindUtils.postGlobalCommand(null, null, CODE_LISTS_POP_UP_CLOSED_COMMAND, args);
 	}
 	
 	@GlobalCommand
@@ -258,8 +271,8 @@ public class SurveyEditVM extends SurveyBaseVM {
 
 	protected boolean checkCanSave(boolean publishing) {
 		if ( checkCanLeaveForm() ) {
-			List<SurveyWorkSummary> surveySummaries = SurveyManagerUtil.getSurveySummaries(surveyManager);
-			for (SurveyWorkSummary surveySummary : surveySummaries) {
+			List<SurveySummary> surveySummaries = surveyManager.loadSummaries();
+			for (SurveySummary surveySummary : surveySummaries) {
 				boolean notDuplicate = checkIsNotDuplicate(surveySummary, publishing);
 				if ( ! notDuplicate ) {
 					return false;
@@ -271,7 +284,7 @@ public class SurveyEditVM extends SurveyBaseVM {
 		}
 	}
 
-	protected boolean checkIsNotDuplicate(SurveyWorkSummary summary, boolean publishing) {
+	protected boolean checkIsNotDuplicate(SurveySummary summary, boolean publishing) {
 		Integer surveyId = survey.getId();
 		Integer publishedSurveyId = getSessionStatus().getPublishedSurveyId();
 		Integer summaryId = summary.getId();

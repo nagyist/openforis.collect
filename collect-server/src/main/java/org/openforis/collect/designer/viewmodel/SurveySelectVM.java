@@ -9,18 +9,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.openforis.collect.designer.form.validator.SurveyValidator;
-import org.openforis.collect.designer.form.validator.SurveyValidator.SurveyValidationResult;
-import org.openforis.collect.designer.model.SurveyManagerUtil;
-import org.openforis.collect.designer.model.SurveyWorkSummary;
 import org.openforis.collect.designer.session.SessionStatus;
+import org.openforis.collect.designer.util.ComponentUtil;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.designer.util.PageUtil;
 import org.openforis.collect.designer.util.Resources;
 import org.openforis.collect.designer.util.Resources.Page;
 import org.openforis.collect.manager.SurveyManager;
+import org.openforis.collect.manager.validation.SurveyValidator;
+import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResult;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyImportException;
+import org.zkoss.bind.Binder;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.DependsOn;
@@ -46,8 +47,10 @@ public class SurveySelectVM extends BaseVM {
 	
 	@WireVariable
 	private SurveyManager surveyManager;
+	@WireVariable
+	private SurveyValidator surveyValidator;
 	
-	private SurveyWorkSummary selectedSurvey;
+	private SurveySummary selectedSurvey;
 
 	private Window surveyImportPopUp;
 
@@ -60,13 +63,17 @@ public class SurveySelectVM extends BaseVM {
 	
 	@Command
 	public void editSelectedSurvey() throws IOException {
-		CollectSurvey surveyWork = loadSelectedSurvey();
+		CollectSurvey surveyWork = loadSelectedSurveyForEdit();
 		SessionStatus sessionStatus = getSessionStatus();
-		if ( selectedSurvey.isPublished() && ! selectedSurvey.isWorking() ) {
-			sessionStatus.setPublishedSurveyId(selectedSurvey.getId());
-		} else {
-			sessionStatus.setPublishedSurveyId(null);
+		Integer publishedSurveyId = null;
+		if ( selectedSurvey.isPublished() ) {
+			if ( selectedSurvey.isWork() ) {
+				publishedSurveyId = selectedSurvey.getPublishedId();
+			} else {
+				publishedSurveyId = selectedSurvey.getId();
+			}
 		}
+		sessionStatus.setPublishedSurveyId(publishedSurveyId);
 		sessionStatus.setSurvey(surveyWork);
 		sessionStatus.setCurrentLanguageCode(null);
 		Executions.sendRedirect(Page.SURVEY_EDIT.getLocation());
@@ -85,7 +92,7 @@ public class SurveySelectVM extends BaseVM {
 	public void exportSelectedSurvey() throws IOException {
 		CollectSurvey survey = loadSelectedSurvey();
 		ByteArrayOutputStream os = new ByteArrayOutputStream();
-		surveyManager.marshalSurvey(survey, os);
+		surveyManager.marshalSurvey(survey, os, true, true, false);
 		byte[] content = os.toByteArray();
 		String fileName = survey.getName() + ".xml";
 		Filedownload.save(content, TEXT_XML, fileName);
@@ -94,7 +101,8 @@ public class SurveySelectVM extends BaseVM {
 	@Command
 	public void publishSelectedSurvey() throws IOException {
 		final CollectSurvey survey = loadSelectedSurvey();
-		if ( validateSurvey(survey) ) {
+		final CollectSurvey publishedSurvey = selectedSurvey.isPublished() ? surveyManager.getByUri(survey.getUri()): null;
+		if ( validateSurvey(survey, publishedSurvey) ) {
 			MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
 				@Override
 				public void onOk() {
@@ -104,9 +112,37 @@ public class SurveySelectVM extends BaseVM {
 		}
 	}
 	
-	protected boolean validateSurvey(CollectSurvey survey) {
-		SurveyValidator surveyValidator = new SurveyValidator(surveyManager);
-		List<SurveyValidationResult> validationResults = surveyValidator.validateSurvey(survey);
+	@Command
+	public void deleteSelectedSurvey() {
+		String messageKey;
+		if ( selectedSurvey.isWork() ) {
+			if ( selectedSurvey.isPublished() ) {
+				messageKey = "survey.delete.published_work.confirm";
+			} else {
+				messageKey = "survey.delete.work.confirm";
+			}
+		} else {
+			messageKey = "survey.delete.confirm";
+		}
+		MessageUtil.showConfirm(new MessageUtil.ConfirmHandler() {
+			@Override
+			public void onOk() {
+				performSelectedSurveyDeletion();
+			}
+		}, messageKey, new String[]{selectedSurvey.getName()});
+	}
+	
+	protected void performSelectedSurveyDeletion() {
+		if ( selectedSurvey.isWork() ) {
+			surveyManager.deleteSurveyWork(selectedSurvey.getId());
+		} else {
+			surveyManager.deleteSurvey(selectedSurvey.getId());
+		}
+		notifyChange("surveySummaries");
+	}
+
+	protected boolean validateSurvey(CollectSurvey survey, CollectSurvey oldPublishedSurvey) {
+		List<SurveyValidationResult> validationResults = surveyValidator.validateCompatibility(oldPublishedSurvey, survey);
 		if ( validationResults.isEmpty() ) {
 			return true;
 		} else {
@@ -114,8 +150,9 @@ public class SurveySelectVM extends BaseVM {
 			return false;
 		}
 	}
-
-	protected void openValidationResultsPopUp(List<SurveyValidationResult> validationResults) {
+	
+	@GlobalCommand
+	public void openValidationResultsPopUp(@BindingParam("validationResults") List<SurveyValidationResult> validationResults) {
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("validationResults", validationResults);
 		validationResultsPopUp = openPopUp(Resources.Component.SURVEY_VALIDATION_RESULTS_POPUP.getLocation(), true, args);
@@ -150,6 +187,11 @@ public class SurveySelectVM extends BaseVM {
 	
 	@GlobalCommand
 	public void closeSurveyImportPopUp(@BindingParam("successfullyImported") Boolean successfullyImported) {
+		if ( surveyImportPopUp != null ) {
+			Binder binder = ComponentUtil.getBinder(surveyImportPopUp);
+			SurveyImportVM vm = (SurveyImportVM) binder.getViewModel();
+			vm.reset();
+		}
 		closePopUp(surveyImportPopUp);
 		surveyImportPopUp = null;
 		if ( successfullyImported != null && successfullyImported.booleanValue()) {
@@ -157,27 +199,40 @@ public class SurveySelectVM extends BaseVM {
 		}
 	}
 	
-	protected CollectSurvey loadSelectedSurvey() {
+	protected CollectSurvey loadSelectedSurveyForEdit() {
 		String uri = selectedSurvey.getUri();
 		CollectSurvey surveyWork;
-		if ( selectedSurvey.isPublished() ) {
-			surveyWork = surveyManager.loadPublishedSurveyForEdit(uri);
-		} else {
+		if ( selectedSurvey.isWork() ) {
 			surveyWork = surveyManager.loadSurveyWork(selectedSurvey.getId());
+		} else if ( selectedSurvey.isPublished() ) {
+			surveyWork = surveyManager.duplicatePublishedSurveyForEdit(uri);
+		} else {
+			throw new IllegalStateException("Trying to load an invalid survey: " + uri);
 		}
 		return surveyWork;
 	}
 	
-	public ListModel<SurveyWorkSummary> getSurveySummaries() {
-		List<SurveyWorkSummary> summaries = SurveyManagerUtil.getSurveySummaries(surveyManager);
-		return new BindingListModelList<SurveyWorkSummary>(summaries, false);
+	protected CollectSurvey loadSelectedSurvey() {
+		String uri = selectedSurvey.getUri();
+		CollectSurvey survey;
+		if ( selectedSurvey.isWork() ) {
+			survey = surveyManager.loadSurveyWork(selectedSurvey.getId());
+		} else {
+			survey = surveyManager.getByUri(uri);
+		}
+		return survey;
+	}
+	
+	public ListModel<SurveySummary> getSurveySummaries() {
+		List<SurveySummary> summaries = surveyManager.loadSummaries();
+		return new BindingListModelList<SurveySummary>(summaries, false);
 	}
 
-	public SurveyWorkSummary getSelectedSurvey() {
+	public SurveySummary getSelectedSurvey() {
 		return selectedSurvey;
 	}
 
-	public void setSelectedSurvey(SurveyWorkSummary selectedSurvey) {
+	public void setSelectedSurvey(SurveySummary selectedSurvey) {
 		this.selectedSurvey = selectedSurvey;
 	}
 	
@@ -198,8 +253,7 @@ public class SurveySelectVM extends BaseVM {
 
 	@DependsOn("selectedSurvey")
 	public boolean isPublishDisabled() {
-		//TODO check validity of survey
-		return this.selectedSurvey == null || ! this.selectedSurvey.isWorking();
+		return this.selectedSurvey == null || ! this.selectedSurvey.isWork();
 	}
 
 }

@@ -47,4 +47,5 @@ public class CollectSurveyIdmlBinder extends SurveyIdmlBinder {
 			survey.addApplicationOptions(newUIOptions);
 		}
 	}
+
 }

@@ -4,9 +4,10 @@ package org.openforis.collect.presenter {
 	import flash.events.KeyboardEvent;
 	import flash.ui.Keyboard;
 	
-	import mx.binding.utils.BindingUtils;
+	import mx.binding.utils.ChangeWatcher;
 	import mx.collections.ArrayCollection;
 	import mx.collections.IList;
+	import mx.events.PropertyChangeEvent;
 	import mx.rpc.events.ResultEvent;
 	
 	import org.openforis.collect.Application;
@@ -24,9 +25,9 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.metamodel.ui.proxy.ColumnProxy;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeAddRequestProxy;
+	import org.openforis.collect.model.proxy.AttributeChangeProxy;
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.AttributeUpdateRequestProxy;
-	import org.openforis.collect.model.proxy.AttributeUpdateResponseProxy;
 	import org.openforis.collect.model.proxy.CodeAttributeProxy;
 	import org.openforis.collect.model.proxy.ConfirmErrorRequestProxy;
 	import org.openforis.collect.model.proxy.DefaultValueApplyRequestProxy;
@@ -34,12 +35,12 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.FieldUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.MissingValueApproveRequestProxy;
+	import org.openforis.collect.model.proxy.NodeChangeProxy;
+	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 	import org.openforis.collect.model.proxy.NodeDeleteRequestProxy;
 	import org.openforis.collect.model.proxy.NodeProxy;
-	import org.openforis.collect.model.proxy.NodeUpdateResponseProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.model.proxy.RemarksUpdateRequestProxy;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.ui.component.input.InputFieldContextMenu;
@@ -92,7 +93,7 @@ package org.openforis.collect.presenter {
 			}
 			_view.addEventListener(FocusEvent.KEY_FOCUS_CHANGE, keyFocusChangeHandler);
 			
-			BindingUtils.bindSetter(setAttribute, _view, "attribute");
+			ChangeWatcher.watch(_view, "attribute", attributeChangeHandler); 
 		}
 		
 		protected function setFocusHandler(event:InputFieldEvent):void {
@@ -104,7 +105,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected static function approveMissingHandler(event:NodeEvent): void {
-			var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy();
+			var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
 			if(event.node != null || event.nodes != null) {
 				var node:NodeProxy = event.node;
 				if(node == null) {
@@ -129,12 +130,12 @@ package org.openforis.collect.presenter {
 			var r:DefaultValueApplyRequestProxy = new DefaultValueApplyRequestProxy();
 			r.nodeId = node.id;
 			
-			var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(r);
+			var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy(r);
 			_dataClient.updateActiveRecord(reqSet, null, faultHandler);
 		}
 		
 		protected static function updateRemarksHandler(event:NodeEvent): void {
-			var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy();
+			var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
 			var fieldIdx:int;
 			if(event.node != null) {
 				var attribute:AttributeProxy = AttributeProxy(event.node);
@@ -157,7 +158,7 @@ package org.openforis.collect.presenter {
 			_dataClient.updateActiveRecord(reqSet, null, faultHandler);
 		}
 		
-		protected static function prepareUpdateRemarksRequest(reqSet:RecordUpdateRequestSetProxy, node:NodeProxy, remarks:String, fieldIdx:Number = NaN):void {
+		protected static function prepareUpdateRemarksRequest(reqSet:NodeUpdateRequestSetProxy, node:NodeProxy, remarks:String, fieldIdx:Number = NaN):void {
 			var r:RemarksUpdateRequestProxy = new RemarksUpdateRequestProxy();
 			r.nodeId = node.id;
 			r.fieldIndex = fieldIdx;
@@ -166,12 +167,12 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected static function updateSymbolHandler(event:NodeEvent): void {
-			var updRequestSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy();
+			var updRequestSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
 			prepareUpdateSymbolRequests(updRequestSet, event.node, event.symbol, event.fieldIdx, event.applyToNonEmptyNodes);
 			_dataClient.updateActiveRecord(updRequestSet, null, faultHandler);
 		}
 		
-		protected static function prepareUpdateSymbolRequests(updateRequestSet:RecordUpdateRequestSetProxy, node:NodeProxy, symbol:FieldSymbol, fieldIdx:Number, applyToNonEmptyNodes:Boolean = false):void {
+		protected static function prepareUpdateSymbolRequests(updateRequestSet:NodeUpdateRequestSetProxy, node:NodeProxy, symbol:FieldSymbol, fieldIdx:Number, applyToNonEmptyNodes:Boolean = false):void {
 			if( node is EntityProxy ){
 				var entity:EntityProxy = node as EntityProxy;
 				var children:IList = entity.getChildren();
@@ -180,7 +181,7 @@ package org.openforis.collect.presenter {
 				}
 			} else {
 				var attr:AttributeProxy = AttributeProxy(node);
-				var r:RecordUpdateRequestProxy;
+				var r:NodeUpdateRequestProxy;
 				var field:FieldProxy;
 				if(isNaN(fieldIdx) || fieldIdx < 0){
 					for(var index:int = 0; index < attr.fields.length; index ++) {
@@ -202,7 +203,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		private static function createUpdateSymbolOperation(node:NodeProxy, field:FieldProxy, fieldIdx:int, symbol:FieldSymbol):RecordUpdateRequestProxy {
+		private static function createUpdateSymbolOperation(node:NodeProxy, field:FieldProxy, fieldIdx:int, symbol:FieldSymbol):NodeUpdateRequestProxy {
 			var r:FieldUpdateRequestProxy = new FieldUpdateRequestProxy();
 			r.nodeId = node.id;
 			r.fieldIndex = fieldIdx;
@@ -226,7 +227,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 
-		protected static function prepareApproveMissingRequests(updateRequestSet:RecordUpdateRequestSetProxy, node:NodeProxy, fieldIdx:Number, applyToNonEmptyNodes:Boolean = true):void {
+		protected static function prepareApproveMissingRequests(updateRequestSet:NodeUpdateRequestSetProxy, node:NodeProxy, fieldIdx:Number, applyToNonEmptyNodes:Boolean = true):void {
 			if( node is EntityProxy ){
 				var entity:EntityProxy = node as EntityProxy;
 				var children:IList = entity.getChildren();
@@ -235,7 +236,7 @@ package org.openforis.collect.presenter {
 				}
 			} else {
 				var attr:AttributeProxy = AttributeProxy(node);
-				var r:RecordUpdateRequestProxy;
+				var r:NodeUpdateRequestProxy;
 				var field:FieldProxy;
 				if(isNaN(fieldIdx) || fieldIdx < 0){
 					for(var index:int = 0; index < attr.fields.length; index ++) {
@@ -255,7 +256,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		private static function createApproveMissingOperation(node:NodeProxy, fieldIdx:int):RecordUpdateRequestProxy {
+		private static function createApproveMissingOperation(node:NodeProxy, fieldIdx:int):NodeUpdateRequestProxy {
 			var r:MissingValueApproveRequestProxy = new MissingValueApproveRequestProxy();
 			r.parentEntityId = node.parentId;
 			r.nodeName = node.name;
@@ -263,8 +264,8 @@ package org.openforis.collect.presenter {
 		}
 		
 		protected static function confirmErrorHandler(event:NodeEvent):void {
-			var updRequest:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy();
-			var op:RecordUpdateRequestProxy;
+			var updRequest:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
+			var op:NodeUpdateRequestProxy;
 			if ( event.node != null ) {
 				op = createConfirmErrorOperation(event.node);
 				updRequest.addRequest(op);
@@ -280,7 +281,7 @@ package org.openforis.collect.presenter {
 			_dataClient.updateActiveRecord(updRequest, null, faultHandler);
 		}
 		
-		protected static function createConfirmErrorOperation(node:NodeProxy):RecordUpdateRequestProxy {
+		protected static function createConfirmErrorOperation(node:NodeProxy):NodeUpdateRequestProxy {
 			var updRequestOp:ConfirmErrorRequestProxy = new ConfirmErrorRequestProxy();
 			updRequestOp.nodeId = node.id;
 			return updRequestOp;
@@ -290,7 +291,7 @@ package org.openforis.collect.presenter {
 			var node:NodeProxy = event.node;
 			var updRequestOp:NodeDeleteRequestProxy = new NodeDeleteRequestProxy();
 			updRequestOp.nodeId = node.id;
-			var updRequest:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(updRequestOp);
+			var updRequest:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy(updRequestOp);
 			_dataClient.updateActiveRecord(updRequest, null, faultHandler);
 		}
 		
@@ -302,10 +303,10 @@ package org.openforis.collect.presenter {
 		
 		protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.attribute != null) {
-				var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
-				for each (var response:NodeUpdateResponseProxy in responseSet.responses) {
-					if ( response is AttributeUpdateResponseProxy && 
-							AttributeUpdateResponseProxy(response).nodeId == _view.attribute.id) {
+				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
+				for each (var change:NodeChangeProxy in changeSet.changes) {
+					if ( change is AttributeChangeProxy && 
+							AttributeChangeProxy(change).nodeId == _view.attribute.id) {
 						_view.changed = false
 						updateView();
 						return;
@@ -314,7 +315,7 @@ package org.openforis.collect.presenter {
 			}
 		}
 		
-		protected function setAttribute(value:AttributeProxy):void {
+		protected function attributeChangeHandler(event:PropertyChangeEvent):void {
 			_view.changed = false;
 			_view.visited = false;
 			_view.updating = false;
@@ -563,7 +564,7 @@ package org.openforis.collect.presenter {
 		}
 		
 		public function updateValue():void {
-			var r:RecordUpdateRequestProxy = createValueUpdateRequest();
+			var r:NodeUpdateRequestProxy = createValueUpdateRequest();
 			sendUpdateRequest(r);
 		}
 		
@@ -577,7 +578,7 @@ package org.openforis.collect.presenter {
 			return r;
 		}
 		
-		public function createValueUpdateRequest():RecordUpdateRequestProxy {
+		public function createValueUpdateRequest():NodeUpdateRequestProxy {
 			var symbol:FieldSymbol = null;
 			var value:String = null;
 			var text:String = textToRequestValue();
@@ -587,17 +588,17 @@ package org.openforis.collect.presenter {
 				value = text;
 			}
 			var remarks:String = getRemarks(); //preserve old remarks
-			var r:RecordUpdateRequestProxy = createSpecificValueUpdateRequest(value, symbol, remarks);
+			var r:NodeUpdateRequestProxy = createSpecificValueUpdateRequest(value, symbol, remarks);
 			return r;
 		}
 
-		protected function sendUpdateRequest(o:RecordUpdateRequestProxy):void {
-			var req:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(o);
+		protected function sendUpdateRequest(o:NodeUpdateRequestProxy):void {
+			var req:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy(o);
 			dataClient.updateActiveRecord(req, updateResultHandler, faultHandler);
 			_view.updating = true;
 		}
 		
-		protected function createSpecificValueUpdateRequest(value:String, symbol:FieldSymbol = null, remarks:String = null):RecordUpdateRequestProxy {
+		protected function createSpecificValueUpdateRequest(value:String, symbol:FieldSymbol = null, remarks:String = null):NodeUpdateRequestProxy {
 			if ( _view.fieldIndex >= 0 ) {
 				var fieldUpdReq:FieldUpdateRequestProxy = new FieldUpdateRequestProxy();
 				fieldUpdReq.nodeId = _view.attribute.id;
@@ -643,18 +644,12 @@ package org.openforis.collect.presenter {
 		
 		protected function updateView():void {
 			//update view according to attribute (generic text value)
-			var hasRemarks:Boolean = false;
-			if(_view.attributeUIModelObject.attributeDefinition != null) {
-				var text:String = getTextFromValue();
-				if ( ! _view.changed ) {
-					_view.text = text;
-				}
-				hasRemarks = StringUtil.isNotBlank(getRemarks());
-				_contextMenu.updateItems();
-			}
+			var text:String = getTextFromValue();
+			_view.text = text;
+			_contextMenu.updateItems();
 			
 			var newStyles:Array = [];
-			if ( hasRemarks ) {
+			if ( StringUtil.isNotBlank(getRemarks()) ) {
 				newStyles.push(InputField.REMARKS_PRESENT_STYLE);
 			}
 			if ( ! Application.activeRecordEditable ) {
@@ -663,7 +658,6 @@ package org.openforis.collect.presenter {
 			UIUtil.replaceStyleNames(_view.validationStateDisplay, newStyles, 
 				[InputField.REMARKS_PRESENT_STYLE, InputField.READONLY_STYLE] );
 			
-			//_view.hasRemarks = hasRemarks;
 			_view.editable = Application.activeRecordEditable;
 		}
 		

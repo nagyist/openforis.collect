@@ -3,12 +3,14 @@
  */
 package org.openforis.collect.model.proxy;
 
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.RecordUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.AttributeUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeUpdateRequest;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.FileAttribute;
 import org.openforis.idm.model.Value;
 
@@ -17,34 +19,31 @@ import org.openforis.idm.model.Value;
  * @author S. Ricci
  *
  */
-public class AttributeUpdateRequestProxy extends BaseAttributeRequestProxy<AttributeUpdateRequest<?>> {
+public class AttributeUpdateRequestProxy extends BaseAttributeUpdateRequestProxy<AttributeUpdateRequest<?>> {
 	
 	private Integer nodeId;
 
 	@Override
-	public AttributeUpdateRequest<?> toUpdateRequest(CollectRecord record) {
-		throw new UnsupportedOperationException();
-	}
-	
 	@SuppressWarnings("unchecked")
-	public AttributeUpdateRequest<?> toUpdateRequest(CollectRecord record, RecordFileManager fileManager, SessionManager sessionManager) {
-		AttributeUpdateRequest<Value> request = new RecordUpdateRequest.AttributeUpdateRequest<Value>();
+	public AttributeUpdateRequest<?> toAttributeUpdateRequest(CodeListManager codeListManager, RecordFileManager fileManager, 
+			SessionManager sessionManager, CollectRecord record) {
+		AttributeUpdateRequest<Value> opts = new NodeUpdateRequest.AttributeUpdateRequest<Value>();
 		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
-		request.setAttribute((Attribute<?, Value>) attribute);
+		opts.setAttribute((Attribute<?, Value>) attribute);
 		if ( value != null ) {
 			Value parsedValue;
 			if ( attribute instanceof FileAttribute ) {
-				parsedValue = parseFileAttributeValue(record, fileManager, sessionManager, nodeId, value);
+				parsedValue = parseFileAttributeValue(fileManager, record, sessionManager, nodeId, value);
 			} else {
-				parsedValue = parseCompositeAttributeValue(attribute.getParent(), attribute.getDefinition(), value);
+				Entity parentEntity = attribute.getParent();
+				String attributeName = attribute.getName();
+				parsedValue = parseCompositeAttributeValue(codeListManager, parentEntity, attributeName, value);
 			}
-			request.setValue(parsedValue);
+			opts.setValue(parsedValue);
 		}
-		request.setSymbol(symbol);
-		request.setRemarks(remarks);
-		return request;
+		opts.setSymbol(symbol);
+		return opts;
 	}
-	
 	
 	public Integer getNodeId() {
 		return nodeId;

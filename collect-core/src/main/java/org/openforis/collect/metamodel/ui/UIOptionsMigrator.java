@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.openforis.collect.metamodel.ui.UIOptions.CoordinateAttributeFieldsOrder;
 import org.openforis.collect.metamodel.ui.UIOptions.Layout;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -139,10 +141,14 @@ public class UIOptionsMigrator {
 	protected Field createField(FormSection parent, NodeDefinition nodeDefn) {
 		Field field = parent.createField();
 		field.setAttributeId(nodeDefn.getId());
+		UIOptions uiOptions = parent.getUIOptions();
 		if ( nodeDefn instanceof TextAttributeDefinition ) {
-			UIOptions uiOptions = parent.getUIOptions();
 			String autoCompleteGroup = uiOptions.getAutoCompleteGroup((TextAttributeDefinition) nodeDefn);
 			field.setAutoCompleteGroup(autoCompleteGroup);
+		}
+		if ( nodeDefn instanceof CoordinateAttributeDefinition ) {
+			CoordinateAttributeFieldsOrder fieldsOrder = uiOptions.getFieldsOrder((CoordinateAttributeDefinition) nodeDefn);
+			field.setFieldsOrder(fieldsOrder);
 		}
 		return field;
 	}

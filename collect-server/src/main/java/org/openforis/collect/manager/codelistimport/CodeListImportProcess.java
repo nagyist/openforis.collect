@@ -4,7 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +13,7 @@ import java.util.Stack;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.codelistimport.CodeListLine.CodeLabelItem;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
@@ -36,6 +37,7 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	
 	private static Log LOG = LogFactory.getLog(CodeListImportProcess.class);
 	//parameters
+	private CodeListManager codeListManager;
 	private File file;
 	private CodeList codeList;
 	private CodeScope codeScope;
@@ -46,8 +48,11 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 	private List<String> levels;
 	private Map<String, CodeListItem> codeToRootItem;
 	private boolean overwriteData;
-	
-	public CodeListImportProcess(CodeList codeList, CodeScope codeScope, String langCode, File file, boolean overwriteData) {
+
+	public CodeListImportProcess(CodeListManager codeListManager,
+			CodeList codeList, CodeScope codeScope, String langCode, File file,
+			boolean overwriteData) {
+		this.codeListManager = codeListManager;
 		this.codeList = codeList;
 		this.codeScope = codeScope;
 		this.langCode = langCode;
@@ -106,11 +111,22 @@ public class CodeListImportProcess extends AbstractProcess<Void, CodeListImportS
 			codeList.removeAllLevels();
 		}
 		addLevelsToCodeList();
-		Collection<CodeListItem> rootItems = codeToRootItem.values();
-		for (CodeListItem item : rootItems) {
-			codeList.addItem(item);
-		}
+		
+		codeListManager.deleteAllItems(codeList);
+		List<CodeListItem> rootItems = new ArrayList<CodeListItem>(codeToRootItem.values());
+		codeListManager.saveItemsAndDescendants(rootItems);
+		//saveItemsAndDescendants(rootItems, null);
 	}
+
+//	protected void saveItemsAndDescendants(Collection<CodeListItem> items,
+//			Integer parentItemId) {
+//		for (CodeListItem item : items) {
+//			PersistedCodeListItem persistedChildItem = PersistedCodeListItem.fromItem(item);
+//			persistedChildItem.setParentId(parentItemId);
+//			codeListManager.save(persistedChildItem);
+//			saveItemsAndDescendants(item.getChildItems(), persistedChildItem.getSystemId());
+//		}
+//	}
 
 	protected void parseCSVLines(File file) {
 		InputStreamReader isReader = null;

@@ -13,7 +13,7 @@ package org.openforis.collect.presenter
 	import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
 	import org.openforis.collect.model.proxy.EntityAddRequestProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 	import org.openforis.collect.ui.component.detail.TableFormItem;
 	import org.openforis.collect.ui.component.input.InputField;
 	import org.openforis.collect.util.AlertUtil;
@@ -93,7 +93,7 @@ package org.openforis.collect.presenter
 				var r:EntityAddRequestProxy = new EntityAddRequestProxy();
 				r.parentEntityId = view.parentEntity.id;
 				r.nodeName = entityDefn.name;
-				var reqSet:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy(r);
+				var reqSet:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy(r);
 				ClientFactory.dataClient.updateActiveRecord(reqSet, addResultHandler, faultHandler);
 			} else {
 				var labelText:String = entityDefn.getInstanceOrHeadingLabelText();

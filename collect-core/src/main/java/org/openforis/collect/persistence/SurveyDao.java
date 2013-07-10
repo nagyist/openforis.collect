@@ -1,7 +1,6 @@
 package org.openforis.collect.persistence;
 
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_ID_SEQ;
-import static org.openforis.collect.persistence.jooq.tables.OfcRecord.OFC_RECORD;
 import static org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
 
 import java.util.ArrayList;
@@ -77,6 +76,20 @@ public class SurveyDao extends SurveyBaseDao {
 		return survey;
 	}
 	
+	@Transactional
+	public List<SurveySummary> loadSummaries() {
+		Factory jf = getJooqFactory();
+		List<SurveySummary> surveys = new ArrayList<SurveySummary>();
+		Result<Record> results = jf.select().from(OFC_SURVEY).fetch();
+		for (Record row : results) {
+			SurveySummary survey = processSurveySummaryRow(row);
+			if (survey != null) {
+				surveys.add(survey);
+			}
+		}
+		return surveys;
+	}
+	
 	public SurveySummary loadSurveySummary(int id) {
 		Factory jf = getJooqFactory();
 		Record record = jf.select()
@@ -112,10 +125,11 @@ public class SurveyDao extends SurveyBaseDao {
 		return surveys;
 	}
 
-	public void clearModel() {
-		Factory jf = getJooqFactory();
-		jf.delete(OFC_RECORD).execute();
-		jf.delete(OFC_SURVEY).execute();
+	public void delete(int id) {
+		DialectAwareJooqFactory jf = getJooqFactory();
+		jf.delete(OFC_SURVEY)
+			.where(OFC_SURVEY.ID.equal(id))
+			.execute();
 	}
 
 	public void updateModel(CollectSurvey survey) throws SurveyImportException {

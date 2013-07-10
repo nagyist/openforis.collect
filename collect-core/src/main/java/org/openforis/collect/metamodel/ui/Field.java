@@ -15,6 +15,7 @@ public class Field extends Component {
 
 	private int attributeId; 
 	private String autoCompleteGroup;
+	private Enum<?> fieldsOrder;
 	
 	Field(FormSection parent, int id) {
 		super(parent, id);
@@ -74,6 +75,14 @@ public class Field extends Component {
 	@Override
 	public String toString() {
 		return "Attribute: " + getAttribute().getPath();
+	}
+
+	public Enum<?> getFieldsOrder() {
+		return fieldsOrder;
+	}
+
+	public void setFieldsOrder(Enum<?> fieldsOrder) {
+		this.fieldsOrder = fieldsOrder;
 	}
 
 }

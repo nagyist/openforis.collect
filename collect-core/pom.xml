@@ -65,13 +65,13 @@
 							<packageName>org.openforis.collect.persistence.jooq</packageName>
 							<directory>${basedir}/src/generated/java</directory>
 						</target>
-						<masterDataTables>
-							<masterDataTable>
-								<name>t_language</name>
-								<literal>cd</literal>
-								<description>description</description>
-							</masterDataTable>
-						</masterDataTables>
+<!-- 						<masterDataTables> -->
+<!-- 							<masterDataTable> -->
+<!-- 								<name>t_language</name> -->
+<!-- 								<literal>cd</literal> -->
+<!-- 								<description>description</description> -->
+<!-- 							</masterDataTable> -->
+<!-- 						</masterDataTables> -->
 					</generator>
 				</configuration>
 			</plugin>
@@ -243,27 +243,6 @@
 										<ignore />
 									</action>
 								</pluginExecution>
-<!-- 								<pluginExecution> -->
-<!-- 									<pluginExecutionFilter> -->
-<!-- 										<groupId> -->
-<!-- 											org.codehaus.mojo -->
-<!-- 										</groupId> -->
-<!-- 										<artifactId> -->
-<!-- 											build-helper-maven-plugin -->
-<!-- 										</artifactId> -->
-<!-- 										<versionRange> -->
-<!-- 											[1.7,) -->
-<!-- 										</versionRange> -->
-<!-- 										<goals> -->
-<!-- 											<goal>add-source</goal> -->
-<!-- 											<goal>add-test-source</goal> -->
-<!-- 											<goal>add-test-resource</goal> -->
-<!-- 										</goals> -->
-<!-- 									</pluginExecutionFilter> -->
-<!-- 									<action> -->
-<!-- 										<ignore /> -->
-<!-- 									</action> -->
-<!-- 								</pluginExecution> -->
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>

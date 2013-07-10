@@ -3,12 +3,12 @@
  */
 package org.openforis.collect.model.proxy;
 
+import org.openforis.collect.manager.CodeListManager;
+import org.openforis.collect.manager.RecordFileManager;
+import org.openforis.collect.manager.SessionManager;
 import org.openforis.collect.model.CollectRecord;
-import org.openforis.collect.model.RecordUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.AttributeAddRequest;
-import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.collect.remoting.service.NodeUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeAddRequest;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Value;
 
@@ -17,26 +17,25 @@ import org.openforis.idm.model.Value;
  * @author S. Ricci
  *
  */
-public class AttributeAddRequestProxy extends BaseAttributeRequestProxy<AttributeAddRequest<?>> {
+public class AttributeAddRequestProxy extends BaseAttributeUpdateRequestProxy<AttributeAddRequest<?>> {
 	
 	private Integer parentEntityId;
 	private String nodeName;
 	
 	@Override
-	public AttributeAddRequest<?> toUpdateRequest(CollectRecord record) {
+	public AttributeAddRequest<?> toAttributeUpdateRequest(CodeListManager codeListManager, RecordFileManager fileManager, 
+			SessionManager sessionManager, CollectRecord record) {
 		Entity parentEntity = (Entity) record.getNodeByInternalId(parentEntityId);
-		EntityDefinition parentEntityDefn = parentEntity.getDefinition();
-		NodeDefinition childDefn = parentEntityDefn.getChildDefinition(nodeName);
-		AttributeAddRequest<Value> request = new RecordUpdateRequest.AttributeAddRequest<Value>();
-		request.setParentEntityId(parentEntityId);
-		request.setNodeName(nodeName);
-		request.setRemarks(remarks);
-		request.setSymbol(symbol);
+		AttributeAddRequest<Value> result = new NodeUpdateRequest.AttributeAddRequest<Value>();
+		result.setParentEntity(parentEntity);
+		result.setNodeName(nodeName);
+		result.setRemarks(remarks);
+		result.setSymbol(symbol);
 		if ( value != null ) {
-			Value parsedValue = parseCompositeAttributeValue(parentEntity, (AttributeDefinition) childDefn, value);
-			request.setValue(parsedValue);
+			Value parsedValue = parseCompositeAttributeValue(codeListManager, parentEntity, nodeName, value);
+			result.setValue(parsedValue);
 		}
-		return request;
+		return result;
 	}
 	
 	public Integer getParentEntityId() {
@@ -54,5 +53,5 @@ public class AttributeAddRequestProxy extends BaseAttributeRequestProxy<Attribut
 	public void setNodeName(String nodeName) {
 		this.nodeName = nodeName;
 	}
-	
+
 }

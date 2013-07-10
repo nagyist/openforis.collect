@@ -19,7 +19,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.model.proxy.AttributeProxy;
 	import org.openforis.collect.model.proxy.AttributeUpdateRequestProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestProxy;
 	import org.openforis.collect.remoting.service.FileWrapper;
 	import org.openforis.collect.ui.component.input.FileInputField;
 	import org.openforis.collect.util.AlertUtil;
@@ -153,8 +153,8 @@ package org.openforis.collect.presenter {
 			fileWrapper.data = fileReference.data;
 			fileWrapper.fileName = fileReference.name;
 			var nodeId:Number = _view.attribute.id;
-			var updateReq:RecordUpdateRequestProxy = createFileUpdateRequestOperation(fileWrapper);
-			sendUpdateRequest(updateReq);
+			var request:NodeUpdateRequestProxy = createFileUpdateRequestOperation(fileWrapper);
+			sendUpdateRequest(request);
 		}
 		
 		protected function fileReferenceIoErrorHandler(event:IOErrorEvent):void {
@@ -194,8 +194,8 @@ package org.openforis.collect.presenter {
 		
 		protected function performDelete():void {
 			var nodeId:Number = _view.attribute.id;
-			var updateReq:RecordUpdateRequestProxy = createFileUpdateRequestOperation(null);
-			sendUpdateRequest(updateReq);
+			var request:NodeUpdateRequestProxy = createFileUpdateRequestOperation(null);
+			sendUpdateRequest(request);
 
 			//var responder:IResponder = new AsyncResponder(deleteResultHandler, faultHandler);
 			//ClientFactory.recordFileClient.deleteFile(responder, nodeId);
@@ -219,7 +219,7 @@ package org.openforis.collect.presenter {
 			fileAttribute.getField(0).value = null;
 		}
 		
-		protected function createFileUpdateRequestOperation(fileWrapper:FileWrapper):RecordUpdateRequestProxy {
+		protected function createFileUpdateRequestOperation(fileWrapper:FileWrapper):NodeUpdateRequestProxy {
 			var r:AttributeUpdateRequestProxy = new AttributeUpdateRequestProxy();
 			r.nodeId = _view.attribute.id;
 			r.value = fileWrapper;

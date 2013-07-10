@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordFileManager;
 import org.openforis.collect.manager.RecordIndexException;
 import org.openforis.collect.manager.RecordIndexManager.SearchType;
@@ -20,18 +22,27 @@ import org.openforis.collect.metamodel.proxy.CodeListItemProxy;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
-import org.openforis.collect.model.NodeUpdateResponse;
+import org.openforis.collect.model.FieldSymbol;
+import org.openforis.collect.model.NodeChange;
+import org.openforis.collect.model.NodeChangeMap;
+import org.openforis.collect.model.NodeChangeSet;
 import org.openforis.collect.model.RecordSummarySortField;
-import org.openforis.collect.model.RecordUpdateRequestSet;
-import org.openforis.collect.model.RecordUpdateResponseSet;
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.proxy.NodeChangeSetProxy;
+import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
 import org.openforis.collect.model.proxy.RecordProxy;
-import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
-import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
 import org.openforis.collect.persistence.MultipleEditException;
 import org.openforis.collect.persistence.RecordPersistenceException;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeAddRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.AttributeUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.DefaultValueApplyRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.EntityAddRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.ErrorConfirmRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.FieldUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.MissingValueApproveRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.NodeDeleteRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.RemarksUpdateRequest;
 import org.openforis.collect.remoting.service.recordindex.RecordIndexService;
-import org.openforis.collect.spring.MessageContextHolder;
 import org.openforis.collect.web.session.SessionState;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeListItem;
@@ -39,6 +50,7 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
 import org.openforis.idm.model.Entity;
 import org.openforis.idm.model.Node;
+import org.openforis.idm.model.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,11 +67,11 @@ public class DataService {
 	@Autowired
 	private transient RecordManager recordManager;
 	@Autowired
+	private transient CodeListManager codeListManager;
+	@Autowired
 	private transient RecordFileManager fileManager;
 	@Autowired
 	private transient RecordIndexService recordIndexService;
-	@Autowired
-	private MessageContextHolder messageContextHolder;
 
 	/**
 	 * it's true when the root entity definition of the record in session has some nodes with the "collect:index" annotation
@@ -68,20 +80,19 @@ public class DataService {
 
 	@Transactional
 	@Secured("ROLE_ENTRY")
-	public RecordProxy loadRecord(int id, int step, boolean forceUnlock) throws RecordPersistenceException, RecordIndexException {
+	public RecordProxy loadRecord(int id, int stepNumber, boolean forceUnlock) throws RecordPersistenceException, RecordIndexException {
 		SessionState sessionState = sessionManager.getSessionState();
 		if ( sessionState.isActiveRecordBeingEdited() ) {
 			throw new MultipleEditException();
 		}
 		final CollectSurvey survey = sessionState.getActiveSurvey();
 		User user = sessionState.getUser();
+		Step step = Step.valueOf(stepNumber);
 		CollectRecord record = recordManager.checkout(survey, user, id, step, sessionState.getSessionId(), forceUnlock);
-		Entity rootEntity = record.getRootEntity();
-		record.addEmptyNodes(rootEntity);
 		sessionManager.setActiveRecord(record);
 		fileManager.reset();
 		prepareRecordIndexing();
-		return new RecordProxy(messageContextHolder, record);
+		return new RecordProxy(record);
 	}
 
 	protected void prepareRecordIndexing() throws RecordIndexException {
@@ -113,7 +124,7 @@ public class DataService {
 		String rootEntityDefinitionName = rootEntityDefinition.getName();
 		int count = recordManager.getRecordCount(activeSurvey, rootEntityDefinitionName, keyValues);
 		List<CollectRecord> summaries = recordManager.loadSummaries(activeSurvey, rootEntityDefinitionName, offset, maxNumberOfRows, sortFields, keyValues);
-		List<RecordProxy> proxies = RecordProxy.fromList(messageContextHolder, summaries);
+		List<RecordProxy> proxies = RecordProxy.fromList(summaries);
 		result.put("count", count);
 		result.put("records", proxies);
 		return result;
@@ -132,11 +143,9 @@ public class DataService {
 		Schema schema = activeSurvey.getSchema();
 		EntityDefinition rootEntityDefinition = schema.getRootEntityDefinition(rootEntityName);
 		CollectRecord record = recordManager.create(activeSurvey, rootEntityDefinition, user, versionName, sessionId);
-		Entity rootEntity = record.getRootEntity();
-		record.addEmptyNodes(rootEntity);
 		sessionManager.setActiveRecord(record);
 		prepareRecordIndexing();
-		RecordProxy recordProxy = new RecordProxy(messageContextHolder, record);
+		RecordProxy recordProxy = new RecordProxy(record);
 		return recordProxy;
 	}
 	
@@ -146,7 +155,7 @@ public class DataService {
 		SessionState sessionState = sessionManager.getSessionState();
 		CollectSurvey survey = sessionState.getActiveSurvey();
 		//TODO check that the record is in ENTRY phase: only delete in ENTRY phase is allowed
-		CollectRecord record = recordManager.load(survey, id, Step.ENTRY.getStepNumber());
+		CollectRecord record = recordManager.load(survey, id, Step.ENTRY);
 		fileManager.deleteAllFiles(record);
 		recordManager.delete(id);
 	}
@@ -170,18 +179,92 @@ public class DataService {
 
 	@Transactional
 	@Secured("ROLE_ENTRY")
-	public RecordUpdateResponseSetProxy updateActiveRecord(RecordUpdateRequestSetProxy requestSet) throws RecordPersistenceException, RecordIndexException {
+	public NodeChangeSetProxy updateActiveRecord(NodeUpdateRequestSetProxy requestSet) throws RecordPersistenceException, RecordIndexException {
 		sessionManager.checkIsActiveRecordLocked();
 		CollectRecord activeRecord = getActiveRecord();
-		RecordUpdateRequestSet reqSet = requestSet.toRecordUpdateResponseSet(activeRecord, fileManager, sessionManager);
-		RecordUpdateResponseSet responseSet = activeRecord.update(reqSet);
-		List<NodeUpdateResponse<?>> responses = responseSet.getResponses();
-		if ( ! responses.isEmpty() && isCurrentRecordIndexable() ) {
+		NodeUpdateRequestSet reqSet = requestSet.toNodeUpdateRequestSet(codeListManager, fileManager, sessionManager, activeRecord);
+		NodeChangeSet changeSet = updateRecord(activeRecord, reqSet);
+		if ( ! changeSet.isEmpty() && isCurrentRecordIndexable() ) {
 			recordIndexService.temporaryIndex(activeRecord);
 		}
-		return new RecordUpdateResponseSetProxy(messageContextHolder, responseSet);
+		NodeChangeSetProxy result = new NodeChangeSetProxy(activeRecord, changeSet);
+		if ( requestSet.isAutoSave() ) {
+			try {
+				saveActiveRecord();
+				result.setRecordSaved(true);
+			} catch(Exception e) {
+				result.setRecordSaved(false);
+			}
+		}
+		return result;
 	}
 
+	protected NodeChangeSet updateRecord(CollectRecord record, NodeUpdateRequestSet nodeUpdateRequestSet) throws RecordPersistenceException, RecordIndexException {
+		List<NodeUpdateRequest> opts = nodeUpdateRequestSet.getRequests();
+		NodeChangeMap result = new NodeChangeMap();
+		for (NodeUpdateRequest req : opts) {
+			NodeChangeSet partialChangeSet = updateRecord(record, req);
+			List<NodeChange<?>> changes = partialChangeSet.getChanges();
+			for (NodeChange<?> change : changes) {
+				result.addOrMergeChange(change);
+			}
+		}
+		return new NodeChangeSet(result.getChanges());
+	}
+	
+	@SuppressWarnings("unchecked")
+	protected NodeChangeSet updateRecord(CollectRecord record, NodeUpdateRequest req) throws RecordPersistenceException {
+		if ( req instanceof ErrorConfirmRequest ) {
+			return recordManager.confirmError(((ErrorConfirmRequest) req).getAttribute());
+		} else if ( req instanceof MissingValueApproveRequest ) {
+			MissingValueApproveRequest r = (MissingValueApproveRequest) req;
+			return recordManager.approveMissingValue(r.getParentEntity(), r.getNodeName());
+		} else if ( req instanceof RemarksUpdateRequest ) {
+			RemarksUpdateRequest r = (RemarksUpdateRequest) req;
+			return recordManager.updateRemarks(r.getField(), r.getRemarks());
+		} else if ( req instanceof AttributeAddRequest ) {
+			AttributeAddRequest<Value> r = (AttributeAddRequest<Value>) req;
+			return recordManager.addAttribute(r.getParentEntity(), r.getNodeName(), r.getValue(), 
+					r.getSymbol(), r.getRemarks());
+		} else if ( req instanceof EntityAddRequest ) {
+			EntityAddRequest r = (EntityAddRequest) req;
+			return recordManager.addEntity(r.getParentEntity(), r.getNodeName());
+		} else if ( req instanceof AttributeUpdateRequest ) {
+			AttributeUpdateRequest<Value> r = (AttributeUpdateRequest<Value>) req;
+			Value value = r.getValue();
+			FieldSymbol symbol = r.getSymbol();
+			if ( value == null && symbol == null || value != null ) {
+				return recordManager.updateAttribute(r.getAttribute(), value);
+			} else if ( symbol != null ) {
+				return recordManager.updateAttribute(r.getAttribute(), symbol);
+			} else {
+				throw new IllegalArgumentException("Cannot specify both value and symbol");
+			}
+		} else if ( req instanceof FieldUpdateRequest ) {
+			return processUpdateFieldRequest((FieldUpdateRequest<?>) req);
+		} else if ( req instanceof DefaultValueApplyRequest ) {
+			return recordManager.applyDefaultValue(((DefaultValueApplyRequest) req).getAttribute());
+		} else if ( req instanceof NodeDeleteRequest ) {
+			return recordManager.deleteNode(((NodeDeleteRequest) req).getNode());
+		} else {
+			throw new IllegalArgumentException("NodeChange not supported: " + req.getClass().getSimpleName());
+		}
+	}
+
+	protected <T> NodeChangeSet processUpdateFieldRequest(FieldUpdateRequest<T> r) {
+		if ( StringUtils.equals(r.getField().getRemarks(), r.getRemarks()) ) {
+			if ( r.getValue() == null && r.getSymbol() == null ) {
+				return recordManager.updateField(r.getField(), (T) null);
+			} else if ( r.getValue() != null ) {
+				return recordManager.updateField(r.getField(), r.getValue());
+			} else {
+				return recordManager.updateField(r.getField(), r.getSymbol());
+			}
+		} else {
+			return recordManager.updateRemarks(r.getField(), r.getRemarks());
+		}
+	}
+	
 	@Secured("ROLE_ENTRY")
 	public void promoteToCleansing() throws RecordPersistenceException, RecordPromoteException  {
 		promote(Step.CLEANSING);
@@ -282,7 +365,7 @@ public class DataService {
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
-		List<CodeListItem> items = record.getAssignableCodeListItems(parent, def);
+		List<CodeListItem> items = codeListManager.loadValidItems(parent, def);
 		List<CodeListItem> filteredItems = new ArrayList<CodeListItem>();
 		if(codes != null && codes.length > 0) {
 			//filter by specified codes
@@ -310,7 +393,7 @@ public class DataService {
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attrName);
-		List<CodeListItem> items = record.getAssignableCodeListItems(parent, def);
+		List<CodeListItem> items = codeListManager.loadValidItems(parent, def);
 		List<CodeListItemProxy> result = CodeListItemProxy.fromList(items);
 		List<Node<?>> selectedCodes = parent.getAll(attrName);
 		CodeListItemProxy.setSelectedItems(result, selectedCodes);
@@ -330,14 +413,10 @@ public class DataService {
 		CollectRecord record = getActiveRecord();
 		Entity parent = (Entity) record.getNodeByInternalId(parentEntityId);
 		CodeAttributeDefinition def = (CodeAttributeDefinition) parent.getDefinition().getChildDefinition(attributeName);
-		List<CodeListItem> items = record.getAssignableCodeListItems(parent, def);
+		List<CodeListItem> items = codeListManager.findValidItems(parent, def, codes);
 		List<CodeListItemProxy> result = new ArrayList<CodeListItemProxy>();
-		for (String code : codes) {
-			CodeListItem item = record.findCodeListItem(items, code);
-			if(item != null) {
-				CodeListItemProxy proxy = new CodeListItemProxy(item);
-				result.add(proxy);
-			}
+		for (CodeListItem item : items) {
+			result.add(new CodeListItemProxy(item));
 		}
 		return result;
 	}

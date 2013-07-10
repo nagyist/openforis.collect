@@ -70,7 +70,7 @@
 	</detail:layout>
 	
 	<detail:FormItemLabel id="formItemLabel"
-	  				  nodeDefinition="{attributeUIModelObject.attributeDefinition}"
+			  		  nodeDefinition="{attributeUIModelObject.attributeDefinition}"
 					  width="{labelWidth}"
 					  includeIn="form"
 					  />

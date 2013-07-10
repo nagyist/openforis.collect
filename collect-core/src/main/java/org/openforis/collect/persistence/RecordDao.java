@@ -96,7 +96,7 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 				.and(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.equal(rootDefinitionId)));
 		addFilterByKeyConditions(q, keyValues);
 		Record r = q.fetchOne();
-		return r.getValueAsInteger(0);
+		return (Integer) r.getValue(0);
 	}
 	
 	@Transactional
@@ -106,17 +106,34 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		q.addConditions(OFC_RECORD.CREATED_BY_ID.equal(userId)
 				.or(OFC_RECORD.MODIFIED_BY_ID.equal(userId)));
 		Record r = q.fetchOne();
-		Integer count = r.getValueAsInteger(0);
+		Integer count = (Integer) r.getValue(0);
 		return count > 0;
 	}
 
 	@Transactional
-	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, String... keyValues) {
-		return loadSummaries(survey, rootEntity, 0, Integer.MAX_VALUE, null, keyValues);
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity) {
+		return loadSummaries(survey, rootEntity, (String[]) null);
 	}
 
 	@Transactional
-	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, List<RecordSummarySortField> sortFields, String... keyValues) {
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step) {
+		return loadSummaries(survey, rootEntity, step, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, (String[]) null);
+	}
+
+	@Transactional
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, String... keyValues) {
+		return loadSummaries(survey, rootEntity, (Step) null, 0, Integer.MAX_VALUE, (List<RecordSummarySortField>) null, keyValues);
+	}
+
+	@Transactional
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, int offset, int maxRecords, 
+			List<RecordSummarySortField> sortFields, String... keyValues) {
+		return loadSummaries(survey, rootEntity, (Step) null, offset, maxRecords, sortFields, keyValues);
+	}
+	
+	@Transactional
+	public List<CollectRecord> loadSummaries(CollectSurvey survey, String rootEntity, Step step, int offset, int maxRecords, 
+			List<RecordSummarySortField> sortFields, String... keyValues) {
 		JooqFactory jf = getMappingJooqFactory(survey);
 		SelectQuery q = jf.selectQuery();	
 		q.addFrom(OFC_RECORD);
@@ -127,7 +144,9 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 		Integer rootEntityDefnId = rootEntityDefn.getId();
 		q.addConditions(OFC_RECORD.SURVEY_ID.equal(survey.getId()));
 		q.addConditions(OFC_RECORD.ROOT_ENTITY_DEFINITION_ID.equal(rootEntityDefnId));
-
+		if ( step != null ) {
+			q.addConditions(OFC_RECORD.STEP.equal(step.getStepNumber()));
+		}
 		addFilterByKeyConditions(q, keyValues);
 		
 		if ( sortFields != null ) {
@@ -232,6 +251,13 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 	@Override
 	public void delete(int id) {
 		super.delete(id);
+	}
+	
+	public void deleteBySurvey(int id) {
+		JooqFactory jf = getMappingJooqFactory();
+		jf.delete(OFC_RECORD)
+			.where(OFC_RECORD.SURVEY_ID.equal(id))
+			.execute();
 	}
 
 	public static class JooqFactory extends MappingJooqFactory<CollectRecord> {
@@ -424,4 +450,5 @@ public class RecordDao extends MappingJooqDaoSupport<CollectRecord, JooqFactory>
 			return new ModelSerializer(SERIALIZATION_BUFFER_SIZE);
 		}
 	}
+
 }

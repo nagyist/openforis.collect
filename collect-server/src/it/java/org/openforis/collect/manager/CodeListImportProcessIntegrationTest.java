@@ -47,6 +47,8 @@ public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest
 
 	@Autowired
 	private SurveyManager surveyManager;
+	@Autowired
+	private CodeListManager codeListManager;
 	
 	private CollectSurvey survey;
 	
@@ -58,7 +60,7 @@ public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest
 	
 	public CodeListImportProcess importCSVFile(String fileName, CodeList codeList, CodeScope codeScope) throws Exception {
 		File file = getTestFile(fileName);
-		CodeListImportProcess process = new CodeListImportProcess(codeList, codeScope, LANG, file, true);
+		CodeListImportProcess process = new CodeListImportProcess(codeListManager, codeList, codeScope, LANG, file, true);
 		process.call();
 		return process;
 	}
@@ -73,13 +75,13 @@ public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest
 		assertTrue(status.isComplete());
 		assertTrue(status.getSkippedRows().isEmpty());
 		assertEquals(5, status.getProcessed());
-		List<CodeListItem> items = codeList.getItems();
+		List<CodeListItem> items = codeListManager.loadRootItems(codeList);
 		assertEquals(2, items.size());
 		{
-			CodeListItem item = codeList.getItem("001");
+			CodeListItem item = codeListManager.loadRootItem(codeList, "001", null);
 			assertNotNull(item);
 			assertEquals("Dodoma", item.getLabel(LANG));
-			List<CodeListItem> childItems = item.getChildItems();
+			List<CodeListItem> childItems = codeListManager.loadChildItems(item);
 			assertEquals(2, childItems.size());
 			CodeListItem childItem = childItems.get(0);
 			assertEquals("001", childItem.getCode());
@@ -89,10 +91,10 @@ public class CodeListImportProcessIntegrationTest extends CollectIntegrationTest
 			assertEquals("Mpwapwa", childItem.getLabel(LANG));
 		}
 		{
-			CodeListItem item = codeList.getItem("002");
+			CodeListItem item = codeListManager.loadRootItem(codeList, "002", null);
 			assertNotNull(item);
 			assertEquals("Arusha", item.getLabel(LANG));
-			List<CodeListItem> childItems = item.getChildItems();
+			List<CodeListItem> childItems = codeListManager.loadChildItems(item);
 			assertEquals(2, childItems.size());
 			CodeListItem childItem = childItems.get(0);
 			assertEquals("001", childItem.getCode());

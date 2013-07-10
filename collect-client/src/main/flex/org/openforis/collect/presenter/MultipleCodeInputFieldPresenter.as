@@ -9,16 +9,17 @@ package org.openforis.collect.presenter {
 	
 	import org.openforis.collect.event.ApplicationEvent;
 	import org.openforis.collect.event.InputFieldEvent;
+	import org.openforis.collect.metamodel.proxy.CodeAttributeDefinitionProxy;
 	import org.openforis.collect.model.FieldSymbol;
 	import org.openforis.collect.model.proxy.AttributeProxy;
-	import org.openforis.collect.model.proxy.AttributeUpdateResponseProxy;
+	import org.openforis.collect.model.proxy.AttributeChangeProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.model.proxy.FieldProxy;
 	import org.openforis.collect.model.proxy.NodeDeleteRequestProxy;
-	import org.openforis.collect.model.proxy.NodeUpdateResponseProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateRequestSetProxy;
-	import org.openforis.collect.model.proxy.RecordUpdateResponseSetProxy;
+	import org.openforis.collect.model.proxy.NodeChangeProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestProxy;
+	import org.openforis.collect.model.proxy.NodeUpdateRequestSetProxy;
+	import org.openforis.collect.model.proxy.NodeChangeSetProxy;
 	import org.openforis.collect.ui.component.input.MultipleCodeInputField;
 	import org.openforis.collect.util.CollectionUtil;
 	import org.openforis.collect.util.StringUtil;
@@ -75,10 +76,10 @@ package org.openforis.collect.presenter {
 		
 		override protected function updateResponseReceivedHandler(event:ApplicationEvent):void {
 			if(_view.attributes != null) {
-				var responseSet:RecordUpdateResponseSetProxy = RecordUpdateResponseSetProxy(event.result);
-				for each (var response:NodeUpdateResponseProxy in responseSet.responses) {
-					if ( response is AttributeUpdateResponseProxy ) {
-						var nodeId:int = AttributeUpdateResponseProxy(response).nodeId;
+				var changeSet:NodeChangeSetProxy = NodeChangeSetProxy(event.result);
+				for each (var change:NodeChangeProxy in changeSet.changes) {
+					if ( change is AttributeChangeProxy ) {
+						var nodeId:int = AttributeChangeProxy(change).nodeId;
 						var attribute:AttributeProxy = CollectionUtil.getItem(_view.attributes, "id", nodeId) as AttributeProxy;
 						if(attribute != null) {
 							updateView();
@@ -113,7 +114,7 @@ package org.openforis.collect.presenter {
 		override public function updateValue():void {
 			var text:String = textToRequestValue();
 			var removeAttributesOperations:ArrayCollection = new ArrayCollection();
-			var r:RecordUpdateRequestProxy;
+			var r:NodeUpdateRequestProxy;
 			//remove old attributes
 			for each (var a:AttributeProxy in _view.attributes) {
 				r = new NodeDeleteRequestProxy();
@@ -151,7 +152,7 @@ package org.openforis.collect.presenter {
 			var requests:ArrayCollection = new ArrayCollection();
 			requests.addAll(removeAttributesOperations);
 			requests.addAll(addAttributesOperations);
-			var req:RecordUpdateRequestSetProxy = new RecordUpdateRequestSetProxy();
+			var req:NodeUpdateRequestSetProxy = new NodeUpdateRequestSetProxy();
 			req.requests = requests;
 			dataClient.updateActiveRecord(req, updateResultHandler, faultHandler);
 		}
@@ -167,7 +168,7 @@ package org.openforis.collect.presenter {
 		
 		override protected function updateDescription():void {
 			_view.description = "";
-			if(_view.attributes != null) {
+			if ( ! CodeAttributeDefinitionProxy(_view.attributeDefinition).external && _view.attributes != null ) {
 				var codes:Array = [];
 				var code:String;
 				var attribute:AttributeProxy;

@@ -17,12 +17,15 @@ import org.openforis.idm.metamodel.SurveyContext;
  * 
  */
 public class CollectSurvey extends Survey {
+
+	private static final long serialVersionUID = 1L;
+	
+	private boolean work;
 	
 	protected CollectSurvey(SurveyContext surveyContext) {
 		super(surveyContext);
+		this.work = false;
 	}
-
-	private static final long serialVersionUID = 1L;
 
 	public String getDefaultLanguage() {
 		List<String> languages = getLanguages();
@@ -31,6 +34,11 @@ public class CollectSurvey extends Survey {
 		} else {
 			return languages.get(0);
 		}
+	}
+	
+	public boolean isDefaultLanguage(String langCode) {
+		String defaultLanguage = getDefaultLanguage();
+		return defaultLanguage.equals(langCode);
 	}
 	
 	public UIOptions createUIOptions() {
@@ -48,6 +56,14 @@ public class CollectSurvey extends Survey {
 		if ( options instanceof UIOptions ) {
 			((UIOptions) options).setSurvey(this);
 		}
+	}
+
+	public boolean isWork() {
+		return work;
+	}
+
+	public void setWork(boolean work) {
+		this.work = work;
 	}
 
 }

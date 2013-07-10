@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.ApplicationOptions;
+import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.NodeDefinition;
@@ -46,7 +47,8 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		DIRECTION(new QName(UI_NAMESPACE_URI, UIOptionsConstants.DIRECTION)),
 		COUNT_IN_SUMMARY_LIST(new QName(UI_NAMESPACE_URI, UIOptionsConstants.COUNT)),
 		SHOW_ROW_NUMBERS(new QName(UI_NAMESPACE_URI, UIOptionsConstants.SHOW_ROW_NUMBERS)),
-		AUTOCOMPLETE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.AUTOCOMPLETE));
+		AUTOCOMPLETE(new QName(UI_NAMESPACE_URI, UIOptionsConstants.AUTOCOMPLETE)),
+		FIELDS_ORDER(new QName(UI_NAMESPACE_URI, UIOptionsConstants.FIELDS_ORDER));
 		
 		private QName qName;
 
@@ -57,6 +59,25 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		public QName getQName() {
 			return qName;
 		}
+	}
+	
+	public enum CoordinateAttributeFieldsOrder {
+		
+		SRS_X_Y("srs_x_y"), 
+		SRS_Y_X("srs_y_x");
+		
+		public static final CoordinateAttributeFieldsOrder DEFAULT = SRS_Y_X;
+		
+		private String value;
+
+		private CoordinateAttributeFieldsOrder(String value) {
+			this.value = value;
+		}
+		
+		public String getValue() {
+			return value;
+		}
+		
 	}
 	
 	public enum Layout {
@@ -322,7 +343,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 		EntityDefinition rootEntity = entityDefn.getRootEntity();
 		UITabSet rootTabSet = getAssignedRootTabSet(rootEntity);
 		if ( rootTabSet != null ) {
-			if ( entityDefn == null || entityDefn.getParentDefinition() == null ) {
+			if ( entityDefn.getParentDefinition() == null ) {
 				List<UITab> tabs = new ArrayList<UITab>(rootTabSet.getTabs());
 				UITab mainTab = getMainTab(rootTabSet);
 				tabs.addAll(mainTab.getTabs());
@@ -489,6 +510,25 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 	
 	@Deprecated
+	public CoordinateAttributeFieldsOrder getFieldsOrder(CoordinateAttributeDefinition defn) {
+		String value = defn.getAnnotation(Annotation.FIELDS_ORDER.getQName());
+		if ( value == null ) {
+			return CoordinateAttributeFieldsOrder.DEFAULT;
+		} else {
+			return CoordinateAttributeFieldsOrder.valueOf(value.toUpperCase());
+		}
+	}
+	
+	public void setFieldsOrder(CoordinateAttributeDefinition defn, CoordinateAttributeFieldsOrder fieldsOrder) {
+		String value;
+		if ( fieldsOrder == null || fieldsOrder == CoordinateAttributeFieldsOrder.DEFAULT ) {
+			value = null;
+		} else {
+			value = fieldsOrder.name().toLowerCase();
+		}
+		defn.setAnnotation(Annotation.FIELDS_ORDER.getQName(), value);
+	}
+	
 	public boolean getShowRowNumbersValue(EntityDefinition defn) {
 		String annotationValue = defn.getAnnotation(Annotation.SHOW_ROW_NUMBERS.getQName());
 		return Boolean.valueOf(annotationValue);

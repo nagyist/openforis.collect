@@ -24,12 +24,13 @@ package org.openforis.collect.model.proxy {
 		
 		private var _survey:SurveyProxy;
 		private var _nodesMap:Dictionary;
-		private var _updated:Boolean = false;
+		private var _updated:Boolean;
 		
 		private var validationResults:ValidationResultsProxy;
 
 		public function RecordProxy():void {
 			super();
+			_updated = false;
 		}
 		
 		public function init():void {
@@ -63,52 +64,52 @@ package org.openforis.collect.model.proxy {
 			return _nodesMap[id];
 		}
 		
-		public function update(responseSet:RecordUpdateResponseSetProxy, requestSet:RecordUpdateRequestSetProxy):void {
+		public function update(changeSet:NodeChangeSetProxy, requestSet:NodeUpdateRequestSetProxy):void {
 			updateNodes(requestSet);
-			this.skipped = responseSet.skipped;
-			this.missing = responseSet.missing;
-			this.missingErrors = responseSet.missingErrors;
-			this.missingWarnings = responseSet.missingWarnings;
-			this.warnings = responseSet.warnings;
-			for each (var response:NodeUpdateResponseProxy in responseSet.responses)	{
-				processResponse(response);
+			this.errors = changeSet.errors;
+			this.skipped = changeSet.skipped;
+			this.missing = changeSet.missing;
+			this.missingErrors = changeSet.missingErrors;
+			this.missingWarnings = changeSet.missingWarnings;
+			this.warnings = changeSet.warnings;
+			for each (var change:NodeChangeProxy in changeSet.changes)	{
+				applyChange(change);
 			}
-			_updated = true;
+			_updated = ! changeSet.recordSaved;
 			var appEvt:ApplicationEvent = new ApplicationEvent(ApplicationEvent.UPDATE_RESPONSE_RECEIVED);
-			appEvt.result = responseSet;
+			appEvt.result = changeSet;
 			EventDispatcherFactory.getEventDispatcher().dispatchEvent(appEvt);
 		}
 		
-		private function updateNodes(reqSet:RecordUpdateRequestSetProxy):void {
-			var requests:ListCollectionView = reqSet.requests;
+		private function updateNodes(reqSet:NodeUpdateRequestSetProxy):void {
 			var attr:AttributeProxy;
 			var field:FieldProxy;
-			for each (var reqOp:RecordUpdateRequestProxy in requests) {
-				if ( reqOp is RemarksUpdateRequestProxy ) {
-					var updRemarksReq:RemarksUpdateRequestProxy = RemarksUpdateRequestProxy(reqOp);
+			for each (var req:NodeUpdateRequestProxy in reqSet.requests) {
+				if ( req is RemarksUpdateRequestProxy ) {
+					var updRemarksReq:RemarksUpdateRequestProxy = RemarksUpdateRequestProxy(req);
 					attr = getNode(updRemarksReq.nodeId) as AttributeProxy;
 					field = attr.getField(updRemarksReq.fieldIndex);
 					field.remarks = updRemarksReq.remarks;
-				} else if ( reqOp is FieldUpdateRequestProxy ) {
-					var updFieldReq:FieldUpdateRequestProxy = FieldUpdateRequestProxy(reqOp);
+				} else if ( req is FieldUpdateRequestProxy ) {
+					var updFieldReq:FieldUpdateRequestProxy = FieldUpdateRequestProxy(req);
 					attr = getNode(updFieldReq.nodeId) as AttributeProxy;
 					field = attr.getField(updFieldReq.fieldIndex);
 					field.symbol = updFieldReq.symbol;
 					field.remarks = updFieldReq.remarks;
-				} else if ( reqOp is AttributeUpdateRequestProxy ) {
-					var updAttrReq:AttributeUpdateRequestProxy = AttributeUpdateRequestProxy(reqOp);
+				} else if ( req is AttributeUpdateRequestProxy ) {
+					var updAttrReq:AttributeUpdateRequestProxy = AttributeUpdateRequestProxy(req);
 					attr = getNode(updAttrReq.nodeId) as AttributeProxy;
 					for each (field in attr.fields) {
 						field.symbol = updAttrReq.symbol;
 						field.remarks = updAttrReq.remarks;
 					}
-				} else if ( reqOp is DefaultValueApplyRequestProxy ) {
-					attr = getNode(DefaultValueApplyRequestProxy(reqOp).nodeId) as AttributeProxy;
+				} else if ( req is DefaultValueApplyRequestProxy ) {
+					attr = getNode(DefaultValueApplyRequestProxy(req).nodeId) as AttributeProxy;
 					for each (field in attr.fields) {
 						field.symbol = null;
 					}
-				} else if ( reqOp is ConfirmErrorRequestProxy ) {
-					attr = getNode(ConfirmErrorRequestProxy(reqOp).nodeId) as AttributeProxy;
+				} else if ( req is ConfirmErrorRequestProxy ) {
+					attr = getNode(ConfirmErrorRequestProxy(req).nodeId) as AttributeProxy;
 					if ( attr != null ) {
 						attr.errorConfirmed = true;
 					}
@@ -116,21 +117,21 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		private function processResponse(response:NodeUpdateResponseProxy):void {
-			if ( response is NodeAddResponseProxy ) {
-				processNodeAddResponse(NodeAddResponseProxy(response));
+		private function applyChange(change:NodeChangeProxy):void {
+			if ( change is NodeAddChangeProxy ) {
+				processNodeAddResponse(NodeAddChangeProxy(change));
 			}
-			if ( response is NodeDeleteResponseProxy ) {
-				processNodeDeleteResponse(NodeDeleteResponseProxy(response));
-			} else if ( response is AttributeUpdateResponseProxy ) {
-				processAttributeUpdateResponse(AttributeUpdateResponseProxy(response));
-			} else if ( response is EntityUpdateResponseProxy ) {
-				processEntityUpdateResponse(EntityUpdateResponseProxy(response));
+			if ( change is NodeDeleteChangeProxy ) {
+				processNodeDeleteResponse(NodeDeleteChangeProxy(change));
+			} else if ( change is AttributeChangeProxy ) {
+				processAttributeUpdateResponse(AttributeChangeProxy(change));
+			} else if ( change is EntityChangeProxy ) {
+				processEntityUpdateResponse(EntityChangeProxy(change));
 			}
 		}
 		
-		protected function processNodeAddResponse(response:NodeAddResponseProxy):void {
-			var node:NodeProxy = NodeAddResponseProxy(response).createdNode;
+		protected function processNodeAddResponse(response:NodeAddChangeProxy):void {
+			var node:NodeProxy = NodeAddChangeProxy(response).createdNode;
 			associateDefinition(node);
 			if ( node is EntityProxy ) {
 				EntityProxy(node).traverse(associateDefinition);
@@ -144,9 +145,9 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		protected function processNodeDeleteResponse(response:NodeDeleteResponseProxy):void {
-			if ( response.deletedNodeId > 0 ) {
-				var node:NodeProxy = getNode(response.deletedNodeId);
+		protected function processNodeDeleteResponse(change:NodeDeleteChangeProxy):void {
+			if ( change.deletedNodeId > 0 ) {
+				var node:NodeProxy = getNode(change.deletedNodeId);
 				if (node != null ) {
 					var parent:EntityProxy = getNode(node.parentId) as EntityProxy;
 					parent.removeChild(node);
@@ -155,17 +156,17 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		protected function processAttributeUpdateResponse(response:AttributeUpdateResponseProxy):void {
-			var node:NodeProxy = getNode(response.nodeId);
+		protected function processAttributeUpdateResponse(change:AttributeChangeProxy):void {
+			var node:NodeProxy = getNode(change.nodeId);
 			var a:AttributeProxy = AttributeProxy(node);
-			if ( response.validationResults != null ) {
-				a.validationResults = response.validationResults;
+			if ( change.validationResults != null ) {
+				a.validationResults = change.validationResults;
 			}
-			if ( response.updatedFieldValues != null ) {
-				var fieldIdxs:ArrayCollection = response.updatedFieldValues.keySet;
+			if ( change.updatedFieldValues != null ) {
+				var fieldIdxs:ArrayCollection = change.updatedFieldValues.keySet;
 				for each (var i:int in fieldIdxs) {
 					var f:FieldProxy = a.getField(i);
-					f.value = response.updatedFieldValues.get(i);
+					f.value = change.updatedFieldValues.get(i);
 				}
 				a.errorConfirmed = false;
 				var parent:EntityProxy = getNode(node.parentId) as EntityProxy;
@@ -173,20 +174,20 @@ package org.openforis.collect.model.proxy {
 			}
 		}
 		
-		protected function processEntityUpdateResponse(response:EntityUpdateResponseProxy):void {
-			var node:NodeProxy = getNode(response.nodeId);
+		protected function processEntityUpdateResponse(change:EntityChangeProxy):void {
+			var node:NodeProxy = getNode(change.nodeId);
 			var e:EntityProxy = node as EntityProxy;
-			if ( response.maxCountValidation != null && response.maxCountValidation.length > 0 ) {
-				e.updateChildrenMaxCountValiditationMap(response.maxCountValidation);
+			if ( change.maxCountValidation != null && change.maxCountValidation.length > 0 ) {
+				e.updateChildrenMaxCountValiditationMap(change.maxCountValidation);
 			}
-			if ( response.minCountValidation != null && response.minCountValidation.length > 0 ) {
-				e.updateChildrenMinCountValiditationMap(response.minCountValidation);
+			if ( change.minCountValidation != null && change.minCountValidation.length > 0 ) {
+				e.updateChildrenMinCountValiditationMap(change.minCountValidation);
 			}
-			if ( response.relevant != null && response.relevant.length > 0 ) {
-				e.updateChildrenRelevanceMap(response.relevant);
+			if ( change.relevant != null && change.relevant.length > 0 ) {
+				e.updateChildrenRelevanceMap(change.relevant);
 			}
-			if ( response.required != null && response.required.length > 0 ) {
-				e.updateChildrenRequiredMap(response.required);
+			if ( change.required != null && change.required.length > 0 ) {
+				e.updateChildrenRequiredMap(change.required);
 			}
 		}
 		
@@ -219,5 +220,6 @@ package org.openforis.collect.model.proxy {
 		public function set updated(value:Boolean):void {
 			 _updated = value;
 		}
+
     }
 }

@@ -4,6 +4,7 @@ import static org.openforis.idm.model.species.Taxon.TaxonRank.FAMILY;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.GENUS;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SPECIES;
 import static org.openforis.idm.model.species.Taxon.TaxonRank.SUBSPECIES;
+import static org.openforis.idm.model.species.Taxon.TaxonRank.VARIETY;
 
 import java.io.Closeable;
 import java.io.File;
@@ -22,8 +23,8 @@ import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.manager.SpeciesManager;
 import org.openforis.collect.manager.process.AbstractProcess;
 import org.openforis.collect.manager.referencedataimport.ParsingError;
-import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.collect.manager.referencedataimport.ParsingError.ErrorType;
+import org.openforis.collect.manager.referencedataimport.ParsingException;
 import org.openforis.collect.model.CollectTaxonomy;
 import org.openforis.collect.model.TaxonTree;
 import org.openforis.collect.model.TaxonTree.Node;
@@ -38,7 +39,6 @@ import org.openforis.idm.model.species.TaxonVernacularName;
  */
 public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportStatus> {
 
-	private static final int CONFIRMED_TAXON_STEP_NUMBER = 9;
 	private static final String TAXONOMY_NOT_FOUND_ERROR_MESSAGE_KEY = "speciesImport.error.taxonomyNotFound";
 	private static final String INVALID_FAMILY_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidFamilyName";
 	private static final String INVALID_GENUS_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidGenusName";
@@ -46,7 +46,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	private static final String INVALID_SCIENTIFIC_NAME_ERROR_MESSAGE_KEY = "speciesImport.error.invalidScientificNameName";
 	private static final String IMPORTING_FILE_ERROR_MESSAGE_KEY = "speciesImport.error.internalErrorImportingFile";
 	
-	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES};
+	private static final TaxonRank[] TAXON_RANKS = new TaxonRank[] {FAMILY, GENUS, SPECIES, SUBSPECIES, VARIETY};
 	public static final String GENUS_SUFFIX = "sp.";
 
 	private static final String CSV = "csv";
@@ -214,14 +214,17 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 		case SPECIES:
 			createTaxonSpecies(line);
 			return mostSpecificRank;
-		default:
+		case SUBSPECIES:
+		case VARIETY:
 			Taxon parent = findParentTaxon(line);
-			if ( parent == null ) {
+			if ( ! mostSpecificRank || parent == null ) {
 				return false;
 			} else {
 				createTaxon(line, rank, parent);
 				return true;
 			}
+		default: 
+			return false;
 		}
 	}
 
@@ -240,51 +243,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 	}
 
 	protected void persistTaxa() {
-		CollectTaxonomy taxonomy = speciesManager.loadTaxonomyById(taxonomyId);
-		if ( taxonomy == null ) {
-			throw new IllegalStateException("Taxonomy not found");
-		} else {
-			if ( overwriteAll ) {
-				speciesManager.deleteTaxonsByTaxonomy(taxonomy);
-			} else {
-				throw new IllegalStateException("Taxonomy already existent but no 'overwriteAll' requested");
-			}
-		}
-		final Integer taxonomyId = taxonomy.getId();
-		taxonTree.bfs(new TaxonTree.NodeVisitor() {
-			@Override
-			public void visit(Node node) {
-				if ( status.isRunning() ) {
-					persistTaxonTreeNode(taxonomyId, node);
-				}
-			}
-		});
-	}
-
-	protected void persistTaxonTreeNode(Integer taxonomyId, Node node) {
-		try {
-			Taxon taxon = node.getTaxon();
-			taxon.setTaxonomyId(taxonomyId);
-			Node parent = node.getParent();
-			if ( parent != null ) {
-				Taxon parentTaxon = parent.getTaxon();
-				taxon.setParentId(parentTaxon.getSystemId());
-				taxon.setStep(CONFIRMED_TAXON_STEP_NUMBER);
-			}
-			speciesManager.save(taxon);
-			
-			List<TaxonVernacularName> vernacularNames = node.getVernacularNames();
-			if ( vernacularNames != null ) {
-				for (TaxonVernacularName vernacularName : vernacularNames) {
-					vernacularName.setTaxonSystemId(taxon.getSystemId());
-					speciesManager.save(vernacularName);
-				}
-			}
-		} catch (Exception e) {
-			LOG.error(e);
-			status.error();
-			status.setErrorMessage(e.getMessage());
-		}
+		speciesManager.insertTaxons(taxonomyId, taxonTree, overwriteAll);
 	}
 
 	private Taxon findParentTaxon(SpeciesLine line) throws ParsingException {
@@ -365,7 +324,7 @@ public class SpeciesImportProcess extends AbstractProcess<Void, SpeciesImportSta
 			checkDuplicates(line, code, taxonId);
 			taxon.setCode(code);
 			taxon.setTaxonId(taxonId);
-			taxonTree.index(taxon);
+			taxonTree.updateNodeInfo(taxon);
 			processVernacularNames(line, taxon);
 		}
 		return taxon;

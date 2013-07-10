@@ -5,33 +5,39 @@ package org.openforis.collect.model.proxy;
 
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.FieldSymbol;
-import org.openforis.collect.model.RecordUpdateRequest;
-import org.openforis.collect.model.RecordUpdateRequest.FieldUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest;
+import org.openforis.collect.remoting.service.NodeUpdateRequest.FieldUpdateRequest;
 import org.openforis.idm.model.Attribute;
+import org.openforis.idm.model.Field;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class FieldUpdateRequestProxy extends RecordUpdateRequestProxy<FieldUpdateRequest> {
+public class FieldUpdateRequestProxy extends NodeUpdateRequestProxy<FieldUpdateRequest<?>> {
 	
 	private Integer nodeId;
 	private int fieldIndex;
-	protected Object value;
+	protected String value;
 	protected String remarks;
 	protected FieldSymbol symbol;
 	
 	@Override
-	public FieldUpdateRequest toUpdateRequest(CollectRecord record) {
-		FieldUpdateRequest request = new RecordUpdateRequest.FieldUpdateRequest();
+	public FieldUpdateRequest<?> toNodeUpdateRequest(CollectRecord record) {
+		return toFieldUpdateRequest(record);	
+	}
+	protected <T> FieldUpdateRequest<T> toFieldUpdateRequest(CollectRecord record) {
+		FieldUpdateRequest<T> req = new NodeUpdateRequest.FieldUpdateRequest<T>();
 		Attribute<?, ?> attribute = (Attribute<?, ?>) record.getNodeByInternalId(nodeId);
-		request.setAttribute(attribute);
-		request.setFieldIndex(fieldIndex);
-		request.setValue(value);
-		request.setSymbol(symbol);
-		request.setRemarks(remarks);
-		return request;	
+		@SuppressWarnings("unchecked")
+		Field<T> field = (Field<T>) attribute.getField(fieldIndex);
+		req.setField(field);
+		T parsedValue = field.parseValue(value);
+		req.setValue(parsedValue);
+		req.setSymbol(symbol);
+		req.setRemarks(remarks);
+		return req;
 	}
 	
 	public Integer getNodeId() {
@@ -50,11 +56,11 @@ public class FieldUpdateRequestProxy extends RecordUpdateRequestProxy<FieldUpdat
 		this.fieldIndex = fieldIndex;
 	}
 
-	public Object getValue() {
+	public String getValue() {
 		return value;
 	}
 
-	public void setValue(Object value) {
+	public void setValue(String value) {
 		this.value = value;
 	}
 
