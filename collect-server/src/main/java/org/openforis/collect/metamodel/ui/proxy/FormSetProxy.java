@@ -6,6 +6,7 @@ package org.openforis.collect.metamodel.ui.proxy;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.jackson.annotate.JsonBackReference;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 import org.openforis.collect.metamodel.ui.FormSet;
@@ -31,6 +32,7 @@ public class FormSetProxy extends FormContainerProxy<FormSet> {
 		return result;
 	}
 
+	@JsonBackReference
 	@ExternalizedProperty
 	public UIOptionsProxy getUIOptions() {
 		return uiOptions;

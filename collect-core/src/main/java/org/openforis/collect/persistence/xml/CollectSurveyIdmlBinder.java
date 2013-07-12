@@ -36,6 +36,22 @@ public class CollectSurveyIdmlBinder extends SurveyIdmlBinder {
 		migrateUIOptions(result);
 		return result;
 	}
+	
+	@Override
+	public Survey unmarshal(InputStream is, boolean includeCodeListItems)
+			throws IdmlParseException {
+		CollectSurvey result = (CollectSurvey) super.unmarshal(is, includeCodeListItems);
+		migrateUIOptions(result);
+		return result;
+	}
+	
+	@Override
+	public Survey unmarshal(Reader r, boolean includeCodeListItems)
+			throws IdmlParseException {
+		CollectSurvey result = (CollectSurvey) super.unmarshal(r, includeCodeListItems);
+		migrateUIOptions(result);
+		return result;
+	}
 
 	@SuppressWarnings("deprecation")
 	protected void migrateUIOptions(CollectSurvey survey) {

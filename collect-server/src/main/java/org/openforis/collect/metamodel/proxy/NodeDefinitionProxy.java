@@ -9,6 +9,7 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import org.codehaus.jackson.annotate.JsonBackReference;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.idm.metamodel.AttributeDefinition;
@@ -78,6 +79,10 @@ public class NodeDefinitionProxy extends VersionableSurveyObjectProxy {
 		}
 		return proxies;
 	}
+	
+	public String getNodeType() {
+		return nodeDefinition.getClass().getSimpleName();
+	}
 
 	public Set<QName> getAnnotationNames() {
 		return nodeDefinition.getAnnotationNames();
@@ -136,13 +141,18 @@ public class NodeDefinitionProxy extends VersionableSurveyObjectProxy {
 	@ExternalizedProperty
 	public String getUiTabName() {
 		String tabName = nodeDefinition.getAnnotation(UIOptions.Annotation.TAB_NAME.getQName());
-		if ( tabName != null) {
-			return tabName;
+		if ( tabName == null) {
+			if ( parent == null ) {
+				return null;
+			} else {
+				return parent.getUiTabName();
+			}
 		} else {
-			return parent.getUiTabName();
+			return tabName;
 		}
 	}
 
+	@JsonBackReference
 	public EntityDefinitionProxy getParent() {
 		return parent;
 	}

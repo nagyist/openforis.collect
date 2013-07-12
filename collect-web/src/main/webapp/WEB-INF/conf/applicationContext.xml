@@ -57,6 +57,10 @@
 		<entry key="/samplingdesign/export/*" value-ref="fileNameViewController" />
 		<entry key="/publishToRdb" value-ref="fileNameViewController" />
 		<entry key="/submitPublishToRdb" value-ref="fileNameViewController" />
+		
+		
+		<entry key="/uiDesigner.htm" value-ref="fileNameViewController" />
+		<entry key="/collectDesigner.htm" value-ref="fileNameViewController" />
 	</util:map>
 
 	<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">

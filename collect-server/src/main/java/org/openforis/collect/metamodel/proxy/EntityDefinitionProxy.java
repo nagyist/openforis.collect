@@ -5,6 +5,7 @@ package org.openforis.collect.metamodel.proxy;
 
 import java.util.List;
 
+import org.codehaus.jackson.annotate.JsonManagedReference;
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -23,6 +24,7 @@ public class EntityDefinitionProxy extends NodeDefinitionProxy {
 		this.entityDefinition = entityDefinition;
 	}
 
+	@JsonManagedReference
 	@ExternalizedProperty
 	public List<NodeDefinitionProxy> getChildDefinitions() {
 		return NodeDefinitionProxy.fromList(this, entityDefinition.getChildDefinitions());

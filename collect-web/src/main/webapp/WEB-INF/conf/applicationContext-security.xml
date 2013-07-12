@@ -36,6 +36,8 @@
 		<intercept-url pattern="/uploadFile.htm" access="permitAll" />
 		<intercept-url pattern="/validateAllRecords.htm" access="hasRole('ROLE_ADMIN')" />
 		<intercept-url pattern="/validationReport" access="hasRole('ROLE_ADMIN')" />
+		
+		<intercept-url pattern="/uiDesigner.htm" access="permitAll" />
 
 		<!-- security disabled for these urls because of an issue with flash player 
 			for netscape compatible browser and uplaod to a secured url -->
@@ -47,6 +49,9 @@
 		<intercept-url pattern="/**/*.swf" access="hasRole('ROLE_USER')" />
 		<!-- <intercept-url pattern="/script/**" access="hasAnyRole('ROLE_ADMIN','ROLE_EDITOR','ROLE_USER')" 
 			/> -->
+
+
+		<intercept-url pattern="/collectDesigner.htm" access="hasRole('ROLE_ADMIN')" />
 
 		<form-login login-page="/login.htm"
 			authentication-failure-url="/login.htm?login_error=1" />
