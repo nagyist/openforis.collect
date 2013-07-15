@@ -56,10 +56,12 @@ public abstract class FormContainer extends UIModelObject {
 			forms = new ArrayList<Form>();
 		}
 		forms.add(form);
+		getUIOptions().attachItem(form);
 	}
 	
 	public void removeForm(Form form) {
 		forms.remove(form);
+		getUIOptions().detachItem(form);
 	}
 	
 	public List<LanguageSpecificText> getLabels() {

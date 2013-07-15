@@ -48,12 +48,14 @@ public class Form extends FormContainer implements FormSectionContainer {
 			formSections = new ArrayList<FormSection>();
 		}
 		formSections.add(formSection);
+		getUIOptions().attachItem(formSection);
 	}
 	
 	public void removeFormSection(FormSection formSection) {
 		formSections.remove(formSection);
+		getUIOptions().detachItem(formSection);
 	}
-
+	
 	public boolean isMultiple() {
 		return multiple;
 	}

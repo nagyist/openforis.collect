@@ -31,6 +31,7 @@ public class FormSection extends UIModelObject implements FormSectionComponent, 
 	@Override
 	public void addFormSection(FormSection formSection) {
 		addChild(formSection);
+		getUIOptions().attachItem(formSection);
 	}
 	
 	public FormSection createFormSection() {
@@ -69,10 +70,12 @@ public class FormSection extends UIModelObject implements FormSectionComponent, 
 			children = new ArrayList<FormSectionComponent>();
 		}
 		children.add(child);
+		getUIOptions().attachItem((UIModelObject) child);
 	}
 	
 	public void removeChild(FormSectionComponent child) {
 		children.remove(child);
+		getUIOptions().detachItem((UIModelObject) child);
 	}
 
 	public List<LanguageSpecificText> getLabels() {

@@ -6,9 +6,11 @@ import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_TYPE;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
 
@@ -102,9 +104,11 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	private CollectSurvey survey;
 	private List<UITabSet> tabSets;
 	private List<FormSet> formSets;
+	private Map<Integer, UIModelObject> modelObjectsById;
 	private int lastId;
 	
 	public UIOptions() {
+		modelObjectsById = new HashMap<Integer, UIModelObject>();
 	}
 	
 	public UIOptions(CollectSurvey survey) {
@@ -196,8 +200,26 @@ public class UIOptions implements ApplicationOptions, Serializable {
 			formSets = new ArrayList<FormSet>();
 		}
 		formSets.add(formSet);
+		attachItem(formSet);
 	}
 	
+	public void removeFormSet(FormSet formSet) {
+		formSets.remove(formSet);
+		detachItem(formSet);
+	}
+	
+	public UIModelObject findModelObjectById(int id) {
+		return modelObjectsById.get(id);
+	}
+	
+	public void attachItem(UIModelObject item) {
+		modelObjectsById.put(item.getId(), item);
+	}
+	
+	public void detachItem(UIModelObject item) {
+		modelObjectsById.remove(item.getId());
+	}
+
 	@Deprecated
 	protected void copyLabels(EntityDefinition nodeDefn, UITab tab) {
 		removeLabels(tab);

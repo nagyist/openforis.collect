@@ -35,10 +35,12 @@ public class ColumnGroup extends TableHeadingComponent {
 			headingComponents = new ArrayList<TableHeadingComponent>();
 		}
 		headingComponents.add(component);
+		getUIOptions().attachItem(component);
 	}
 	
 	public void removeHeadingComponent(TableHeadingComponent component) {
 		headingComponents.remove(component);
+		getUIOptions().detachItem(component);
 	}
 	
 	public List<LanguageSpecificText> getLabels() {
