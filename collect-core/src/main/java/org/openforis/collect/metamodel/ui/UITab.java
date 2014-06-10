@@ -13,6 +13,7 @@ import org.openforis.idm.metamodel.LanguageSpecificTextMap;
  * @author S. Ricci
  * 
  */
+@Deprecated
 public class UITab extends UITabSet {
 
 	public UITab() {

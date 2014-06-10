@@ -11,6 +11,7 @@ import org.openforis.idm.metamodel.SurveyObject;
  * @author S. Ricci
  *
  */
+@Deprecated
 public class UITabSet extends SurveyObject {
 	
 	private static final long serialVersionUID = 1L;

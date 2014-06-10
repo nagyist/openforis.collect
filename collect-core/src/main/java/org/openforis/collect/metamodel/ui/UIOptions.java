@@ -28,6 +28,7 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeDefinitionVisitor;
 import org.openforis.idm.metamodel.NodeLabel;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.TextAttributeDefinition;
 
 
 /**
@@ -35,6 +36,7 @@ import org.openforis.idm.metamodel.Schema;
  * @author S. Ricci
  * 
  */
+@Deprecated
 public class UIOptions implements ApplicationOptions, Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -649,6 +651,15 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	
 	public void setCountInSummaryListValue(EntityDefinition defn, boolean value) {
 		defn.setAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName(), Boolean.toString(value));
+	}
+	
+	public String getAutoCompleteGroup(TextAttributeDefinition defn) {
+		String annotationValue = defn.getAnnotation(Annotation.AUTOCOMPLETE.getQName());
+		return annotationValue;
+	}
+	
+	public void setAutoCompleteGroup(TextAttributeDefinition defn, String value) {
+		defn.setAnnotation(Annotation.AUTOCOMPLETE.getQName(), value);
 	}
 	
 	/**
