@@ -221,10 +221,29 @@ public class RecordManager {
 		return load(survey, recordId, stepEnum);
 	}
 	
+	public CollectRecord load(CollectSurvey survey, int recordId) {
+		return load(survey, recordId, (Step) null);
+	}
+	
 	public CollectRecord load(CollectSurvey survey, int recordId, Step step) {
+		if ( step == null ) {
+			//fetch last record step
+			RecordFilter filter = new RecordFilter(survey);
+			filter.setRecordId(recordId);
+			List<CollectRecord> summaries = recordDao.loadSummaries(filter, null);
+			if ( ! summaries.isEmpty() ) {
+				CollectRecord summary = summaries.get(0);
+				step = summary.getStep();
+			}
+		}
 		CollectRecord record = recordDao.load(survey, recordId, step.getStepNumber());
 		recordConverter.convertToLatestVersion(record);
 		return record;
+	}
+	
+	public byte[] loadBinaryData(CollectSurvey survey, int recordId, Step step) {
+		byte[] result = recordDao.loadBinaryData(survey, recordId, step.getStepNumber());
+		return result;
 	}
 
 	@Transactional
