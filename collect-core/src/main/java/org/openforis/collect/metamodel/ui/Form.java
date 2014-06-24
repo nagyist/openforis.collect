@@ -27,7 +27,7 @@ public class Form extends FormContainer implements FormSectionContainer {
 	}
 	
 	public FormSection createFormSection() {
-		UIFormSets uiOptions = getUIOptions();
+		UIConfiguration uiOptions = getUIOptions();
 		return createFormSection(uiOptions.nextId());
 	}
 	

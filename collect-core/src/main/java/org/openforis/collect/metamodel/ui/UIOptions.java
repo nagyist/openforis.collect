@@ -643,7 +643,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 	
 	public void setShowRowNumbersValue(EntityDefinition defn, boolean value) {
-		defn.setAnnotation(Annotation.SHOW_ROW_NUMBERS.getQName(), value ? Boolean.toString(value): null);
+		defn.setAnnotation(Annotation.SHOW_ROW_NUMBERS.getQName(), Boolean.toString(value));
 	}
 	
 	public boolean getCountInSumamryListValue(EntityDefinition defn) {
@@ -652,16 +652,7 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	}
 	
 	public void setCountInSummaryListValue(EntityDefinition defn, boolean value) {
-		defn.setAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName(), value ? Boolean.toString(value): null);
-	}
-	
-	public boolean getShowAllowedValuesPreviewValue(CodeAttributeDefinition defn) {
-		String annotationValue = defn.getAnnotation(Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getQName());
-		return Boolean.valueOf(annotationValue);
-	}
-	
-	public void setShowAllowedValuesPreviewValue(CodeAttributeDefinition defn, boolean value) {
-		defn.setAnnotation(Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getQName(), value ? Boolean.toString(value): null);
+		defn.setAnnotation(Annotation.COUNT_IN_SUMMARY_LIST.getQName(), Boolean.toString(value));
 	}
 	
 	public String getAutoCompleteGroup(TextAttributeDefinition defn) {
@@ -671,6 +662,15 @@ public class UIOptions implements ApplicationOptions, Serializable {
 	
 	public void setAutoCompleteGroup(TextAttributeDefinition defn, String value) {
 		defn.setAnnotation(Annotation.AUTOCOMPLETE.getQName(), value);
+	}
+	
+	public boolean getShowAllowedValuesPreviewValue(CodeAttributeDefinition defn) {
+		String annotationValue = defn.getAnnotation(Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getQName());
+		return Boolean.valueOf(annotationValue);
+	}
+	
+	public void setShowAllowedValuesPreviewValue(CodeAttributeDefinition defn, boolean value) {
+		defn.setAnnotation(Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getQName(), value ? Boolean.toString(value): null);
 	}
 	
 	/**

@@ -43,6 +43,7 @@ public class CodeAttributeDefinitionProxy extends AttributeDefinitionProxy {
 		return attributeDefinition.isAllowValuesSorting();
 	}
 
+	@Deprecated
 	@ExternalizedProperty
 	public boolean isShowAllowedValuesPreview() {
 		CollectSurvey survey = (CollectSurvey) attributeDefinition.getSurvey();

@@ -35,7 +35,7 @@ public class UIOptionsMigratorTest extends CollectIntegrationTest {
 	@Test
 	public void testMigration() {
 		UIOptionsMigrator migrator = new UIOptionsMigrator();
-		UIFormSets uiModel = migrator.migrateToUIModel(uiOptions);
+		UIConfiguration uiModel = migrator.migrateToUIConfiguration(uiOptions);
 		assertNotNull(uiModel);
 		Schema schema = survey.getSchema();
 		{

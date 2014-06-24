@@ -1,6 +1,16 @@
 package org.openforis.collect.persistence.xml;
 
+import java.io.InputStream;
+import java.io.Reader;
+
+import org.openforis.collect.metamodel.ui.UIConfiguration;
+import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIOptionsConstants;
+import org.openforis.collect.metamodel.ui.UIOptionsMigrator;
+import org.openforis.collect.model.CollectSurvey;
+import org.openforis.idm.metamodel.Survey;
 import org.openforis.idm.metamodel.SurveyContext;
+import org.openforis.idm.metamodel.xml.IdmlParseException;
 import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
 
 /**
@@ -15,4 +25,45 @@ public class CollectSurveyIdmlBinder extends SurveyIdmlBinder {
 		addApplicationOptionsBinder(new UIOptionsBinder());
 	}
 	
+	@Override
+	public Survey unmarshal(InputStream is) throws IdmlParseException {
+		CollectSurvey result = (CollectSurvey) super.unmarshal(is);
+		migrateUIOptions(result);
+		return result;
+	}
+	
+	@Override
+	public Survey unmarshal(Reader r) throws IdmlParseException {
+		CollectSurvey result = (CollectSurvey) super.unmarshal(r);
+		migrateUIOptions(result);
+		return result;
+	}
+	
+	@Override
+	public Survey unmarshal(InputStream is, boolean includeCodeListItems)
+			throws IdmlParseException {
+		CollectSurvey result = (CollectSurvey) super.unmarshal(is, includeCodeListItems);
+		migrateUIOptions(result);
+		return result;
+	}
+	
+	@Override
+	public Survey unmarshal(Reader r, boolean includeCodeListItems)
+			throws IdmlParseException {
+		CollectSurvey result = (CollectSurvey) super.unmarshal(r, includeCodeListItems);
+		migrateUIOptions(result);
+		return result;
+	}
+
+	@SuppressWarnings("deprecation")
+	protected void migrateUIOptions(CollectSurvey survey) {
+		UIOptions uiOptions = (UIOptions) survey.getApplicationOptions(UIOptionsConstants.UI_TYPE);
+		if ( uiOptions != null && ! uiOptions.getTabSets().isEmpty() ) {
+			UIOptionsMigrator migrator = new UIOptionsMigrator();
+			UIConfiguration uiConfiguration = migrator.migrateToUIConfiguration(uiOptions);
+			survey.removeApplicationOptions(uiOptions.getType());
+			survey.addApplicationOptions(uiConfiguration);
+		}
+	}
+
 }

@@ -15,17 +15,17 @@ public abstract class UIModelObject implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private UIFormSets uiOptions;
+	private UIConfiguration uiOptions;
 	private int id;
 
-	UIModelObject(UIFormSets uiOptions, int id) {
+	UIModelObject(UIConfiguration uiOptions, int id) {
 		super();
 		this.uiOptions = uiOptions;
 		this.id = id;
 	}
 	
 	protected NodeDefinition getNodeDefinition(int id) {
-		UIFormSets uiOptions = getUIOptions();
+		UIConfiguration uiOptions = getUIOptions();
 		if ( uiOptions == null || uiOptions.getSurvey() == null ) {
 			throw new IllegalStateException("UIOptions not initialized correctly");
 		}
@@ -35,7 +35,7 @@ public abstract class UIModelObject implements Serializable {
 		return result;
 	}
 	
-	public UIFormSets getUIOptions() {
+	public UIConfiguration getUIOptions() {
 		return uiOptions;
 	}
 	

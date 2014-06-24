@@ -45,7 +45,7 @@ public class Table extends Component {
 	}
 	
 	public Column createColumn() {
-		UIFormSets uiOptions = getUIOptions();
+		UIConfiguration uiOptions = getUIOptions();
 		return createColumn(uiOptions.nextId());
 	}
 	
@@ -54,7 +54,7 @@ public class Table extends Component {
 	}
 	
 	public ColumnGroup createColumnGroup() {
-		UIFormSets uiOptions = getUIOptions();
+		UIConfiguration uiOptions = getUIOptions();
 		return createColumnGroup(uiOptions.nextId());
 	}
 	

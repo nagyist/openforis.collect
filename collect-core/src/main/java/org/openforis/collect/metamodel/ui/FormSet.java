@@ -10,7 +10,7 @@ public class FormSet extends FormContainer {
 
 	private static final long serialVersionUID = 1L;
 	
-	FormSet(UIFormSets uiOptions, int id) {
+	FormSet(UIConfiguration uiOptions, int id) {
 		super(uiOptions, id);
 	}
 	

@@ -7,7 +7,7 @@ package org.openforis.collect.metamodel.ui;
  */
 public interface FormSectionContainer {
 	
-	UIFormSets getUIOptions();
+	UIConfiguration getUIOptions();
 	
 	void addFormSection(FormSection formSection);
 

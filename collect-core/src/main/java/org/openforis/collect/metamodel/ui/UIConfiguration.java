@@ -1,6 +1,6 @@
 package org.openforis.collect.metamodel.ui;
 
-import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_TYPE;
+import static org.openforis.collect.metamodel.ui.UIConfigurationConstants.UI_CONFIGURATION_TYPE;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import org.openforis.idm.metamodel.ApplicationOptions;
  * @author S. Ricci
  *
  */
-public class UIFormSets implements ApplicationOptions, Serializable {
+public class UIConfiguration implements ApplicationOptions, Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -26,19 +26,26 @@ public class UIFormSets implements ApplicationOptions, Serializable {
 	private Map<Integer, UIModelObject> modelObjectsById;
 	private int lastId;
 	
-	public UIFormSets(CollectSurvey survey) {
-		super();
-		this.survey = survey;
+	public UIConfiguration() {
 		this.modelObjectsById = new HashMap<Integer, UIModelObject>();
+	}
+	
+	public UIConfiguration(CollectSurvey survey) {
+		this();
+		this.survey = survey;
 	}
 	
 	@Override
 	public String getType() {
-		return UI_TYPE;
+		return UI_CONFIGURATION_TYPE;
 	}
 	
 	public CollectSurvey getSurvey() {
 		return survey;
+	}
+
+	public void setSurvey(CollectSurvey survey) {
+		this.survey = survey;
 	}
 	
 	synchronized 

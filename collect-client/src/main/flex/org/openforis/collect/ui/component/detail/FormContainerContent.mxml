@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:NavigatorContent xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" 
+		 width="100%" height="100%" 
+		 xmlns:detail="org.openforis.collect.ui.component.detail.*" xmlns:layout="org.openforis.collect.ui.layout.*"
+		 creationComplete="creationCompleteHandler(event)"
+		 currentState="{hasItemsPerCurrentForm &amp;&amp; hasInnerForms ? STATE_COMPLETE: hasInnerForms ? STATE_INNER_FORMS: STATE_DEFAULT}">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.IList;
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
+			import org.openforis.collect.metamodel.ui.proxy.FormContainerProxy;
+			import org.openforis.collect.metamodel.ui.proxy.FormProxy;
+			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.presenter.FormContainerContentPresenter;
+			import org.openforis.collect.util.CollectionUtil;
+
+			public static const STATE_DEFAULT:String = "default";
+			public static const STATE_INNER_FORMS:String = "innerForms";
+			public static const STATE_COMPLETE:String = "complete";
+			
+			private var _modelVersion:ModelVersionProxy;
+			private var _formContainer:FormContainerProxy;
+			private var _innerForms:IList;
+			private var _parentEntity:EntityProxy;
+			
+			private var _presenter:FormContainerContentPresenter;
+			
+			protected function creationCompleteHandler(event:FlexEvent):void {
+				_presenter = new FormContainerContentPresenter(this);
+			}
+			
+			public function reset():void {
+				if ( tabBar != null ) {
+					resetTabBar();
+				}
+				resetScrollBars();
+			}
+			
+			private function resetTabBar():void {
+				tabBar.selectedIndex = 0;
+			}
+			
+			public function resetScrollBars():void {
+				if ( mainFormSectionRenderer != null ) {
+					mainFormSectionRenderer.resetScrollBars();
+				}
+				if ( viewStack != null ) {
+					var forms:Array = viewStack.getChildren();
+					if ( forms != null ) {
+						for each (var extCanvas:Canvas in forms) {
+							var form:FormContainerFormItem = FormContainerFormItem(extCanvas.getChildAt(0));
+							form.resetScrollbars();
+						}
+					}
+				}
+			}
+			
+			[Bindable(event="formContainerChange")]
+			public function get formContainer():FormContainerProxy {
+				return _formContainer;
+			}
+			
+			public function set formContainer(value:FormContainerProxy):void {
+				_formContainer = value;
+				dispatchEvent(new Event("formContainerChange"));
+			}
+			
+			[Bindable]
+			public function get modelVersion():ModelVersionProxy {
+				return _modelVersion;
+			}
+			
+			public function set modelVersion(value:ModelVersionProxy):void {
+				_modelVersion = value;
+			}
+			
+			[Bindable]
+			public function get parentEntity():EntityProxy {
+				return _parentEntity;
+			}
+			
+			public function set parentEntity(value:EntityProxy):void {
+				_parentEntity = value;
+			}
+			
+			[Bindable("innerFormsChange")]
+			public function get innerForms():IList {
+				return _innerForms;
+			}
+			
+			public function set innerForms(value:IList):void {
+				_innerForms = value;
+				dispatchEvent(new Event("innerFormsChange"));
+			}
+			
+			[Bindable(event="innerFormsChange")]
+			public function get hasInnerForms():Boolean {
+				return CollectionUtil.isNotEmpty(innerForms);
+			}
+			
+			[Bindable(event="formContainerChange")]
+			public function get hasItemsPerCurrentForm():Boolean {
+				return formContainer != null && formContainer is FormProxy && CollectionUtil.isNotEmpty(FormProxy(formContainer).formSection.children);
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="default" />
+		<s:State name="innerForms" />
+		<s:State name="complete" basedOn="innerForms" />
+	</s:states>
+	
+	<s:VGroup width="100%" height="100%" 
+			  gap="0">
+		<detail:MainFormSectionRenderer 
+			id="mainFormSectionRenderer"
+			modelVersion="{modelVersion}"
+			formSection="{formContainer is FormProxy ? FormProxy(formContainer).formSection: null}"
+			parentEntity="{parentEntity}"
+			width.default="100%"
+			height.default="100%"
+			includeIn="default,complete" />
+		
+		<s:TabBar id="tabBar" 
+				  dataProvider="{viewStack}"
+				  width="100%"
+				  includeIn="innerForms">
+			<s:layout>
+				<layout:FlowLayout />
+			</s:layout>
+		</s:TabBar>
+		
+		<s:BorderContainer
+			width="100%" 
+			height="100%"
+			styleName="entityForm"
+			includeIn="innerForms">
+			
+			<mx:ViewStack id="viewStack" width="100%" height="100%" 
+						  verticalGap="0">
+				<mx:Repeater id="innerFormsRP" dataProvider="{innerForms}">
+					<mx:Canvas label="{FormProxy(innerFormsRP.currentItem).labelText}">
+						<detail:FormContainerFormItem 
+							id="formContainsers"
+							modelVersion="{modelVersion}"
+							form="{FormProxy(innerFormsRP.currentItem)}"
+							parentEntity="{parentEntity}"
+							/>
+					</mx:Canvas>
+				</mx:Repeater>
+			</mx:ViewStack>
+		</s:BorderContainer>
+	</s:VGroup>
+</s:NavigatorContent>

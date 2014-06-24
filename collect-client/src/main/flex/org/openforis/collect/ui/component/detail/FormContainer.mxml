@@ -19,7 +19,7 @@
 			import org.openforis.collect.metamodel.proxy.UIOptionsProxy;
 			import org.openforis.collect.model.proxy.RecordProxy;
 			
-			private var _rootEntityDefinition:EntityDefinitionProxy;
+			private var _formContainer:FormContainerProxy;
 			private var _version:ModelVersionProxy;
 			private var _record:RecordProxy;
 
@@ -29,14 +29,14 @@
 			}
 			
 			protected function recordChangeHandler(value:RecordProxy):void {
-				if(tabContentContainer.tabBar != null) {
-					tabContentContainer.reset();
+				if(content.tabBar != null) {
+					content.reset();
 				}
 			}
 			
 			protected function rootEntityDefinitionChangeHandler(value:EntityDefinitionProxy):void {
 				if ( value != null ) {
-					tabContentContainer.uiTabSet = UIOptionsProxy.getRootEntityTabSet(value);
+					content.uiTabSet = UIOptionsProxy.getRootEntityTabSet(value);
 				}
 			}
 			
@@ -70,10 +70,10 @@
 		]]>
 	</fx:Script>
 
-	<detail:TabbedFormContainer id="tabContentContainer"
-								entityDefinition="{rootEntityDefinition}"
-								modelVersion="{version}"
-								parentEntity="{record.rootEntity}"
-								/>
+	<detail:FormContainerContent id="content"
+								 formContainer="{formContainer}"
+								 modelVersion="{version}"
+								 parentEntity="{record.rootEntity}"
+								 />
 
 </s:NavigatorContent>

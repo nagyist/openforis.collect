@@ -26,9 +26,9 @@ import org.openforis.idm.metamodel.TextAttributeDefinition;
 @SuppressWarnings("deprecation")
 public class UIOptionsMigrator {
 	
-	public UIFormSets migrateToUIModel(UIOptions oldUIOptions) {
+	public UIConfiguration migrateToUIConfiguration(UIOptions oldUIOptions) {
 		CollectSurvey survey = oldUIOptions.getSurvey();
-		UIFormSets result = new UIFormSets(survey);
+		UIConfiguration result = new UIConfiguration(survey);
 		List<UITabSet> tabSets = oldUIOptions.getTabSets();
 		for (UITabSet tabSet : tabSets) {
 			FormSet formSet;

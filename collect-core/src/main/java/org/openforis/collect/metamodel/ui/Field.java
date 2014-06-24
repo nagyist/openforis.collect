@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.metamodel.ui;
 
+import java.util.List;
+
 import org.openforis.idm.metamodel.AttributeDefinition;
 
 /**
@@ -16,6 +18,7 @@ public class Field extends Component {
 	private int attributeId; 
 	private String autoCompleteGroup;
 	private Enum<?> fieldsOrder;
+	private List<String> visibleFields;
 	
 	Field(FormSection parent, int id) {
 		super(parent, id);
@@ -39,6 +42,14 @@ public class Field extends Component {
 	
 	public void setAutoCompleteGroup(String autoCompleteGroup) {
 		this.autoCompleteGroup = autoCompleteGroup;
+	}
+	
+	public List<String> getVisibleFields() {
+		return visibleFields;
+	}
+	
+	public void setVisibleFields(List<String> visibleFields) {
+		this.visibleFields = visibleFields;
 	}
 	
 	@Override

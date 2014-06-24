@@ -22,12 +22,12 @@ public abstract class FormContainer extends UIModelObject {
 	private List<Form> forms;
 	private LanguageSpecificTextMap labels;
 
-	FormContainer(UIFormSets uiOptions, int id) {
+	FormContainer(UIConfiguration uiOptions, int id) {
 		super(uiOptions, id);
 	}
 
 	public Form createForm() {
-		UIFormSets uiOptions = getUIOptions();
+		UIConfiguration uiOptions = getUIOptions();
 		return createForm(uiOptions.nextId());
 	}
 	

@@ -35,7 +35,7 @@ public class FormSection extends UIModelObject implements FormSectionComponent, 
 	}
 	
 	public FormSection createFormSection() {
-		UIFormSets uiOptions = getUIOptions();
+		UIConfiguration uiOptions = getUIOptions();
 		return createFormSection(uiOptions.nextId());
 	}
 	
@@ -44,7 +44,7 @@ public class FormSection extends UIModelObject implements FormSectionComponent, 
 	}
 	
 	public Field createField() {
-		UIFormSets uiOptions = getUIOptions();
+		UIConfiguration uiOptions = getUIOptions();
 		return createField(uiOptions.nextId());
 	}
 	
@@ -53,7 +53,7 @@ public class FormSection extends UIModelObject implements FormSectionComponent, 
 	}
 
 	public Table createTable() {
-		UIFormSets uiOptions = getUIOptions();
+		UIConfiguration uiOptions = getUIOptions();
 		return createTable(uiOptions.nextId());
 	}
 	

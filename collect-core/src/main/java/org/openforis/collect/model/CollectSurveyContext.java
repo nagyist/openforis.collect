@@ -6,7 +6,7 @@ package org.openforis.collect.model;
 import java.io.Serializable;
 import java.util.UUID;
 
-import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.metamodel.ui.UIConfiguration;
 import org.openforis.idm.metamodel.CodeListService;
 import org.openforis.idm.metamodel.ExternalCodeListProvider;
 import org.openforis.idm.metamodel.Survey;
@@ -45,8 +45,8 @@ public class CollectSurveyContext implements SurveyContext, Serializable {
 		UUID uuid = UUID.randomUUID();
 		survey.setUri(uriPrefix + uuid.toString());
 		//application options
-		UIOptions uiOptions = survey.createUIOptions();
-		survey.addApplicationOptions(uiOptions);
+		UIConfiguration uiConfiguration = survey.createUIConfiguration();
+		survey.addApplicationOptions(uiConfiguration);
 		return survey;
 	}
 

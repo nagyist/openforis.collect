@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.openforis.collect.metamodel.ui.UIConfiguration;
+import org.openforis.collect.metamodel.ui.UIConfigurationConstants;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptionsConstants;
 import org.openforis.collect.persistence.jooq.tables.OfcSamplingDesign;
@@ -34,20 +36,32 @@ public class CollectSurvey extends Survey {
 		this.work = false;
 	}
 
+	@Deprecated
 	public UIOptions createUIOptions() {
 		return new UIOptions(this);
 	}
 	
+	public UIConfiguration createUIConfiguration() {
+		return new UIConfiguration(this);
+	}
+
+	@Deprecated
 	public UIOptions getUIOptions() {
-		ApplicationOptions applicationOptions = getApplicationOptions(UIOptionsConstants.UI_TYPE);
-		return (UIOptions) applicationOptions;
+		ApplicationOptions options = getApplicationOptions(UIOptionsConstants.UI_TYPE);
+		return (UIOptions) options;
+	}
+	
+	public UIConfiguration getUIConfiguration() {
+		ApplicationOptions options = getApplicationOptions(UIConfigurationConstants.UI_CONFIGURATION_TYPE);
+		return (UIConfiguration) options;
 	}
 	
 	@Override
 	public void addApplicationOptions(ApplicationOptions options) {
 		super.addApplicationOptions(options);
-		if ( options instanceof UIOptions ) {
-			((UIOptions) options).setSurvey(this);
+		
+		if ( options instanceof UIConfiguration ) {
+			((UIConfiguration) options).setSurvey(this);
 		}
 	}
 
