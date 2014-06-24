@@ -15,28 +15,27 @@ public abstract class UIModelObject implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private UIConfiguration uiOptions;
+	private UIConfiguration uiConfiguration;
 	private int id;
 
 	UIModelObject(UIConfiguration uiOptions, int id) {
 		super();
-		this.uiOptions = uiOptions;
+		this.uiConfiguration = uiOptions;
 		this.id = id;
 	}
 	
 	protected NodeDefinition getNodeDefinition(int id) {
-		UIConfiguration uiOptions = getUIOptions();
-		if ( uiOptions == null || uiOptions.getSurvey() == null ) {
+		if ( uiConfiguration == null || uiConfiguration.getSurvey() == null ) {
 			throw new IllegalStateException("UIOptions not initialized correctly");
 		}
-		CollectSurvey survey = uiOptions.getSurvey();
+		CollectSurvey survey = uiConfiguration.getSurvey();
 		Schema schema = survey.getSchema();
 		NodeDefinition result = schema.getDefinitionById(id);
 		return result;
 	}
 	
 	public UIConfiguration getUIOptions() {
-		return uiOptions;
+		return uiConfiguration;
 	}
 	
 	public int getId() {
