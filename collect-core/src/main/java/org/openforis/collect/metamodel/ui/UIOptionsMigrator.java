@@ -33,12 +33,12 @@ public class UIOptionsMigrator {
 		for (UITabSet tabSet : tabSets) {
 			FormSet formSet;
 			EntityDefinition associatedRootEntity = findAssociatedRootEntity(tabSet);
-			if ( associatedRootEntity != null ) {
+			if ( associatedRootEntity == null ) {
+				throw new IllegalStateException("Cannot find associated root entity. Tab set: " + tabSet.getName());
+			} else {
 				formSet = result.createFormSet();
 				formSet.setEntityId(associatedRootEntity.getId());
 				result.addFormSet(formSet);
-			} else {
-				throw new IllegalStateException("Cannot find associated root entity. Tab set: " + tabSet.getName());
 			}
 			List<UITab> tabs = tabSet.getTabs();
 			for (UITab tab : tabs) {

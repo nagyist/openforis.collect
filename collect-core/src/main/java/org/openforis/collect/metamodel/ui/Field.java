@@ -52,6 +52,10 @@ public class Field extends Component {
 		this.visibleFields = visibleFields;
 	}
 	
+	public boolean isVisibleField(String name) {
+		return visibleFields == null || visibleFields.size() == 0 || visibleFields.contains(name);
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

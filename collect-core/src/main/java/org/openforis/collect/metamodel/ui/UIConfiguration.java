@@ -12,8 +12,6 @@ import java.util.Stack;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.ApplicationOptions;
-import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.NodeDefinition;
 
 /**
  * 
@@ -101,9 +99,9 @@ public class UIConfiguration implements ApplicationOptions, Serializable {
 		Stack<UIModelObject> stack = new Stack<UIModelObject>();
 		
 		// Initialize stack with form sets
-		stack.addAll(formSets);
+		stack.addAll(getFormSets());
 
-		while ( ! stack.isEmpty() && visitor.isContinueVisiting() ) {
+		while ( ! stack.isEmpty() && ! visitor.isStopped() ) {
 			UIModelObject obj = stack.pop();
 			
 			// Pre-order operation
@@ -136,30 +134,24 @@ public class UIConfiguration implements ApplicationOptions, Serializable {
 	}
 	
 	public UIModelObject findModelObjetByNodeDefinitionId(final int id) {
-		
-		
 		UIModelObjectVisitor visitor = new UIModelObjectVisitor() {
-			UIModelObject result = null;
-			
-			private boolean found = false;
-
 			@Override
 			public void visit(UIModelObject object) {
 				if ( object instanceof Field ) {
 					if ( ((Field) object).getAttributeId() == id ) {
-						result = object;
-						found = true;
+						setLastItem(object);
+						this.stop();
 					}
 				}
 			}
-			
-			@Override
-			public boolean isContinueVisiting() {
-				return ! found;
-			}
 		};
-		
 		traverse(visitor);
+		
+		if ( visitor.isStopped() ) {
+			return visitor.getLastItem();
+		} else {
+			return null;
+		}
 	}
 	
 	public void attachItem(UIModelObject item) {
@@ -172,10 +164,29 @@ public class UIConfiguration implements ApplicationOptions, Serializable {
 	
 	public abstract class UIModelObjectVisitor {
 		
-		public abstract void visit(UIModelObject object);
+		private boolean stopped;
+		private UIModelObject lastItem = null;
 		
-		public boolean isContinueVisiting() {
-			return true;
+		public UIModelObjectVisitor() {
+			this.stopped = false;
+		}
+		
+		public abstract void visit(UIModelObject object);
+
+		void stop() {
+			this.stopped = true;
+		}
+
+		public boolean isStopped() {
+			return stopped;
+		}
+		
+		public UIModelObject getLastItem() {
+			return lastItem;
+		}
+		
+		void setLastItem(UIModelObject lastItem) {
+			this.lastItem = lastItem;
 		}
 		
 	}

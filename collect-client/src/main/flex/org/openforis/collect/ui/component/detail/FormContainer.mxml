@@ -12,6 +12,9 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.binding.utils.BindingUtils;
+			
+			import org.openforis.collect.metamodel.ui.proxy.FormContainerProxy;
+			
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.metamodel.proxy.EntityDefinitionProxy;
@@ -25,7 +28,6 @@
 
 			protected function initializeHandler(event:FlexEvent):void {
 				BindingUtils.bindSetter(recordChangeHandler, this, "record");
-				BindingUtils.bindSetter(rootEntityDefinitionChangeHandler, this, "rootEntityDefinition");
 			}
 			
 			protected function recordChangeHandler(value:RecordProxy):void {
@@ -34,21 +36,6 @@
 				}
 			}
 			
-			protected function rootEntityDefinitionChangeHandler(value:EntityDefinitionProxy):void {
-				if ( value != null ) {
-					content.uiTabSet = UIOptionsProxy.getRootEntityTabSet(value);
-				}
-			}
-			
-			[Bindable]
-			public function get rootEntityDefinition():EntityDefinitionProxy {
-				return _rootEntityDefinition;
-			}
-
-			public function set rootEntityDefinition(value:EntityDefinitionProxy):void {
-				_rootEntityDefinition = value;
-			}
-
 			[Bindable]
 			public function get version():ModelVersionProxy {
 				return _version;

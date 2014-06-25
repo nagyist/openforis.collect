@@ -5,15 +5,20 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.InputStream;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.openforis.collect.CollectIntegrationTest;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.persistence.xml.UIOptionsBinder;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Schema;
+import org.openforis.idm.metamodel.SurveyContext;
 import org.openforis.idm.metamodel.xml.IdmlParseException;
+import org.openforis.idm.metamodel.xml.SurveyIdmlBinder;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * 
@@ -22,13 +27,21 @@ import org.openforis.idm.metamodel.xml.IdmlParseException;
  */
 public class UIOptionsMigratorTest extends CollectIntegrationTest {
 
+	@Autowired
+	private SurveyContext surveyContext;
+	
 	private CollectSurvey survey;
 	@SuppressWarnings("deprecation")
 	private UIOptions uiOptions;
 
 	@Before
 	public void setUp() throws IdmlParseException {
-		survey = loadSurvey();
+		SurveyIdmlBinder binder = new SurveyIdmlBinder(surveyContext);
+		binder.addApplicationOptionsBinder(new UIOptionsBinder());
+
+		InputStream is = ClassLoader.getSystemResourceAsStream("test.idm.xml");
+		survey = (CollectSurvey) binder.unmarshal(is);
+		
 		uiOptions = survey.getUIOptions();
 	}
 

@@ -15,7 +15,7 @@ import org.openforis.idm.metamodel.LanguageSpecificTextMap;
  * @author S. Ricci
  *
  */
-public class FormSection extends UIModelObject implements FormSectionComponent, FormSectionContainer {
+public class FormSection extends UIModelObject implements FormSectionComponent, FormSectionComponentContainer, FormSectionContainer {
 
 	private static final long serialVersionUID = 1L;
 
@@ -61,10 +61,12 @@ public class FormSection extends UIModelObject implements FormSectionComponent, 
 		return new Table(this, id);
 	}
 	
+	@Override
 	public List<FormSectionComponent> getChildren() {
 		return CollectionUtils.unmodifiableList(children);
 	}
 	
+	@Override
 	public void addChild(FormSectionComponent child) {
 		if ( children == null ) {
 			children = new ArrayList<FormSectionComponent>();
@@ -73,6 +75,7 @@ public class FormSection extends UIModelObject implements FormSectionComponent, 
 		getUIOptions().attachItem((UIModelObject) child);
 	}
 	
+	@Override
 	public void removeChild(FormSectionComponent child) {
 		children.remove(child);
 		getUIOptions().detachItem((UIModelObject) child);

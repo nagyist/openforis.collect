@@ -8,6 +8,7 @@ import java.util.List;
 import org.openforis.collect.manager.CodeListManager;
 import org.openforis.collect.manager.RecordManager;
 import org.openforis.collect.metamodel.ui.UIConfiguration;
+import org.openforis.collect.metamodel.ui.UIModelObject;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
@@ -185,9 +186,12 @@ public class CollectValidator extends Validator {
 		CollectSurvey survey = (CollectSurvey) defn.getSurvey();
 		UIConfiguration uiConfiguration = survey.getUIConfiguration();
 		
+		UIModelObject uiModelObject = uiConfiguration.findModelObjetByNodeDefinitionId(defn.getId());
 		for ( int i = 0 ; i < fieldCount ; i++ ) {
 			Field<?> field = attribute.getField(i);
-			boolean visible = uiConfiguration.isVisibleField(defn, field.getName());
+			boolean visible = uiModelObject == null || 
+					( uiModelObject instanceof org.openforis.collect.metamodel.ui.Field && 
+						((org.openforis.collect.metamodel.ui.Field) uiModelObject).isVisibleField(field.getName()) );
 			if ( visible ) {
 				FieldSymbol symbol = FieldSymbol.valueOf(field.getSymbol());
 				if ( symbol == null || !symbol.isReasonBlank() ) {

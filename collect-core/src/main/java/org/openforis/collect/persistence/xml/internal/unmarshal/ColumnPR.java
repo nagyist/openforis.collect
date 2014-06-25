@@ -7,7 +7,9 @@ import static org.openforis.collect.metamodel.ui.UIConfigurationConstants.ID;
 import java.io.IOException;
 
 import org.openforis.collect.metamodel.ui.Column;
+import org.openforis.collect.metamodel.ui.ColumnGroup;
 import org.openforis.collect.metamodel.ui.Table;
+import org.openforis.collect.metamodel.ui.UIModelObject;
 import org.openforis.idm.metamodel.xml.XmlParseException;
 import org.xmlpull.v1.XmlPullParserException;
 
@@ -18,7 +20,8 @@ import org.xmlpull.v1.XmlPullParserException;
  */
 class ColumnPR extends UIModelPR {
 	
-	protected Table parent;
+	//parent can be Table or ColumnGroup
+	protected UIModelObject parent;
 	protected Column column;
 	
 	public ColumnPR() {
@@ -29,14 +32,21 @@ class ColumnPR extends UIModelPR {
 	protected void onStartTag() throws XmlParseException, XmlPullParserException, IOException {
 		super.onStartTag();
 		int id = getIntegerAttribute(ID, true);
-		column = parent.createColumn(id);
+		Table parentTable = getParentTable();
+		column = parentTable.createColumn(id);
 		int attributeId = getIntegerAttribute(ATTRIBUTE_ID, true);
 		column.setAttributeId(attributeId);
+	}
+
+	private Table getParentTable() {
+		Table parentTable = parent instanceof Table ? (Table) parent: ((ColumnGroup) parent).getTable();
+		return parentTable;
 	}
 	
 	@Override
 	protected void onEndTag() throws XmlParseException {
 		super.onEndTag();
-		parent.addHeadingComponent(column);
+		Table parentTable = getParentTable();
+		parentTable.addHeadingComponent(column);
 	}
 }

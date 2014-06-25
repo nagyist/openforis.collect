@@ -12,7 +12,7 @@ import org.openforis.commons.collection.CollectionUtils;
  * @author S. Ricci
  *
  */
-public class Form extends FormContainer implements FormSectionContainer {
+public class Form extends FormContainer implements FormSectionContainer, FormSectionComponentContainer {
 
 	private static final long serialVersionUID = 1L;
 

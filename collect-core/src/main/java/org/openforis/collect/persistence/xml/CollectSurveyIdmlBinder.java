@@ -23,6 +23,7 @@ public class CollectSurveyIdmlBinder extends SurveyIdmlBinder {
 	public CollectSurveyIdmlBinder(SurveyContext surveyContext) {
 		super(surveyContext);
 		addApplicationOptionsBinder(new UIOptionsBinder());
+		addApplicationOptionsBinder(new UIConfigurationBinder());
 	}
 	
 	@Override
