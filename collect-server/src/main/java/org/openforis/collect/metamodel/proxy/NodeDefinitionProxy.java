@@ -11,8 +11,10 @@ import javax.xml.namespace.QName;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.metamodel.ui.UIOptions;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
+import org.openforis.idm.metamodel.CalculatedAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
 import org.openforis.idm.metamodel.DateAttributeDefinition;
@@ -49,6 +51,13 @@ public class NodeDefinitionProxy extends VersionableSurveyObjectProxy {
 				if (n instanceof AttributeDefinition) {
 					if (n instanceof BooleanAttributeDefinition) {
 						p = new BooleanAttributeDefinitionProxy(parent, (BooleanAttributeDefinition) n);
+					} else if ( n instanceof CalculatedAttributeDefinition ) {
+						CollectSurvey survey = (CollectSurvey) n.getSurvey();
+						UIOptions uiOptions = survey.getUIOptions();
+						boolean shownInUI = uiOptions.isShownInUI((CalculatedAttributeDefinition) n);
+						if ( shownInUI ) {
+							p = new CalculatedAttributeDefinitionProxy(parent, (CalculatedAttributeDefinition) n);
+						}
 					} else if (n instanceof CodeAttributeDefinition) {
 						p = new CodeAttributeDefinitionProxy(parent, (CodeAttributeDefinition) n);
 					} else if (n instanceof CoordinateAttributeDefinition) {
@@ -73,7 +82,9 @@ public class NodeDefinitionProxy extends VersionableSurveyObjectProxy {
 				} else if (n instanceof EntityDefinition) {
 					p = new EntityDefinitionProxy(parent, (EntityDefinition) n);
 				}
-				proxies.add(p);
+				if ( p != null ) {
+					proxies.add(p);
+				}
 			}
 		}
 		return proxies;
