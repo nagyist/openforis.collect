@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.openforis.collect.csv.ColumnProvider;
 import org.openforis.idm.model.Node;
 
 /**
