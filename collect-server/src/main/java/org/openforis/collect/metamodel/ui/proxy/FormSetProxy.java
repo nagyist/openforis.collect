@@ -13,7 +13,7 @@ import org.openforis.collect.metamodel.ui.FormSet;
  * @author S. Ricci
  *
  */
-public class FormSetProxy extends FormContainerProxy<FormSet> {
+public class FormSetProxy extends FormContentContainerProxy<FormSet> implements EntityDefinitionLinkedUIObjectProxy {
 
 	private transient UIConfigurationProxy uiConfiguration;
 
@@ -29,10 +29,26 @@ public class FormSetProxy extends FormContainerProxy<FormSet> {
 		}
 		return result;
 	}
+	
+	@Override
+	@ExternalizedProperty
+	public int getEntityDefinitionId() {
+		return getRootEntityDefinitionId();
+	}
+	
+	@Override
+	@ExternalizedProperty
+	public int getNodeDefinitionId() {
+		return getEntityDefinitionId();
+	}
 
 	@ExternalizedProperty
 	public UIConfigurationProxy getUIConfiguration() {
 		return uiConfiguration;
 	}
 
+	@ExternalizedProperty
+	public int getRootEntityDefinitionId() {
+		return modelObject.getRootEntityDefinitionId();
+	}
 }

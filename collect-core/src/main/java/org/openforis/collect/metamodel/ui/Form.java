@@ -3,102 +3,54 @@
  */
 package org.openforis.collect.metamodel.ui;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-import org.openforis.commons.collection.CollectionUtils;
+import org.openforis.idm.metamodel.LanguageSpecificText;
+import org.openforis.idm.metamodel.LanguageSpecificTextMap;
 
 /**
  * @author S. Ricci
  *
  */
-public class Form extends FormContainer implements FormSectionContainer, FormSectionComponentContainer {
+public class Form extends FormContentContainer {
 
 	private static final long serialVersionUID = 1L;
 
-	private FormContainer parent;
-	private List<FormSection> formSections;
-	private boolean multiple;
-
-	public Form(FormContainer parent, int id) {
-		super(parent.getUIOptions(), id);
-		this.parent = parent;
-		this.multiple = false;
-	}
+	private LanguageSpecificTextMap labels;
 	
-	public FormSection createFormSection() {
-		UIConfiguration uiOptions = getUIOptions();
-		return createFormSection(uiOptions.nextId());
-	}
-	
-	public FormSection createFormSection(int id) {
-		return new FormSection(this, id);
+	public <P extends FormContentContainer> Form(P parent, int id) {
+		super(parent, id);
 	}
 
-	public FormContainer getParent() {
-		return parent;
-	}
-	
-	public List<FormSection> getFormSections() {
-		return CollectionUtils.unmodifiableList(formSections);
-	}
-	
-	public FormSection getMainFormSection() {
-		if ( org.apache.commons.collections.CollectionUtils.isEmpty(formSections) ) {
-			return null;
+	public List<LanguageSpecificText> getLabels() {
+		if ( labels == null ) {
+			return Collections.emptyList();
 		} else {
-			return formSections.get(0);
+			return labels.values();
 		}
 	}
 	
-	public void addFormSection(FormSection formSection) {
-		if ( formSections == null ) {
-			formSections = new ArrayList<FormSection>();
+	public String getLabel(String language) {
+		return labels == null ? null: labels.getText(language);
+	}
+	
+	public void addLabel(LanguageSpecificText label) {
+		if ( labels == null ) {
+			labels = new LanguageSpecificTextMap();
 		}
-		formSections.add(formSection);
-		getUIOptions().attachItem(formSection);
+		labels.add(label);
+	}
+
+	public void setLabel(String language, String text) {
+		if ( labels == null ) {
+			labels = new LanguageSpecificTextMap();
+		}
+		labels.setText(language, text);
 	}
 	
-	public void removeFormSection(FormSection formSection) {
-		formSections.remove(formSection);
-		getUIOptions().detachItem(formSection);
-	}
-	
-	public boolean isMultiple() {
-		return multiple;
-	}
-
-	public void setMultiple(boolean multiple) {
-		this.multiple = multiple;
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result
-				+ ((formSections == null) ? 0 : formSections.hashCode());
-		result = prime * result + (multiple ? 1231 : 1237);
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Form other = (Form) obj;
-		if (formSections == null) {
-			if (other.formSections != null)
-				return false;
-		} else if (!formSections.equals(other.formSections))
-			return false;
-		if (multiple != other.multiple)
-			return false;
-		return true;
+	public void removeLabel(String language) {
+		labels.remove(language);
 	}
 
 }

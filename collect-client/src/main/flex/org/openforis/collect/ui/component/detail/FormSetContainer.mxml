@@ -19,7 +19,7 @@
 			 * Return true if the form for teh specified version / entity definition has been generated
 			 * */
 			public function containsForm(entity:EntityDefinitionProxy, version:ModelVersionProxy):Boolean {
-				var form:FormContainer = getForm(entity, version);
+				var form:FormSetRenderer = getFormSetPresenter(entity, version);
 				var result:Boolean = form != null;
 				return result;
 			}
@@ -27,8 +27,8 @@
 			/**
 			 * Add the form to the stack
 			 * */
-			public function addForm(form:FormContainer, entity:EntityDefinitionProxy, version:ModelVersionProxy):void {
-				var key:String = getFormKey(entity, version);
+			public function addFormSetRenderer(form:FormSetRenderer, entity:EntityDefinitionProxy, version:ModelVersionProxy):void {
+				var key:String = getFormSetKey(entity, version);
 				_forms[key] = form; 
 				this.addElement(form);
 			}
@@ -36,11 +36,11 @@
 			/**
 			 * Return the form for the given version and entity definition, null if it has not been created yet. 
 			 * */
-			public function getForm(entity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer{
-				var key:String = getFormKey(entity, version);
+			public function getFormSetRenderer(entity:EntityDefinitionProxy, version:ModelVersionProxy):FormSetRenderer {
+				var key:String = getFormSetKey(entity, version);
 				for (var formKey:String in _forms) {
 					if ( key == formKey ) {
-						var form:FormContainer = _forms[key] as FormContainer;
+						var form:FormSetRenderer = _forms[key] as FormSetRenderer;
 						return form;
 					}
 				}
@@ -50,8 +50,8 @@
 			/**
 			 * Show the the form for the given version and entity definition
 			 * */
-			public function setActiveForm(entity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
-				var form:FormContainer = getForm(entity, version);
+			public function setActiveFormSet(entity:EntityDefinitionProxy, version:ModelVersionProxy):FormSetRenderer {
+				var form:FormSetRenderer = getFormSetPresenter(entity, version);
 				this.selectedChild = form;
 				return form;
 			}
@@ -64,7 +64,7 @@
 				this.removeAll();
 			}
 			
-			private function getFormKey(entity:EntityDefinitionProxy, version:ModelVersionProxy):String {
+			private function getFormSetKey(entity:EntityDefinitionProxy, version:ModelVersionProxy):String {
 				var survey:SurveyProxy = entity.survey;
 				var versionId:int = version == null ? 0: version.id;
 				var key:String = StringUtil.substitute("{0};{1};{2}", survey.id, entity.id, versionId);

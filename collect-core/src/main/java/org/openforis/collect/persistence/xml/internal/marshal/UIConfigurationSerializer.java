@@ -13,7 +13,6 @@ import static org.openforis.collect.metamodel.ui.UIConfigurationConstants.FORM_S
 import static org.openforis.collect.metamodel.ui.UIConfigurationConstants.FORM_SETS;
 import static org.openforis.collect.metamodel.ui.UIConfigurationConstants.ID;
 import static org.openforis.collect.metamodel.ui.UIConfigurationConstants.LABEL;
-import static org.openforis.collect.metamodel.ui.UIConfigurationConstants.NAME;
 import static org.openforis.collect.metamodel.ui.UIConfigurationConstants.SHOW_ROW_NUMBERS;
 import static org.openforis.collect.metamodel.ui.UIConfigurationConstants.TABLE;
 import static org.openforis.collect.metamodel.ui.UIConfigurationConstants.UI_NAMESPACE_URI;
@@ -28,8 +27,9 @@ import org.openforis.collect.metamodel.ui.Column;
 import org.openforis.collect.metamodel.ui.ColumnGroup;
 import org.openforis.collect.metamodel.ui.Field;
 import org.openforis.collect.metamodel.ui.Form;
+import org.openforis.collect.metamodel.ui.FormComponent;
+import org.openforis.collect.metamodel.ui.FormContentContainer;
 import org.openforis.collect.metamodel.ui.FormSection;
-import org.openforis.collect.metamodel.ui.FormSectionComponent;
 import org.openforis.collect.metamodel.ui.FormSet;
 import org.openforis.collect.metamodel.ui.Table;
 import org.openforis.collect.metamodel.ui.TableHeadingComponent;
@@ -55,9 +55,9 @@ public class UIConfigurationSerializer {
 			serializer.setOutput(out);
 
 			serializer.startTag(UI_NAMESPACE_URI, FORM_SETS);
-			List<FormSet> formBundles = options.getFormSets();
-			for (FormSet formBundle : formBundles) {
-				write(serializer, formBundle);
+			List<FormSet> formSets = options.getFormSets();
+			for (FormSet formSet : formSets) {
+				write(serializer, formSet);
 			}
 			serializer.endTag(UI_NAMESPACE_URI, FORM_SETS);
 			serializer.flush();
@@ -75,16 +75,12 @@ public class UIConfigurationSerializer {
 		return serializer;
 	}
 
-	protected void write(XmlSerializer serializer, FormSet formBundle)
+	protected void write(XmlSerializer serializer, FormSet formSet)
 			throws IOException {
 		serializer.startTag(UI_NAMESPACE_URI, FORM_SET);
-		serializer.attribute(UI_NAMESPACE_URI, ID, Integer.toString(formBundle.getId()));
-		serializer.attribute(UI_NAMESPACE_URI, ENTITY_ID, Integer.toString(formBundle.getEntityId()));
-		List<LanguageSpecificText> labels = formBundle.getLabels();
-		for (LanguageSpecificText label : labels) {
-			writeLabel(serializer, label);
-		}
-		List<Form> forms = formBundle.getForms();
+		serializer.attribute("", ID, Integer.toString(formSet.getId()));
+		serializer.attribute("", ENTITY_ID, Integer.toString(formSet.getRootEntityDefinition().getId()));
+		List<Form> forms = formSet.getForms();
 		for (Form form : forms) {
 			write(serializer, form);
 		}
@@ -94,53 +90,50 @@ public class UIConfigurationSerializer {
 	protected void write(XmlSerializer serializer, Form form)
 			throws IOException {
 		serializer.startTag(UI_NAMESPACE_URI, FORM);
-		serializer.attribute(UI_NAMESPACE_URI, ID, Integer.toString(form.getId()));
-		serializer.attribute(UI_NAMESPACE_URI, ENTITY_ID, Integer.toString(form.getEntityId()));
+		serializer.attribute("", ID, Integer.toString(form.getId()));
 		List<LanguageSpecificText> labels = form.getLabels();
 		for (LanguageSpecificText label : labels) {
 			writeLabel(serializer, label);
 		}
-		List<Form> forms = form.getForms();
-		for (Form subForm : forms) {
-			write(serializer, subForm);
-		}
-		List<FormSection> formSections = form.getFormSections();
-		for (FormSection formSection : formSections) {
-			write(serializer, formSection);
-		}
+		writeFormContent(serializer, form);
 		serializer.endTag(UI_NAMESPACE_URI, FORM);
 	}
 	
-	protected void write(XmlSerializer serializer, FormSection formSection)
-			throws IOException {
-		serializer.startTag(UI_NAMESPACE_URI, FORM_SECTION);
-		serializer.attribute(UI_NAMESPACE_URI, ID, Integer.toString(formSection.getId()));
-		List<LanguageSpecificText> labels = formSection.getLabels();
-		for (LanguageSpecificText label : labels) {
-			writeLabel(serializer, label);
-		}
-		List<FormSectionComponent> children = formSection.getChildren();
-		for (FormSectionComponent child : children) {
+	private void writeFormContent(XmlSerializer serializer, FormContentContainer section) throws IOException {
+		List<FormComponent> children = section.getChildren();
+		for (FormComponent child : children) {
 			if ( child instanceof Field ) {
 				write(serializer, (Field) child);
 			} else if ( child instanceof Table ) {
 				write(serializer, (Table) child);
-			} else if  (child instanceof FormSection ) {
+			} else if (child instanceof FormSection ) {
 				write(serializer, (FormSection) child);
 			} else {
 				throw new IllegalArgumentException("Container subclass not supported as child of FormSection object: " + child.getClass().getSimpleName());
 			}
 		}
+		List<Form> forms = section.getForms();
+		for (Form subForm : forms) {
+			write(serializer, subForm);
+		}
+	}
+
+	protected void write(XmlSerializer serializer, FormSection formSection)
+			throws IOException {
+		serializer.startTag(UI_NAMESPACE_URI, FORM_SECTION);
+		serializer.attribute("", ID, Integer.toString(formSection.getId()));
+		serializer.attribute("", ENTITY_ID, Integer.toString(formSection.getEntityDefinition().getId()));
+		writeFormContent(serializer, formSection);
 		serializer.endTag(UI_NAMESPACE_URI, FORM_SECTION);
 	}
-	
+
 	protected void write(XmlSerializer serializer, Field field) throws IOException {
 		serializer.startTag(UI_NAMESPACE_URI, FIELD);
-		serializer.attribute(UI_NAMESPACE_URI, ID, Integer.toString(field.getId()));
-		serializer.attribute(UI_NAMESPACE_URI, ATTRIBUTE_ID, Integer.toString(field.getAttributeId()));
+		serializer.attribute("", ID, Integer.toString(field.getId()));
+		serializer.attribute("", ATTRIBUTE_ID, Integer.toString(field.getAttributeDefinitionId()));
 		String autoCompleteGroup = field.getAutoCompleteGroup();
 		if ( StringUtils.isNotBlank(autoCompleteGroup) ) {
-			serializer.attribute(UI_NAMESPACE_URI, AUTOCOMPLETE, Boolean.TRUE.toString());
+			serializer.attribute("", AUTOCOMPLETE, Boolean.TRUE.toString());
 		}
 		serializer.endTag(UI_NAMESPACE_URI, FIELD);
 	}
@@ -148,17 +141,13 @@ public class UIConfigurationSerializer {
 	protected void write(XmlSerializer serializer, Table table)
 			throws IOException {
 		serializer.startTag(UI_NAMESPACE_URI, TABLE);
-		serializer.attribute(UI_NAMESPACE_URI, ID, Integer.toString(table.getId()));
-		serializer.attribute(UI_NAMESPACE_URI, ENTITY_ID, Integer.toString(table.getEntityId()));
+		serializer.attribute("", ID, Integer.toString(table.getId()));
+		serializer.attribute("", ENTITY_ID, Integer.toString(table.getEntityDefinition().getId()));
 		if ( table.isCountInSummaryList() ) {
-			serializer.attribute(UI_NAMESPACE_URI, COUNT, Boolean.TRUE.toString());
+			serializer.attribute("", COUNT, Boolean.TRUE.toString());
 		}
 		if ( table.isShowRowNumbers() ) {
-			serializer.attribute(UI_NAMESPACE_URI, SHOW_ROW_NUMBERS, Boolean.TRUE.toString());
-		}
-		List<LanguageSpecificText> labels = table.getLabels();
-		for (LanguageSpecificText label : labels) {
-			writeLabel(serializer, label);
+			serializer.attribute("", SHOW_ROW_NUMBERS, Boolean.TRUE.toString());
 		}
 		List<TableHeadingComponent> headingComponents = table.getHeadingComponents();
 		write(serializer, headingComponents);
@@ -181,11 +170,8 @@ public class UIConfigurationSerializer {
 	protected void write(XmlSerializer serializer, ColumnGroup columnGroup)
 			throws IOException {
 		serializer.startTag(UI_NAMESPACE_URI, COLUMN_GROUP);
-		serializer.attribute(UI_NAMESPACE_URI, ID, Integer.toString(columnGroup.getId()));
-		List<LanguageSpecificText> labels = columnGroup.getLabels();
-		for (LanguageSpecificText label : labels) {
-			writeLabel(serializer, label);
-		}
+		serializer.attribute("", ID, Integer.toString(columnGroup.getId()));
+		serializer.attribute("", ENTITY_ID, Integer.toString(columnGroup.getEntityDefinition().getId()));
 		List<TableHeadingComponent> headingComponents = columnGroup.getHeadingComponents();
 		write(serializer, headingComponents);
 		serializer.endTag(UI_NAMESPACE_URI, COLUMN_GROUP);
@@ -193,8 +179,8 @@ public class UIConfigurationSerializer {
 	
 	protected void write(XmlSerializer serializer, Column column) throws IOException {
 		serializer.startTag(UI_NAMESPACE_URI, COLUMN);
-		serializer.attribute(UI_NAMESPACE_URI, ID, Integer.toString(column.getId()));
-		serializer.attribute(UI_NAMESPACE_URI, ATTRIBUTE_ID, Integer.toString(column.getAttributeId()));
+		serializer.attribute("", ID, Integer.toString(column.getId()));
+		serializer.attribute("", ATTRIBUTE_ID, Integer.toString(column.getAttributeDefinitionId()));
 		serializer.endTag(UI_NAMESPACE_URI, COLUMN);
 	}
 	

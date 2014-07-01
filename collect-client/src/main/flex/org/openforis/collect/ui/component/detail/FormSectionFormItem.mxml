@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<detail:CollectFormItem 
+		xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx"
+		xmlns:detail="org.openforis.collect.ui.component.detail.*"
+		width="100%"
+		>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.IList;
+			
+			import org.openforis.collect.metamodel.ui.proxy.FormSectionProxy;
+			import org.openforis.collect.presenter.FormSectionFormItemPresenter;
+			
+			private var _formSection:FormSectionProxy;
+			private var _items:IList;
+			
+			override protected function initPresenter():void {
+				_presenter = new FormSectionFormItemPresenter(this);
+			}
+
+			[Bindable]
+			public function get formSection():FormSectionProxy {
+				return _formSection;
+			}
+
+			public function set formSection(value:FormSectionProxy):void {
+				_formSection = value;
+			}
+
+			[Bindable]
+			public function get items():IList {
+				return _items;
+			}
+
+			public function set items(value:IList):void {
+				_items = value;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	
+	<detail:layout>
+		<s:VerticalLayout />
+	</detail:layout>
+
+	<s:Label styleName="formSectionLabel"
+			 text="{formSection.labelText}" />
+
+	<s:DataGroup 
+		dataProvider="{items}">
+		<s:layout>
+			<s:VerticalLayout gap="2" 
+							  paddingLeft="20" 
+							  />
+		</s:layout>
+		<s:itemRenderer>
+			<fx:Component>
+				<detail:FormComponentItemRenderer
+					modelVersion="{outerDocument.modelVersion}"
+					parentEntity="{outerDocument.parentEntity}"
+					labelWidth="130"
+					/>
+			</fx:Component>
+		</s:itemRenderer>
+	</s:DataGroup>
+	
+</detail:CollectFormItem>

@@ -10,15 +10,13 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.IList;
-			
-			import org.openforis.collect.presenter.FormContainerContentPresenter;
-			
 			import mx.events.FlexEvent;
 			
 			import org.openforis.collect.metamodel.proxy.ModelVersionProxy;
 			import org.openforis.collect.metamodel.ui.proxy.FormContainerProxy;
 			import org.openforis.collect.metamodel.ui.proxy.FormProxy;
 			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.presenter.FormContainerContentPresenter;
 			import org.openforis.collect.util.CollectionUtil;
 
 			public static const STATE_DEFAULT:String = "default";
@@ -107,7 +105,7 @@
 			
 			[Bindable(event="formContainerChange")]
 			public function get hasItemsPerCurrentForm():Boolean {
-				return formContainer != null && formContainer is FormProxy && CollectionUtil.isNotEmpty(FormProxy(formContainer).children);
+				return formContainer != null && formContainer is FormProxy && CollectionUtil.isNotEmpty(FormProxy(formContainer).formSection.children);
 			}
 			
 		]]>

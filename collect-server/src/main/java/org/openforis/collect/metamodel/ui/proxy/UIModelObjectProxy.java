@@ -31,10 +31,9 @@ public class UIModelObjectProxy<T extends UIModelObject> implements Proxy {
 	public int getId() {
 		return modelObject.getId();
 	}
-
-//	public UIModelObjectProxy<?> getParent() {
-//		return parent;
-//	}
-//
+	
+	public UIModelObjectProxy<?> getParent() {
+		return parent;
+	}
 	
 }

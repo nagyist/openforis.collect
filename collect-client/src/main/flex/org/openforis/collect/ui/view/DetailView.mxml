@@ -108,7 +108,7 @@
 				 includeIn="edit" 
 				 itemCreationPolicy="immediate">
 			
-			<detail:FormsContainer id="formsContainer" 
+			<detail:FormSetContainer id="formSetContainer" 
 								   height="100%" 
 								   width="100%"
 								   verticalGap="0" />

@@ -3,7 +3,6 @@
  */
 package org.openforis.collect.persistence.xml.internal.unmarshal;
 
-import static org.openforis.collect.metamodel.ui.UIConfigurationConstants.ENTITY_ID;
 import static org.openforis.collect.metamodel.ui.UIConfigurationConstants.FORM;
 import static org.openforis.collect.metamodel.ui.UIConfigurationConstants.ID;
 import static org.openforis.collect.metamodel.ui.UIConfigurationConstants.LABEL;
@@ -11,10 +10,10 @@ import static org.openforis.collect.metamodel.ui.UIConfigurationConstants.LABEL;
 import java.io.IOException;
 
 import org.openforis.collect.metamodel.ui.Form;
-import org.openforis.collect.metamodel.ui.FormContainer;
+import org.openforis.collect.metamodel.ui.FormContentContainer;
+import org.openforis.collect.metamodel.ui.FormSection;
 import org.openforis.idm.metamodel.LanguageSpecificText;
 import org.openforis.idm.metamodel.xml.XmlParseException;
-import org.openforis.idm.metamodel.xml.internal.unmarshal.XmlPullReader;
 import org.xmlpull.v1.XmlPullParserException;
 
 /**
@@ -22,16 +21,15 @@ import org.xmlpull.v1.XmlPullParserException;
  *
  */
 public class FormPR extends UIModelPR {
-	
-	protected FormContainer parentFormContainer;
-	protected Form form;
 
 	public FormPR() {
 		super(FORM);
 		
 		addChildPullReaders(
 			new LabelPR(),
-			new FormSectionPR(),
+			new FieldPR(),
+			new TablePR(),
+			new FormSectionPR(this),
 			this
 		);
 	}
@@ -41,42 +39,20 @@ public class FormPR extends UIModelPR {
 			XmlPullParserException, IOException {
 		super.onStartTag();
 		int id = getIntegerAttribute(ID, true);
-		form = parentFormContainer.createForm(id);
-		int entityId = getIntegerAttribute(ENTITY_ID, true);
-		form.setEntityId(entityId);
+		item = ((FormContentContainer) parent).createForm(id);
 	}
 	
 	@Override
 	protected void onEndTag() throws XmlParseException {
 		super.onEndTag();
-		parentFormContainer.addForm(form);
-	}
-	
-	@Override
-	protected final void handleChildTag(XmlPullReader childPR)
-			throws XmlPullParserException, IOException, XmlParseException {
-		if ( childPR instanceof FormPR ) {
-			FormPR formpr = (FormPR) childPR;
-			// Store child state in case reused recursively
-			FormContainer tmpParent = formpr.parentFormContainer;
-			Form tmpForm = formpr.form;
-			formpr.parentFormContainer = this.form;
-			super.handleChildTag(childPR);
-			formpr.parentFormContainer = tmpParent;
-			formpr.form = tmpForm;
-		} else if ( childPR instanceof FormSectionPR ) {
-			((FormSectionPR) childPR).parent = form;
-			super.handleChildTag(childPR);
-		} else {
-			super.handleChildTag(childPR);
-		}
+		((FormContentContainer) parent).addForm((Form) item);
 	}
 	
 	public Form getForm() {
-		return form;
+		return (Form) item;
 	}
 
-	private class LabelPR extends LanguageSpecificTextPR {
+	private class LabelPR extends UILanguageSpecificTextPR {
 
 		public LabelPR() {
 			super(LABEL);
@@ -84,7 +60,7 @@ public class FormPR extends UIModelPR {
 		
 		@Override
 		protected void processText(LanguageSpecificText lst) {
-			((Form) form).addLabel(lst);
+			((Form) item).addLabel(lst);
 		}
 	}
 }

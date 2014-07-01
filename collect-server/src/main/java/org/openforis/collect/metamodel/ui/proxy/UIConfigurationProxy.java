@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.Proxy;
+import org.openforis.collect.metamodel.proxy.SurveyProxy;
 import org.openforis.collect.metamodel.ui.FormSet;
 import org.openforis.collect.metamodel.ui.UIConfiguration;
 
@@ -17,12 +18,18 @@ import org.openforis.collect.metamodel.ui.UIConfiguration;
 public class UIConfigurationProxy implements Proxy {
 	
 	private transient UIConfiguration uiConfiguration;
+	private SurveyProxy survey;
 
-	public UIConfigurationProxy(UIConfiguration uiFormSets) {
+	public UIConfigurationProxy(SurveyProxy survey, UIConfiguration uiConfiguration) {
 		super();
-		this.uiConfiguration = uiFormSets;
+		this.survey = survey;
+		this.uiConfiguration = uiConfiguration;
 	}
 
+	public SurveyProxy getSurvey() {
+		return survey;
+	}
+	
 	@ExternalizedProperty
 	public List<FormSetProxy> getFormSets() {
 		List<FormSet> formSets = uiConfiguration.getFormSets();

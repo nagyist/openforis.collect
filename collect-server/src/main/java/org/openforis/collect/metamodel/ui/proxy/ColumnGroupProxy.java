@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
 import org.openforis.collect.metamodel.ui.ColumnGroup;
-import org.openforis.idm.metamodel.LanguageSpecificText;
 
 /**
  * @author S. Ricci
@@ -25,10 +24,7 @@ public class ColumnGroupProxy extends TableHeadingComponentProxy<ColumnGroup> {
 	}
 
 	@ExternalizedProperty
-	public List<LanguageSpecificText> getLabels() {
-		return modelObject.getLabels();
+	public int getEntityDefinitionId() {
+		return modelObject.getEntityDefinitionId();
 	}
-
-	
-	
 }

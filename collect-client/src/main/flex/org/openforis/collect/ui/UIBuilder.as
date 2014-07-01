@@ -30,6 +30,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.metamodel.proxy.UnitProxy;
 	import org.openforis.collect.metamodel.ui.UIOptions$CoordinateAttributeFieldsOrder;
 	import org.openforis.collect.metamodel.ui.UIOptions$Direction;
+	import org.openforis.collect.metamodel.ui.proxy.FormSetProxy;
 	import org.openforis.collect.model.proxy.EntityProxy;
 	import org.openforis.collect.ui.component.datagrid.CompleteColumnItemRenderer;
 	import org.openforis.collect.ui.component.datagrid.RecordOwnerColumnItemRenderer;
@@ -41,7 +42,7 @@ package org.openforis.collect.ui {
 	import org.openforis.collect.ui.component.detail.CodeAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.CompositeAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.EntityFormItem;
-	import org.openforis.collect.ui.component.detail.FormContainer;
+	import org.openforis.collect.ui.component.detail.FormSetRenderer;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeDataGroupFormItem;
 	import org.openforis.collect.ui.component.detail.MultipleAttributeFormItem;
 	import org.openforis.collect.ui.component.detail.MultipleEntityAsTableFormItem;
@@ -98,11 +99,11 @@ package org.openforis.collect.ui {
 		public static const COMPOSITE_ATTRIBUTE_LABELS_V_GAP:int = 6;
 		public static const GROUPING_LABEL_PADDING_TOP:int = 4;
 		
-		public static function buildForm(rootEntity:EntityDefinitionProxy, version:ModelVersionProxy):FormContainer {
-			var formContainer:FormContainer = new FormContainer();
-			formContainer.rootEntityDefinition = rootEntity;
-			formContainer.version = version;
-			return formContainer;
+		public static function buildFormSetRenderer(formSet:FormSetProxy, version:ModelVersionProxy):FormSetRenderer {
+			var renderer:FormSetRenderer = new FormSetRenderer();
+			renderer.formSet = formSet;
+			renderer.version = version;
+			return renderer;
 		}
 		
 		public static function getRecordSummaryListColumns(rootEntity:EntityDefinitionProxy):IList {

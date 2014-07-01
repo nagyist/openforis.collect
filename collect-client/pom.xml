@@ -100,6 +100,7 @@
                                 <includeClass>org.openforis.collect.metamodel.ui.proxy.*</includeClass>
                                 <includeClass>org.openforis.collect.metamodel.ui.UIOptions$Direction</includeClass>
                                 <includeClass>org.openforis.collect.metamodel.ui.UIOptions$CoordinateAttributeFieldsOrder</includeClass>
+                                <includeClass>org.openforis.collect.metamodel.ui.Table$Direction</includeClass>
                                 <includeClass>org.openforis.collect.model.AbstractSummaries</includeClass>
                                 <includeClass>org.openforis.collect.model.CollectRecord$State</includeClass>
                                 <includeClass>org.openforis.collect.model.CollectTaxonomy</includeClass>

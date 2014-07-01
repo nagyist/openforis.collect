@@ -28,6 +28,7 @@ package org.openforis.collect.presenter {
 	import org.openforis.collect.ui.UIBuilder;
 	import org.openforis.collect.ui.component.ErrorListPopUp;
 	import org.openforis.collect.ui.component.detail.FormContainer;
+	import org.openforis.collect.ui.component.detail.FormSetRenderer;
 	import org.openforis.collect.ui.view.DetailView;
 	import org.openforis.collect.util.AlertUtil;
 	import org.openforis.collect.util.PopUpUtil;
@@ -105,12 +106,12 @@ package org.openforis.collect.presenter {
 			var rootEntityDefn:EntityDefinitionProxy = Application.activeRootEntity;
 			//do not mantain more than one form in FormsContainer for performance issues
 			_view.currentState = DetailView.LOADING_STATE;
-			var form:FormContainer = _view.formsContainer.getForm(rootEntityDefn, version);
+			var form:FormSetRenderer = _view.formSetContainer.getFormSetRenderer(rootEntityDefn, version);
 			if ( form == null ) {
-				_view.formsContainer.reset();
-				form = UIBuilder.buildForm(rootEntityDefn, version);
-				_view.formsContainer.addForm(form, rootEntityDefn, version);
-				_view.formsContainer.selectedChild = form;
+				_view.formSetContainer.reset();
+				form = UIBuilder.buildFormSetRenderer(rootEntityDefn, version);
+				_view.formSetContainer.addFormSetRenderer(form, rootEntityDefn, version);
+				_view.formSetContainer.selectedChild = form;
 			}
 			_view.currentState = DetailView.EDIT_STATE;
 			form.record = activeRecord;

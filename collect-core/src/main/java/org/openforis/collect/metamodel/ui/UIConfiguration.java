@@ -25,10 +25,12 @@ public class UIConfiguration implements ApplicationOptions, Serializable {
 	private CollectSurvey survey;
 	private List<FormSet> formSets;
 	private Map<Integer, UIModelObject> modelObjectsById;
+	private Map<Integer, UIModelObject> modelObjectsByNodeDefinitionId;
 	private int lastId;
 	
 	public UIConfiguration() {
 		this.modelObjectsById = new HashMap<Integer, UIModelObject>();
+		this.modelObjectsByNodeDefinitionId = new HashMap<Integer, UIModelObject>();
 	}
 	
 	public UIConfiguration(CollectSurvey survey) {
@@ -69,7 +71,7 @@ public class UIConfiguration implements ApplicationOptions, Serializable {
 	public FormSet getFormSetByRootEntityId(int entityId) {
 		if ( formSets != null ) {
 			for (FormSet formSet : formSets) {
-				if ( formSet.getEntityId() == entityId ) {
+				if ( formSet.getRootEntityDefinition().getId() == entityId ) {
 					return formSet;
 				}
 			}
@@ -90,10 +92,14 @@ public class UIConfiguration implements ApplicationOptions, Serializable {
 		detachItem(formSet);
 	}
 	
-	public UIModelObject findModelObjectById(int id) {
+	public UIModelObject getModelObjectById(int id) {
 		return modelObjectsById.get(id);
 	}
-	
+
+	public UIModelObject getModelObjectByNodeDefinitionId(int id) {
+		return modelObjectsByNodeDefinitionId.get(id);
+	}
+
 	// Pre-order depth-first traversal from here down
 	public void traverse(UIModelObjectVisitor visitor) {
 		Stack<UIModelObject> stack = new Stack<UIModelObject>();
@@ -101,68 +107,60 @@ public class UIConfiguration implements ApplicationOptions, Serializable {
 		// Initialize stack with form sets
 		stack.addAll(getFormSets());
 
-		while ( ! stack.isEmpty() && ! visitor.isStopped() ) {
+		while ( ! stack.isEmpty() ) {
 			UIModelObject obj = stack.pop();
 			
 			// Pre-order operation
 			visitor.visit(obj);
 			
-			if ( obj instanceof Table ) {
-				List<TableHeadingComponent> headingComponents = ((Table) obj).getHeadingComponents();
-				for (TableHeadingComponent tableHeadingComponent : headingComponents) {
-					stack.push(tableHeadingComponent);
-				}
-//			} else if ( obj instanceof TableHeadingComponent ) {
-			} else if ( obj instanceof Form ) {
-				List<FormSection> formSections = ((Form) obj).getFormSections();
-				for (FormSection formSection : formSections) {
-					stack.push(formSection);
-				}
-			} else if ( obj instanceof FormSection ) {
-				List<FormSectionComponent> children = ((FormSection) obj).getChildren();
-				for (FormSectionComponent child : children) {
+			if ( visitor.isStopped() ) {
+				break;
+			}
+			
+			if ( obj instanceof FormSection ) {
+				FormSection section = (FormSection) obj;
+				List<FormComponent> children = section.getChildren();
+				for (FormComponent child : children) {
 					stack.push((UIModelObject) child);
 				}
-			} else if ( obj instanceof FormContainer ) {
-				List<Form> forms = ((FormContainer) obj).getForms();
+				List<Form> forms = section.getForms();
 				for (Form form : forms) {
 					stack.push(form);
 				}
 			}
-
+			if ( obj instanceof TableHeadingContainer ) {
+				List<TableHeadingComponent> headingComponents = ((TableHeadingContainer) obj).getHeadingComponents();
+				for (TableHeadingComponent tableHeadingComponent : headingComponents) {
+					stack.push(tableHeadingComponent);
+				}
+			}
 		}		
 	}
 	
-	public UIModelObject findModelObjetByNodeDefinitionId(final int id) {
-		UIModelObjectVisitor visitor = new UIModelObjectVisitor() {
-			@Override
-			public void visit(UIModelObject object) {
-				if ( object instanceof Field ) {
-					if ( ((Field) object).getAttributeId() == id ) {
-						setLastItem(object);
-						this.stop();
-					}
-				}
+	public void attachItem(Identifiable item) {
+		int id = item.getId();
+		if ( modelObjectsById.containsKey(id) ) {
+			throw new IllegalArgumentException(String.format("UI object with id %d already attached to model", id));
+		}
+		modelObjectsById.put(id, (UIModelObject) item);
+
+		if ( item instanceof NodeDefinitionRelatedComponent ) {
+			int nodeDefnId = ((NodeDefinitionRelatedComponent) item).getNodeDefinitionId();
+			if ( modelObjectsByNodeDefinitionId.containsKey(nodeDefnId) ) {
+				throw new IllegalArgumentException(String.format("UI object associated to node definition with id %d already attached to model", nodeDefnId));
 			}
-		};
-		traverse(visitor);
-		
-		if ( visitor.isStopped() ) {
-			return visitor.getLastItem();
-		} else {
-			return null;
+			modelObjectsByNodeDefinitionId.put(nodeDefnId, (UIModelObject) item);
 		}
 	}
 	
-	public void attachItem(UIModelObject item) {
-		modelObjectsById.put(item.getId(), item);
-	}
-	
-	public void detachItem(UIModelObject item) {
+	public void detachItem(Identifiable item) {
 		modelObjectsById.remove(item.getId());
+		if ( item instanceof NodeDefinitionRelatedComponent ) {
+			modelObjectsByNodeDefinitionId.remove(((NodeDefinitionRelatedComponent) item).getNodeDefinitionId());
+		}
 	}
 	
-	public abstract class UIModelObjectVisitor {
+	public static abstract class UIModelObjectVisitor {
 		
 		private boolean stopped;
 		private UIModelObject lastItem = null;

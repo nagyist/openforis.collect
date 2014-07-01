@@ -3,16 +3,16 @@
  */
 package org.openforis.collect.metamodel.ui.proxy;
 
+import java.util.List;
+
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
-import org.openforis.collect.metamodel.proxy.AttributeDefinitionProxy;
 import org.openforis.collect.metamodel.ui.Field;
-import org.openforis.collect.metamodel.ui.FormSection;
 
 /**
  * @author S. Ricci
  *
  */
-public class FieldProxy extends ComponentProxy<Field> implements FormSectionComponentProxy<FormSection>, AttributeModelObjectProxy {
+public class FieldProxy extends UIModelObjectProxy<Field> implements FormComponentProxy, AttributeDefinitionLinkedUIObjectProxy {
 
 	public FieldProxy(UIModelObjectProxy<?> parent, Field modelObject) {
 		super(parent, modelObject);
@@ -20,14 +20,14 @@ public class FieldProxy extends ComponentProxy<Field> implements FormSectionComp
 
 	@Override
 	@ExternalizedProperty
-	public int getAttributeId() {
-		return modelObject.getAttributeId();
+	public int getAttributeDefinitionId() {
+		return modelObject.getAttributeDefinitionId();
 	}
 
 	@Override
 	@ExternalizedProperty
-	public AttributeDefinitionProxy getAttributeDefinition() {
-		return null;
+	public int getNodeDefinitionId() {
+		return getAttributeDefinitionId();
 	}
 	
 	@ExternalizedProperty
@@ -40,4 +40,9 @@ public class FieldProxy extends ComponentProxy<Field> implements FormSectionComp
 		return modelObject.getFieldsOrder();
 	}
 	
+	@ExternalizedProperty
+	public List<String> getVisibleFields() {
+		return modelObject.getVisibleFields();
+	}
+
 }

@@ -4,38 +4,58 @@
 package org.openforis.collect.metamodel.ui;
 
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 
 /**
  * @author S. Ricci
  *
  */
-public class Column extends TableHeadingComponent {
+public class Column extends TableHeadingComponent implements NodeDefinitionRelatedComponent {
 
 	private static final long serialVersionUID = 1L;
 	
-	private int attributeId;
+	private Integer attributeDefinitionId;
+	private AttributeDefinition attributeDefinition;
 	
-	Column(Table table, int id) {
-		super(table, id);
+	Column(TableHeadingContainer parent, int id) {
+		super(parent, id);
 	}
 
-	public AttributeDefinition getAttribute() {
-		return (AttributeDefinition) getNodeDefinition(attributeId);
+	@Override
+	public int getNodeDefinitionId() {
+		return getAttributeDefinitionId();
+	}
+	
+	@Override
+	public NodeDefinition getNodeDefinition() {
+		return getAttributeDefinition();
+	}
+	
+	public Integer getAttributeDefinitionId() {
+		return attributeDefinitionId;
 	}
 
-	public int getAttributeId() {
-		return attributeId;
+	public void setAttributeDefinitionId(Integer attributeDefinitionId) {
+		this.attributeDefinitionId = attributeDefinitionId;
 	}
-
-	public void setAttributeId(int attributeId) {
-		this.attributeId = attributeId;
+	
+	public AttributeDefinition getAttributeDefinition() {
+		if ( attributeDefinitionId != null && attributeDefinition == null ) {
+			this.attributeDefinition = (AttributeDefinition) getNodeDefinition(attributeDefinitionId);
+		}
+		return attributeDefinition;
 	}
-
+	
+	public void setAttributeDefinition(AttributeDefinition attributeDefinition) {
+		this.attributeDefinition = attributeDefinition;
+		this.attributeDefinitionId = attributeDefinition == null ? null: attributeDefinition.getId();
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + attributeId;
+		result = prime * result + attributeDefinitionId;
 		return result;
 	}
 
@@ -48,14 +68,14 @@ public class Column extends TableHeadingComponent {
 		if (getClass() != obj.getClass())
 			return false;
 		Column other = (Column) obj;
-		if (attributeId != other.attributeId)
+		if (attributeDefinitionId != other.attributeDefinitionId)
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "Attribute: " + getAttribute().getPath();
+		return "Attribute: " + getAttributeDefinition().getPath();
 	}
 
 }

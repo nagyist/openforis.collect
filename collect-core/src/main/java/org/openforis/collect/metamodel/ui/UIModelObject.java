@@ -11,22 +11,23 @@ import org.openforis.idm.metamodel.Schema;
  * @author S. Ricci
  *
  */
-public abstract class UIModelObject implements Serializable {
+public abstract class UIModelObject implements Serializable, Identifiable {
 
 	private static final long serialVersionUID = 1L;
 	
-	private UIConfiguration uiConfiguration;
+	private UIModelObject parent;
 	private int id;
 
-	UIModelObject(UIConfiguration uiOptions, int id) {
+	UIModelObject(UIModelObject parent, int id) {
 		super();
-		this.uiConfiguration = uiOptions;
+		this.parent = parent;
 		this.id = id;
 	}
 	
 	protected NodeDefinition getNodeDefinition(int id) {
+		UIConfiguration uiConfiguration = getUIConfiguration();
 		if ( uiConfiguration == null || uiConfiguration.getSurvey() == null ) {
-			throw new IllegalStateException("UIOptions not initialized correctly");
+			throw new IllegalStateException("UIConfiguration not initialized correctly");
 		}
 		CollectSurvey survey = uiConfiguration.getSurvey();
 		Schema schema = survey.getSchema();
@@ -34,34 +35,25 @@ public abstract class UIModelObject implements Serializable {
 		return result;
 	}
 	
-	public UIConfiguration getUIOptions() {
-		return uiConfiguration;
+	public FormSet getFormSet() {
+		UIModelObject currentObject = this;
+		while ( currentObject.getParent() != null ) {
+			currentObject = currentObject.getParent();
+		}
+		return (FormSet) currentObject;
 	}
 	
+	public UIConfiguration getUIConfiguration() {
+		FormSet formSet = getFormSet();
+		return formSet.getUIConfiguration();
+	}
+	
+	public UIModelObject getParent() {
+		return parent;
+	}
+
+	@Override
 	public int getId() {
 		return id;
 	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + id;
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		UIModelObject other = (UIModelObject) obj;
-		if (id != other.id)
-			return false;
-		return true;
-	}
-
 }

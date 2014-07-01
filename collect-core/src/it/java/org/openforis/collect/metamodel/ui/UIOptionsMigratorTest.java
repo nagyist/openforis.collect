@@ -25,13 +25,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @author S. Ricci
  *
  */
+@SuppressWarnings("deprecation")
 public class UIOptionsMigratorTest extends CollectIntegrationTest {
 
 	@Autowired
 	private SurveyContext surveyContext;
 	
 	private CollectSurvey survey;
-	@SuppressWarnings("deprecation")
 	private UIOptions uiOptions;
 
 	@Before
@@ -49,6 +49,7 @@ public class UIOptionsMigratorTest extends CollectIntegrationTest {
 	public void testMigration() {
 		UIOptionsMigrator migrator = new UIOptionsMigrator();
 		UIConfiguration uiModel = migrator.migrateToUIConfiguration(uiOptions);
+
 		assertNotNull(uiModel);
 		Schema schema = survey.getSchema();
 		{
@@ -60,53 +61,58 @@ public class UIOptionsMigratorTest extends CollectIntegrationTest {
 			//cluster form
 			{
 				Form form = forms.get(0);
-				FormSection formSection = form.getMainFormSection();
-				List<FormSectionComponent> children = formSection.getChildren();
-				assertEquals(14, children.size());
+				List<FormComponent> children = form.getChildren();
+				assertEquals(15, children.size());
 				{
 					//task
-					FormSectionComponent component = children.get(0);
+					FormComponent component = children.get(0);
 					assertTrue(component instanceof Table);
 					Table taskTable = (Table) component;
-					assertNotNull(taskTable.getEntity());
-					assertEquals("task", taskTable.getEntity().getName());
+					assertNotNull(taskTable.getEntityDefinition());
+					assertEquals("task", taskTable.getEntityDefinition().getName());
 					
 					//task/task
 					assertEquals(3, taskTable.getHeadingComponents().size());
 					TableHeadingComponent heading = taskTable.getHeadingComponents().get(0);
 					assertTrue(heading instanceof Column);
 					Column col = (Column) heading;
-					assertEquals(729, col.getAttributeId());
+					assertEquals(Integer.valueOf(729), col.getAttributeDefinitionId());
 				}
 			}
 			//plot form
 			{
 				Form plotForm = forms.get(1);
-				List<Form> subforms = plotForm.getForms();
+				List<FormComponent> plotFormChildren = plotForm.getChildren();
+				assertEquals(1, plotFormChildren.size());
+				FormComponent plotMultipleEntityComponent = plotFormChildren.get(0);
+				assertTrue(plotMultipleEntityComponent instanceof FormSection);
+				
+				FormSection plotMultipleEntityFormSection = (FormSection) plotMultipleEntityComponent;
+				
+				List<Form> subforms = plotMultipleEntityFormSection.getForms();
 				assertEquals(6, subforms.size());
 				Form detailForm = subforms.get(0);
-				FormSection formSection = detailForm.getMainFormSection();
-				List<FormSectionComponent> children = formSection.getChildren();
+				List<FormComponent> children = detailForm.getChildren();
 				assertEquals(34, children.size());
 				{
 					//plot_no
 					{
-						FormSectionComponent component = children.get(0);
+						FormComponent component = children.get(0);
 						assertTrue(component instanceof Field);
 						Field plotNoField = (Field) component;
-						assertEquals(749, plotNoField.getAttributeId());
+						assertEquals(Integer.valueOf(749), plotNoField.getAttributeDefinitionId());
 					}
 					//time study (single entity -> form section)
 					{
-						FormSectionComponent component = children.get(2);
+						FormComponent component = children.get(2);
 						assertTrue(component instanceof FormSection);
 						FormSection section = (FormSection) component;
 						assertEquals(3, section.getChildren().size());
 						//start time
-						FormSectionComponent startTimeComp = section.getChildren().get(1);
+						FormComponent startTimeComp = section.getChildren().get(1);
 						assertTrue(startTimeComp instanceof Field);
 						Field startTimeField = (Field) startTimeComp;
-						assertEquals(753, startTimeField.getAttributeId());
+						assertEquals(Integer.valueOf(753), startTimeField.getAttributeDefinitionId());
 					}
 				}
 			}

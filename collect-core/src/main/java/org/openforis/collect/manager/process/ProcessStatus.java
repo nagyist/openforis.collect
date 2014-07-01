@@ -1,6 +1,10 @@
 package org.openforis.collect.manager.process;
 
-import static org.openforis.collect.manager.process.ProcessStatus.Step.*;
+import static org.openforis.collect.manager.process.ProcessStatus.Step.CANCEL;
+import static org.openforis.collect.manager.process.ProcessStatus.Step.COMPLETE;
+import static org.openforis.collect.manager.process.ProcessStatus.Step.ERROR;
+import static org.openforis.collect.manager.process.ProcessStatus.Step.INIT;
+import static org.openforis.collect.manager.process.ProcessStatus.Step.RUN;
 
 /**
  * 

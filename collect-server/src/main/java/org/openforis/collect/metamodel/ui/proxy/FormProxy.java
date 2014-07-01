@@ -7,13 +7,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.granite.messaging.amf.io.util.externalizer.annotation.ExternalizedProperty;
+import org.openforis.collect.metamodel.proxy.LanguageSpecificTextProxy;
 import org.openforis.collect.metamodel.ui.Form;
+import org.openforis.idm.metamodel.LanguageSpecificText;
 
 /**
  * @author S. Ricci
  *
  */
-public class FormProxy extends FormContainerProxy<Form> {
+public class FormProxy extends FormContentContainerProxy<Form> {
 
 	public FormProxy(UIModelObjectProxy<?> parent, Form modelObject) {
 		super(parent, modelObject);
@@ -28,13 +30,9 @@ public class FormProxy extends FormContainerProxy<Form> {
 	}
 	
 	@ExternalizedProperty
-	public List<FormSectionProxy> getFormSections() {
-		return FormSectionProxy.fromList(this, modelObject.getFormSections());
+	public List<LanguageSpecificTextProxy> getLabels() {
+		List<LanguageSpecificText> labels = modelObject.getLabels();
+		return LanguageSpecificTextProxy.fromList(labels);
 	}
 	
-	@ExternalizedProperty
-	public boolean isMultiple() {
-		return modelObject.isMultiple();
-	}
-
 }

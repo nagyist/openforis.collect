@@ -6,36 +6,56 @@ package org.openforis.collect.metamodel.ui;
 import java.util.List;
 
 import org.openforis.idm.metamodel.AttributeDefinition;
+import org.openforis.idm.metamodel.NodeDefinition;
 
 /**
  * @author S. Ricci
  *
  */
-public class Field extends Component {
+public class Field extends UIModelObject implements FormComponent, NodeDefinitionRelatedComponent {
 
 	private static final long serialVersionUID = 1L;
 
-	private int attributeId; 
+	private AttributeDefinition attributeDefinition;
+	private Integer attributeDefinitionId;
 	private String autoCompleteGroup;
 	private Enum<?> fieldsOrder;
 	private List<String> visibleFields;
 	
-	Field(FormSection parent, int id) {
+	<P extends FormContentContainer> Field(P parent, int id) {
 		super(parent, id);
 	}
-
-	public AttributeDefinition getAttribute() {
-		return (AttributeDefinition) getNodeDefinition(attributeId);
+	
+	@Override
+	public int getNodeDefinitionId() {
+		return getAttributeDefinitionId();
+	}
+	
+	@Override
+	public NodeDefinition getNodeDefinition() {
+		return getAttributeDefinition();
 	}
 
-	public int getAttributeId() {
-		return attributeId;
+	public Integer getAttributeDefinitionId() {
+		return attributeDefinitionId;
 	}
 
-	public void setAttributeId(int attributeId) {
-		this.attributeId = attributeId;
+	public void setAttributeDefinitionId(Integer attributeDefinitionId) {
+		this.attributeDefinitionId = attributeDefinitionId;
 	}
 
+	public AttributeDefinition getAttributeDefinition() {
+		if ( attributeDefinitionId != null && attributeDefinition == null ) {
+			this.attributeDefinition = (AttributeDefinition) getNodeDefinition(attributeDefinitionId);
+		}
+		return attributeDefinition;
+	}
+	
+	public void setAttributeDefinition(AttributeDefinition attributeDefinition) {
+		this.attributeDefinition = attributeDefinition;
+		this.attributeDefinitionId = attributeDefinition == null ? null: attributeDefinition.getId();
+	}
+	
 	public String getAutoCompleteGroup() {
 		return autoCompleteGroup;
 	}
@@ -60,7 +80,7 @@ public class Field extends Component {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + attributeId;
+		result = prime * result + attributeDefinitionId;
 		result = prime
 				* result
 				+ ((autoCompleteGroup == null) ? 0 : autoCompleteGroup
@@ -77,7 +97,7 @@ public class Field extends Component {
 		if (getClass() != obj.getClass())
 			return false;
 		Field other = (Field) obj;
-		if (attributeId != other.attributeId)
+		if (attributeDefinitionId != other.attributeDefinitionId)
 			return false;
 		if (autoCompleteGroup == null) {
 			if (other.autoCompleteGroup != null)
@@ -89,7 +109,7 @@ public class Field extends Component {
 	
 	@Override
 	public String toString() {
-		return "Attribute: " + getAttribute().getPath();
+		return "Attribute: " + getAttributeDefinition().getPath();
 	}
 
 	public Enum<?> getFieldsOrder() {

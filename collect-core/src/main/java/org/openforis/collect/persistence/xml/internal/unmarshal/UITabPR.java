@@ -40,7 +40,7 @@ class UITabPR extends UITabSetPRBase {
 		parentTabSet.addTab((UITab) tabSet);
 	}
 	
-	private class LabelPR extends LanguageSpecificTextPR {
+	private class LabelPR extends UILanguageSpecificTextPR {
 
 		public LabelPR() {
 			super(LABEL);

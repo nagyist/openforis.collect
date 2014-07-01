@@ -35,8 +35,8 @@ public interface UIConfigurationConstants {
 	String FORM_SECTION = "section";
 	String FIELD = "field";
 	String TABLE = "table";
-	String COLUMN = "column";
-	String COLUMN_GROUP = "columnGroup";
+	String COLUMN = "col";
+	String COLUMN_GROUP = "colGroup";
 	
 	String ENTITY_ID = "entityId";
 	String ATTRIBUTE_ID = "attributeId";

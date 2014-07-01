@@ -11,15 +11,8 @@ public abstract class TableHeadingComponent extends UIModelObject {
 
 	private static final long serialVersionUID = 1L;
 	
-	TableHeadingComponent(Table table, int id) {
-		super(table.getUIOptions(), id);
-		this.table = table;
+	TableHeadingComponent(TableHeadingContainer parent, int id) {
+		super((UIModelObject) parent, id);
 	}
 
-	private Table table;
-	
-	public Table getTable() {
-		return table;
-	}
-	
 }

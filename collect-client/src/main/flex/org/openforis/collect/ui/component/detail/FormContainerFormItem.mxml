@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<detail:CollectFormItem xmlns:fx="http://ns.adobe.com/mxml/2009"
+					   xmlns:s="library://ns.adobe.com/flex/spark"
+					   xmlns:mx="library://ns.adobe.com/flex/mx"
+					   xmlns:datagroup="org.openforis.collect.ui.component.datagroup.*"
+					   xmlns:detail="org.openforis.collect.ui.component.detail.*"
+					   xmlns:component="org.openforis.collect.ui.component.*"
+					   xmlns:layout="org.openforis.collect.ui.layout.*" 
+					   width="100%" height="100%"
+					   currentState="{STATE_SINGLE}">
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.collections.IList;
+			import mx.events.FlexEvent;
+			
+			import org.openforis.collect.metamodel.ui.proxy.FormProxy;
+			import org.openforis.collect.model.proxy.EntityProxy;
+			import org.openforis.collect.presenter.FormContainerFormItemPresenter;
+			
+			public static const STATE_SINGLE:String = "single";
+			public static const STATE_MULTIPLE:String = "multiple";
+			
+			private var _entities:IList;
+			private var _selectedEntity:EntityProxy;
+			private var _form:FormProxy;
+			
+			override protected function initializeHandler(event:FlexEvent):void {
+			}
+			
+			override protected function initPresenter():void {
+				presenter = new FormContainerFormItemPresenter(this);
+			}
+			
+			public function resetScrollbars():void {
+				if ( internalContainer != null ) {
+					internalContainer.resetScrollBars();
+				}
+			}
+			
+			[Bindable]
+			public function get form():FormProxy {
+				return _form;
+			}
+
+			public function set form(value:FormProxy):void {
+				_form = value;
+			}
+
+			[Bindable]
+			public function get entities():IList {
+				return _entities;
+			}
+
+			public function set entities(value:IList):void {
+				_entities = value;
+			}
+
+			[Bindable]
+			public function get selectedEntity():EntityProxy {
+				return _selectedEntity;
+			}
+
+			public function set selectedEntity(value:EntityProxy):void {
+				_selectedEntity = value;
+			}
+
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<s:Fade id="showFormEffect" 
+				duration="600" 
+				alphaFrom="0" 
+				alphaTo="1"
+				/>
+		
+		<s:Fade id="hideFormEffect" 
+				duration="400" 
+				alphaFrom="1" 
+				alphaTo="0"
+				/>
+		
+	</fx:Declarations>
+	
+	<detail:states>
+		<s:State name="single" />
+		<s:State name="multiple" />
+	</detail:states>
+	
+	<s:BorderContainer id="border" 
+					   height="100%" 
+					   width="100%"
+					   minHeight="0"
+					   minWidth="0">
+		<s:layout>
+			<s:VerticalLayout />
+		</s:layout>
+
+		<component:AddEntityControlBar id="addSection"
+									   includeIn="multiple"
+									   entityDefinition="{form.entityDefinition}"
+									   entities="{entities}" />
+		
+		<detail:FormContainerContentRenderer 
+			id="internalContainer" 
+			height="100%" width="100%"
+			modelVersion="{modelVersion}"
+			parentEntity="{selectedEntity}"
+			formContainer="{form}"
+			visible="false"
+			showEffect="{showFormEffect}" 
+			hideEffect="{hideFormEffect}"
+			/>
+	</s:BorderContainer>
+</detail:CollectFormItem>

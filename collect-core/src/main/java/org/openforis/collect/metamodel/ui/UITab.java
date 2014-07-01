@@ -111,6 +111,17 @@ public class UITab extends UITabSet {
 		parent = null;
 	}
 	
+	public boolean isDescendantOf(UITab parentTab) {
+		UITabSet currentParent = this.parent;
+		while ( currentParent != null ) {
+			if ( currentParent instanceof UITab && currentParent == parentTab ) {
+				return true;
+			}
+			currentParent = currentParent.parent;
+		}
+		return false;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

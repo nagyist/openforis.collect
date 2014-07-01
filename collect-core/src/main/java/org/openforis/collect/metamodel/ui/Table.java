@@ -1,20 +1,18 @@
 package org.openforis.collect.metamodel.ui;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.openforis.commons.collection.CollectionUtils;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.openforis.idm.metamodel.LanguageSpecificText;
-import org.openforis.idm.metamodel.LanguageSpecificTextMap;
+import org.openforis.idm.metamodel.NodeDefinition;
 
 /**
  * 
  * @author S. Ricci
  *
  */
-public class Table extends Component {
+public class Table extends UIModelObject implements NodeDefinitionRelatedComponent, FormComponent, TableHeadingContainer {
 
 	private static final long serialVersionUID = 1L;
 
@@ -33,39 +31,69 @@ public class Table extends Component {
 		}
 	}
 	
-	private int entityId;
+	private Integer entityDefinitionId;
+	private EntityDefinition entityDefinition;
 	private List<TableHeadingComponent> headingComponents;
-	private LanguageSpecificTextMap labels;
 	private boolean showRowNumbers;
 	private boolean countInSummaryList;
 	private Direction direction;
 	
-	Table(FormSection parent, int id) {
+	<P extends FormContentContainer> Table(P parent, int id) {
 		super(parent, id);
 	}
 	
+	@Override
 	public Column createColumn() {
-		UIConfiguration uiOptions = getUIOptions();
+		UIConfiguration uiOptions = getUIConfiguration();
 		return createColumn(uiOptions.nextId());
 	}
 	
+	@Override
 	public Column createColumn(int id) {
 		return new Column(this, id);
 	}
 	
+	@Override
 	public ColumnGroup createColumnGroup() {
-		UIConfiguration uiOptions = getUIOptions();
+		UIConfiguration uiOptions = getUIConfiguration();
 		return createColumnGroup(uiOptions.nextId());
 	}
 	
+	@Override
 	public ColumnGroup createColumnGroup(int id) {
 		return new ColumnGroup(this, id);
 	}
 	
-	public EntityDefinition getEntity() {
-		return (EntityDefinition) getNodeDefinition(entityId);
+	@Override
+	public int getNodeDefinitionId() {
+		return getEntityDefinitionId();
+	}
+	
+	@Override
+	public NodeDefinition getNodeDefinition() {
+		return getEntityDefinition();
+	}
+	
+	public Integer getEntityDefinitionId() {
+		return entityDefinitionId;
 	}
 
+	public void setEntityDefinitionId(Integer entityDefinitionId) {
+		this.entityDefinitionId = entityDefinitionId;
+	}
+
+	public EntityDefinition getEntityDefinition() {
+		if ( entityDefinitionId != null && entityDefinition == null ) {
+			this.entityDefinition = (EntityDefinition) getNodeDefinition(entityDefinitionId);
+		}
+		return entityDefinition;
+	}
+	
+	public void setEntityDefinition(EntityDefinition entityDefinition) {
+		this.entityDefinition = entityDefinition;
+		this.entityDefinitionId = entityDefinition == null ? null: entityDefinition.getId();
+	}
+	
 	public List<TableHeadingComponent> getHeadingComponents() {
 		return CollectionUtils.unmodifiableList(headingComponents);
 	}
@@ -75,50 +103,12 @@ public class Table extends Component {
 			headingComponents = new ArrayList<TableHeadingComponent>();
 		}
 		headingComponents.add(component);
-		getUIOptions().attachItem(component);
+		getUIConfiguration().attachItem(component);
 	}
 	
 	public void removeHeadingComponent(TableHeadingComponent component) {
 		headingComponents.remove(component);
-		getUIOptions().detachItem(component);
-	}
-
-	public List<LanguageSpecificText> getLabels() {
-		if ( labels == null ) {
-			return Collections.emptyList();
-		} else {
-			return labels.values();
-		}
-	}
-	
-	public String getLabel(String language) {
-		return labels == null ? null: labels.getText(language);
-	}
-	
-	public void addLabel(LanguageSpecificText label) {
-		if ( labels == null ) {
-			labels = new LanguageSpecificTextMap();
-		}
-		labels.add(label);
-	}
-
-	public void setLabel(String language, String text) {
-		if ( labels == null ) {
-			labels = new LanguageSpecificTextMap();
-		}
-		labels.setText(language, text);
-	}
-	
-	public void removeLabel(String language) {
-		labels.remove(language);
-	}
-	
-	public int getEntityId() {
-		return entityId;
-	}
-	
-	public void setEntityId(int entityId) {
-		this.entityId = entityId;
+		getUIConfiguration().detachItem(component);
 	}
 
 	public boolean isShowRowNumbers() {
@@ -154,8 +144,6 @@ public class Table extends Component {
 		result = prime * result + (countInSummaryList ? 1231 : 1237);
 		result = prime * result
 				+ ((direction == null) ? 0 : direction.hashCode());
-		result = prime * result + entityId;
-		result = prime * result + ((labels == null) ? 0 : labels.hashCode());
 		result = prime * result + (showRowNumbers ? 1231 : 1237);
 		return result;
 	}
@@ -178,13 +166,6 @@ public class Table extends Component {
 			return false;
 		if (direction != other.direction)
 			return false;
-		if (entityId != other.entityId)
-			return false;
-		if (labels == null) {
-			if (other.labels != null)
-				return false;
-		} else if (!labels.equals(other.labels))
-			return false;
 		if (showRowNumbers != other.showRowNumbers)
 			return false;
 		return true;
@@ -192,8 +173,7 @@ public class Table extends Component {
 	
 	@Override
 	public String toString() {
-		return "Attribute: " + getEntity().getPath();
+		return this.getClass().getSimpleName() + " associated to entity: " + getEntityDefinition().getPath();
 	}
-
 
 }

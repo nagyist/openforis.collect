@@ -19,15 +19,15 @@ import org.xmlpull.v1.XmlPullParserException;
  * @author S. Ricci
  *
  */
-class LanguageSpecificTextPR extends UIElementPullReader {
+class UILanguageSpecificTextPR extends UIElementPullReader {
 	private boolean requireType;
 	
-	public LanguageSpecificTextPR(String tagName, boolean requireType) {
+	public UILanguageSpecificTextPR(String tagName, boolean requireType) {
 		super(UI_NAMESPACE_URI, tagName);
 		this.requireType = requireType;
 	}
 	
-	public LanguageSpecificTextPR(String tagName) {
+	public UILanguageSpecificTextPR(String tagName) {
 		this(tagName, false);
 	}
 

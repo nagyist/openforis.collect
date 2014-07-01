@@ -192,7 +192,7 @@ public class CollectValidator extends Validator {
 		CollectSurvey survey = (CollectSurvey) defn.getSurvey();
 		UIConfiguration uiConfiguration = survey.getUIConfiguration();
 		
-		UIModelObject uiModelObject = uiConfiguration.findModelObjetByNodeDefinitionId(defn.getId());
+		UIModelObject uiModelObject = uiConfiguration.getModelObjectByNodeDefinitionId(defn.getId());
 		for ( int i = 0 ; i < fieldCount ; i++ ) {
 			Field<?> field = attribute.getField(i);
 			boolean visible = uiModelObject == null || 

@@ -2,7 +2,9 @@ package org.openforis.collect.metamodel.ui;
 
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_NAMESPACE_URI;
 import static org.openforis.collect.metamodel.ui.UIOptionsConstants.UI_TYPE;
-import static org.openforis.idm.metamodel.TaxonAttributeDefinition.*;
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.CODE_FIELD_NAME;
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.SCIENTIFIC_NAME_FIELD_NAME;
+import static org.openforis.idm.metamodel.TaxonAttributeDefinition.VERNACULAR_NAME_FIELD_NAME;
 
 import java.io.Serializable;
 import java.util.ArrayList;
