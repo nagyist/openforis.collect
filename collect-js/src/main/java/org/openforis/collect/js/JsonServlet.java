@@ -12,76 +12,39 @@ import org.openforis.idm.model.TextValue;
 import org.openforis.idm.model.Value;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.Arrays.asList;
 
-public class JsonServlet extends HttpServlet {
-    private final Map<String, RequestHandler> postHandlers;
-    private final Map<String, RequestHandler> getHandlers;
-
+public class JsonServlet extends DispatchingServlet {
     private final EntityDef dummySchema = dummySchema();
     private final List<? extends Event> recordEvents = dummyRecordEvents();
 
+    protected void initHandlers() {
+        post("/update-attribute", new RequestHandler() {
+            void handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                // TODO: Fire off a command to collect-core
+                String text = IOUtils.toString(req.getInputStream(), "UTF-8");
+                System.out.println("Updated attribute: " + text);
+            }
+        });
 
-    public JsonServlet() {
-        postHandlers = new HashMap<String, RequestHandler>() {{
-
-            put("/update-attribute", new RequestHandler() {
-                void handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-                    // TODO: Fire off a command to collect-core
-                    String text = IOUtils.toString(req.getInputStream(), "UTF-8");
-                    System.out.println("Updated attribute: " + text);
-                }
-            });
-
-        }};
-
-        getHandlers = new HashMap<String, RequestHandler>() {{
-
-            put("/schema", new RequestHandler() {
-                void handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-                    String schemaJson = new SchemaJsonSerializer().serialize(dummySchema);
-                    resp.getWriter().print(schemaJson);
-                }
-            });
-
-            put("/record", new RequestHandler() {
-                void handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-                    String recordJson = new EventJsonSerializer().serialize(recordEvents);
-                    resp.getWriter().print(recordJson);
-                }
-            });
-
-        }};
-    }
-
-
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        handleRequest(req, resp, postHandlers);
-    }
-
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        handleRequest(req, resp, getHandlers);
-    }
-
-    private void handleRequest(HttpServletRequest req, HttpServletResponse resp, Map<String, RequestHandler> handlers) throws IOException, ServletException {RequestHandler handler = handlers.get(req.getPathInfo());
-        if (handler == null) {
-            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "JSON resource not found.");
-            return;
-        }
-        resp.setContentType("application/json");
-        handler.handle(req, resp);
-    }
-
-    private abstract class RequestHandler {
-        abstract void handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
+        get("/schema", new RequestHandler() {
+            void handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                String schemaJson = new SchemaJsonSerializer().serialize(dummySchema);
+                resp.getWriter().print(schemaJson);
+            }
+        });
+        get("/record", new RequestHandler() {
+            void handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+                String recordJson = new EventJsonSerializer().serialize(recordEvents);
+                resp.getWriter().print(recordJson);
+            }
+        });
     }
 
 
