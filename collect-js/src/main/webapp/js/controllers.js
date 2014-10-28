@@ -17,8 +17,31 @@ var collectApp = angular.module('collectApp', []).
             template: "<div ng-include src=\"'partials/' + node.type + '.html'\"></div>",
             link: function ($scope, element, attrs) {
                 $scope.attributeUpdated = function (attribute) {
-                    recordService.updateAttribute(attribute);
+                    recordService.updateAttribute({
+                        id: attribute.id,
+                        value: attribute.value
+                    });
                 }
             }
         };
-    }]);
+    }]).
+
+    directive('ngModelOnblur', function () {
+        return {
+            restrict: 'A',
+            require: 'ngModel',
+            priority: 1,
+            link: function (scope, elm, attr, ngModelCtrl) {
+                if (attr.type === 'radio' || attr.type === 'checkbox') return;
+
+                elm.unbind('input').unbind('keydown').unbind('change');
+                elm.bind('blur', function () {
+                    scope.$apply(function () {
+                        if (elm.val().length == 0 && ngModelCtrl.$viewValue === undefined)
+                            return;
+                        ngModelCtrl.$setViewValue(elm.val());
+                    });
+                });
+            }
+        };
+    });

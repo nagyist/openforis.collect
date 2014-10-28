@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 
 public class JsonServlet extends DispatchingServlet {
     private final EntityDef dummySchema = dummySchema();
@@ -30,6 +31,7 @@ public class JsonServlet extends DispatchingServlet {
                 // TODO: Fire off a command to collect-core
                 String text = IOUtils.toString(req.getInputStream(), "UTF-8");
                 System.out.println("Updated attribute: " + text);
+                resp.setStatus(SC_NO_CONTENT);
             }
         });
 

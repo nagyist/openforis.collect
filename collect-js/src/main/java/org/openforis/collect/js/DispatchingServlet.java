@@ -31,6 +31,7 @@ public abstract class DispatchingServlet extends HttpServlet {
     }
 
     protected final void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        resp.setContentType("application/json");
         handleRequest(req, resp, getHandlers);
     }
 
@@ -39,7 +40,7 @@ public abstract class DispatchingServlet extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND, "JSON resource not found.");
             return;
         }
-        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
         handler.handle(req, resp);
     }
 

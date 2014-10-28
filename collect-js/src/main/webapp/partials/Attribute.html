@@ -1,6 +1,5 @@
 <div class="form-group">
     <label for="attribute-{{node.id}}">{{node.label}}</label>
-    <input ng-model="node.value"
-           ng-blur="attributeUpdated(node)"
+    <input ng-model="node.value" ng-change="attributeUpdated(node)" ng-model-onblur
            class="form-control" id="attribute-{{node.id}}">
 </div>
