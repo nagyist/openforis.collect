@@ -9,6 +9,6 @@ import org.openforis.idm.model.Record;
  */
 public interface RecordProvider {
 	
-	Record provideRecord(int recordId);
+	Record provideRecord(int surveyId, int recordId);
 
 }

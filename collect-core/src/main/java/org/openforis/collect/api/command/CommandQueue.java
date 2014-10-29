@@ -17,4 +17,6 @@ public interface CommandQueue {
 	void addListener(EventListener eventListener);
 
 	void removeListener(EventListener eventListener);
+
+	void stop();
 }

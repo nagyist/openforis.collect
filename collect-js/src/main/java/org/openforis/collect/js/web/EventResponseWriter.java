@@ -11,6 +11,7 @@ import javax.servlet.AsyncContext;
 import javax.servlet.AsyncEvent;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.SocketException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -92,6 +93,8 @@ public class EventResponseWriter implements EventListener {
             if (writer.checkError()) {
                 commandQueue.removeListener(EventResponseWriter.this);
             }
+        } catch (SocketException e) {
+            commandQueue.removeListener(EventResponseWriter.this);
         } catch (IOException e) {
             commandQueue.removeListener(EventResponseWriter.this);
         }

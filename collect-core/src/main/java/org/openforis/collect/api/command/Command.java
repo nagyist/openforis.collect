@@ -12,12 +12,14 @@ import org.openforis.collect.api.User;
  */
 public abstract class Command {
 
+	public final int surveyId;
 	public final int recordId;
 	public final Date timestamp;
 	public final User user;
 	
-	public Command(int recordId, User user) {
+	public Command(int surveyId, int recordId, User user) {
 		super();
+		this.surveyId = surveyId;
 		this.recordId = recordId;
 		this.user = user;
 		this.timestamp = new Date();

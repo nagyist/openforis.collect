@@ -12,10 +12,12 @@ public class JsonCommandParser {
 
     public UpdateAttributeValueCommand updateAttributeValueCommand(String jsonString, User user) {
         JsonObject json = toJson(jsonString);
+        int surveyId = asInt("surveyId", json);
         int recordId = asInt("recordId", json);
         int attributeId = asInt("attributeId", json);
         String value = asString("value", json);
         return new UpdateAttributeValueCommand(
+                surveyId,
                 recordId,
                 user,
                 attributeId,
@@ -25,10 +27,6 @@ public class JsonCommandParser {
 
     private String asString(String name, JsonObject json) {
         return getMember(name, json).getAsString();
-    }
-
-    private String asString(JsonObject json, String name) {
-        return asString(name, json);
     }
 
     private int asInt(String name, JsonObject json) {

@@ -46,6 +46,10 @@ public class SynchronousCommandQueue implements CommandQueue {
         clientListeners.remove(eventListener);
     }
 
+    public void stop() {
+
+    }
+
     private class ClientNotifyingEventListener implements EventListener {
         public void handle(List<? extends Event> events) {
             for (EventListener clientListener : clientListeners) {

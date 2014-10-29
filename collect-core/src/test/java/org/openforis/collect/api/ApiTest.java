@@ -42,15 +42,16 @@ public class ApiTest implements EventListener {
 		queue = new SynchronousCommandQueue(recordProvider);
 		queue.addListener(this);
 		user = new org.openforis.collect.model.User("test");
-		record = recordProvider.provideRecord(1);
+		record = recordProvider.provideRecord(1, 1);
 	}
 	
 	@Test
 	public void test() {
+		int surveyId = record.getSurvey().getId();
 		int recordId = record.getId();
 		Attribute<?, ?> attr = (Attribute<?, ?>) record.findNodeByPath("/root/attr");
 		int attributeId = attr.getInternalId();
-		UpdateAttributeValueCommand command = new UpdateAttributeValueCommand(recordId, user, attributeId, new TextValue("text"));
+		UpdateAttributeValueCommand command = new UpdateAttributeValueCommand(surveyId, recordId, user, attributeId, new TextValue("text"));
 		
 		submit(command);
 		
@@ -86,7 +87,7 @@ public class ApiTest implements EventListener {
 		}
 		
 		@Override
-		public Record provideRecord(int recordId) {
+		public Record provideRecord(int surveyId, int recordId) {
 			return fixture.records.get(0);
 		}
 		

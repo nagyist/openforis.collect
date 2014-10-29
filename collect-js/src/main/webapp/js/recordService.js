@@ -5,7 +5,6 @@ angular.module('collectApp').
         function handleEvent(event) {
             var handler = eventHandlers[event.type];
             handler(record, event);
-            console.log(event)
         }
 
         function handleEvents(events) {
