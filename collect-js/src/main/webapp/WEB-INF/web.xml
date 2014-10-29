@@ -4,7 +4,8 @@
          version="3.0" metadata-complete="true">
     <servlet>
         <servlet-name>jsonServlet</servlet-name>
-        <servlet-class>org.openforis.collect.js.JsonServlet</servlet-class>
+        <servlet-class>org.openforis.collect.js.web.JsonServlet</servlet-class>
+        <async-supported>true</async-supported>
     </servlet>
     <servlet-mapping>
         <servlet-name>jsonServlet</servlet-name>

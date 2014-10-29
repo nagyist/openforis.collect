@@ -3,18 +3,23 @@ angular.module('collectApp').
         return {
 
             EntityAdded: function (record, event) {
-                var node = addNode(record, event, 'Entity');
-                node.members = [];
+                var entity = addNode(record, event, 'Entity');
+                entity.members = [];
             },
 
             EntityListAdded: function (record, event) {
-                var node = addNode(record, event, 'EntityList');
-                node.members = [];
+                var entityList = addNode(record, event, 'EntityList');
+                entityList.members = [];
             },
 
             AttributeAdded: function (record, event) {
-                var node = addNode(record, event, 'Attribute');
-                node.value = event.value;
+                var attribute = addNode(record, event, 'Attribute');
+                attribute.value = event.value;
+            },
+
+            AttributeValueUpdated: function (record, event) {
+                var attribute = record.nodeById[event.id];
+                attribute.value = event.value;
             }
         };
 

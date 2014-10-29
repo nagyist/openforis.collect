@@ -1,4 +1,6 @@
-package org.openforis.collect.js;
+package org.openforis.collect.js.web.util;
+
+import org.openforis.collect.js.json.MalformedJson;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -31,20 +33,28 @@ public abstract class DispatchingServlet extends HttpServlet {
     }
 
     protected final void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.setContentType("application/json");
         handleRequest(req, resp, getHandlers);
     }
 
-    private void handleRequest(HttpServletRequest req, HttpServletResponse resp, Map<String, RequestHandler> handlers) throws IOException, ServletException {RequestHandler handler = handlers.get(req.getPathInfo());
+    private void handleRequest(HttpServletRequest req, HttpServletResponse resp, Map<String, RequestHandler> handlers) throws IOException, ServletException {
+        RequestHandler handler = handlers.get(req.getPathInfo());
         if (handler == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND, "JSON resource not found.");
             return;
         }
         resp.setCharacterEncoding("UTF-8");
-        handler.handle(req, resp);
+        try {
+            handler.handle(req, resp);
+        } catch (BadRequest e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+        } catch (MalformedJson e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+        }
     }
 
-    protected abstract class RequestHandler {
-        abstract void handle(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException;
+    static class BadRequest extends RuntimeException {
+        public BadRequest(String message) {
+            super(message);
+        }
     }
 }

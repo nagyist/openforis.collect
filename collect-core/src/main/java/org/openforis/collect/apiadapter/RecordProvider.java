@@ -1,4 +1,4 @@
-package org.openforis.collect.api;
+package org.openforis.collect.apiadapter;
 
 import org.openforis.idm.model.Record;
 

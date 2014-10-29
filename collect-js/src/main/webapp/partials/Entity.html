@@ -1,4 +1,3 @@
 <strong>{{node.label}}</strong>
-<div ng-repeat="member in node.members">
-    <render-node node="member"></render-node>
-</div>
+<render-node ng-repeat="member in node.members"
+             node="member"></render-node>

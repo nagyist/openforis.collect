@@ -1,10 +1,11 @@
 /**
  * 
  */
-package org.openforis.collect.api.command;
+package org.openforis.collect.apiadapter;
 
 import java.util.List;
 
+import org.openforis.collect.api.command.Command;
 import org.openforis.collect.api.event.Event;
 
 /**

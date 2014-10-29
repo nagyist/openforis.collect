@@ -1,55 +1,11 @@
 angular.module('collectApp').
-    factory('recordService', ['$http', '$q', 'eventHandlers', function ($http, $q, eventHandlers) {
+    factory('recordService', ['$http', '$q', '$rootScope', 'eventHandlers', function ($http, $q, $rootScope, eventHandlers) {
         var record = {nodeById: {}};
-
-        var dummyRecordEvents = [
-            {
-                type: 'EntityAdded',
-                defId: 'plot',
-                id: '1'
-            },
-            {
-                type: 'AttributeAdded',
-                defId: 'plot_number',
-                parentId: '1',
-                id: '2'
-            },
-            {
-                type: 'EntityListAdded',
-                defId: 'trees',
-                id: '1-3',
-                parentId: '1'
-            },
-            {
-                type: 'EntityAdded',
-                defId: 'tree',
-                parentId: '1-3',
-                id: '4'
-            },
-            {
-                type: 'AttributeAdded',
-                defId: 'tree_number',
-                parentId: '4',
-                id: '5',
-                value: 'A test tree number'
-            },
-            {
-                type: 'EntityAdded',
-                defId: 'tree',
-                id: '6',
-                parentId: '1-3'
-            },
-            {
-                type: 'AttributeAdded',
-                defId: 'tree_number',
-                id: '7',
-                parentId: '6'
-            }
-        ];
 
         function handleEvent(event) {
             var handler = eventHandlers[event.type];
             handler(record, event);
+            console.log(event)
         }
 
         function handleEvents(events) {
@@ -74,15 +30,16 @@ angular.module('collectApp').
                 });
         }
 
-        function loadSchemaAndRecord(recordId) {
+        function loadSchemaAndRecord(surveyId, recordId) {
             var deferred = $q.defer();
 
-            $q.all([loadSchema(), loadRecord(recordId)]).
+            $q.all([loadSchema(surveyId), listenToRecord(surveyId, recordId)]).
                 then(function (result) {
+                    record.surveyId = surveyId;
+                    record.recordId = recordId;
                     record.schema = initSchema(result[0].data);
-                    var events = result[1].data;
-                    handleEvents(dummyRecordEvents);
-                    //handleEvents(events);
+                    var events = result[1];
+                    handleEvents(events);
                     deferred.resolve(record);
                 }).
                 catch(function (data, status, headers, config) {
@@ -92,19 +49,36 @@ angular.module('collectApp').
             return deferred.promise;
         }
 
-        function loadSchema() {
-            return $http.get('json/schema');
+        function listenToRecord(surveyId, recordId) {
+            var deferred = $q.defer();
+            var source = new EventSource('json/record?surveyId=' + surveyId + '&recordId=' + recordId);
+            source.addEventListener('recordEvent', function (msg) {
+                $rootScope.$apply(function() {
+                    var events = angular.fromJson(msg.data);
+                    if (record.schema)
+                        handleEvents(events);
+                    deferred.resolve(events);
+                }, false);
+
+                });
+            return deferred.promise;
         }
 
-
-        function loadRecord(recordId) {
-            return $http.get('json/record', {
-                params: {id: recordId}
+        function loadSchema(surveyId) {
+            return $http.get('json/schema', {
+                params: {
+                    surveyId: surveyId
+                }
             });
         }
 
         function updateAttribute(attribute) {
-            $http.post('json/update-attribute', attribute)
+            $http.post('json/update-attribute', {
+                surveyId: record.surveyId,
+                recordId: record.recordId,
+                attributeId: attribute.id,
+                value: attribute.value
+            })
         }
 
         return {

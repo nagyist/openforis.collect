@@ -1,18 +1,22 @@
-package org.openforis.collect.js;
+package org.openforis.collect.apiadapter;
 
-import org.junit.Test;
+import org.openforis.collect.api.query.SchemaProvider;
 import org.openforis.collect.api.schema.AttributeDef;
 import org.openforis.collect.api.schema.EntityDef;
 import org.openforis.collect.api.schema.EntityListDef;
 import org.openforis.collect.api.schema.ValueType;
-import org.openforis.collect.js.json.SchemaJsonSerializer;
 
 import static java.util.Arrays.asList;
 
-public class SchemaJsonSerializerTest {
-    @Test
-    public void test() {
-        EntityDef schema = new EntityDef("plot", "Plot", asList(
+public class DefaultSchemaProvider implements SchemaProvider {
+    private final EntityDef dummySchema = dummySchema();
+
+    public EntityDef schema(int surveyId) {
+        return dummySchema;
+    }
+
+    private EntityDef dummySchema() {
+        return new EntityDef("plot", "Plot", asList(
                 new AttributeDef("plot_number", "Plot Number", ValueType.Number),
                 new EntityListDef("trees", "Trees",
                         new EntityDef("tree", "Tree", asList(
@@ -20,9 +24,6 @@ public class SchemaJsonSerializerTest {
                         ))
                 ))
         );
-
-        String s = new SchemaJsonSerializer().serialize(schema);
-        System.out.println(s);
-        // TODO: Assert something
     }
+
 }

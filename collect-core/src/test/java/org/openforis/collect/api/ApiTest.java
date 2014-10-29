@@ -11,15 +11,14 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.openforis.collect.api.command.SynchronousCommandQueue;
+import org.openforis.collect.apiadapter.SynchronousCommandQueue;
 import org.openforis.collect.api.command.UpdateAttributeValueCommand;
 import org.openforis.collect.api.event.Event;
-import org.openforis.collect.api.event.EventHandler;
+import org.openforis.collect.api.event.EventListener;
+import org.openforis.collect.apiadapter.RecordProvider;
 import org.openforis.collect.model.RecordUpdater;
 import org.openforis.collect.model.User;
-import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.model.Attribute;
-import org.openforis.idm.model.Node;
 import org.openforis.idm.model.Record;
 import org.openforis.idm.model.TextValue;
 import org.openforis.idm.testfixture.TestFixture;
@@ -29,7 +28,7 @@ import org.openforis.idm.testfixture.TestFixture;
  * @author S. Ricci
  *
  */
-public class ApiTest implements EventHandler {
+public class ApiTest implements EventListener {
 	
 	private SynchronousCommandQueue queue;
 	private User user;
@@ -40,7 +39,8 @@ public class ApiTest implements EventHandler {
 	@Before
 	public void setup() {
 		recordProvider = new TestRecordProvider();
-		queue = new SynchronousCommandQueue(recordProvider, this);
+		queue = new SynchronousCommandQueue(recordProvider);
+		queue.addListener(this);
 		user = new org.openforis.collect.model.User("test");
 		record = recordProvider.provideRecord(1);
 	}
@@ -57,8 +57,7 @@ public class ApiTest implements EventHandler {
 		System.out.println(recievedEvents);
 	}
 
-	@Override
-	public void handle(List<Event> events) {
+	public void handle(List<? extends Event> events) {
 		recievedEvents.addAll(events);
 	}
 	

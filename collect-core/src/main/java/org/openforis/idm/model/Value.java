@@ -5,6 +5,6 @@ package org.openforis.idm.model;
  * @author M. Togna
  * @author S. Ricci
  */
-public interface Value {
+public interface Value extends org.openforis.collect.api.Value {
 
 }

@@ -3,6 +3,8 @@
  */
 package org.openforis.collect.api.command;
 
+import org.openforis.collect.api.event.EventListener;
+
 /**
  * @author D. Wiell
  * @author S. Ricci
@@ -11,5 +13,8 @@ package org.openforis.collect.api.command;
 public interface CommandQueue {
 
 	void submit(Command command);
-	
+
+	void addListener(EventListener eventListener);
+
+	void removeListener(EventListener eventListener);
 }

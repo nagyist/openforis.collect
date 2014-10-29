@@ -1,4 +1,4 @@
-package org.openforis.collect.js;
+package org.openforis.collect.js.json;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -9,9 +9,9 @@ import org.openforis.collect.api.schema.EntityListDef;
 import org.openforis.collect.api.schema.NodeDef;
 
 public class SchemaJsonSerializer {
-    String serialize(EntityDef schema) {
+    public String serialize(EntityDef schema) {
         JsonObject json = entity(schema, new JsonObject());
-        return new GsonBuilder().setPrettyPrinting().create().toJson(json);
+        return new GsonBuilder().create().toJson(json);
     }
 
     private JsonObject node(NodeDef node, JsonObject json) {

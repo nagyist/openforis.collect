@@ -7,8 +7,8 @@ import java.util.List;
  * @author S. Ricci
  *
  */
-public interface EventHandler {
+public interface EventListener {
 
-	void handle(List<Event> events);
+	void handle(List<? extends Event> events);
 	
 }
