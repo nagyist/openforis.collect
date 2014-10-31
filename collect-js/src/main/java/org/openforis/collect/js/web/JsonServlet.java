@@ -40,7 +40,7 @@ public class JsonServlet extends DispatchingServlet {
 
         get("/schema", new JsonQueryHandler() {
             protected String json(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-                EntityDef schema = schemaProvider.schema(intParam("surveyId", req));
+                EntityDef schema = schemaProvider.schema(intParam("surveyId", req), req.getLocale());
                 return new SchemaJsonSerializer().serialize(schema);
             }
         });

@@ -76,6 +76,8 @@ public class ApiTest implements EventListener {
 							attributeDef("attr")
 						), 
 						record());
+			fixture.survey.setId(1);
+			
 			RecordUpdater recordUpdater = new RecordUpdater();
 			
 			List<Record> records = fixture.records;

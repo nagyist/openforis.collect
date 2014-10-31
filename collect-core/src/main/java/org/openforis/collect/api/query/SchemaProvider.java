@@ -1,10 +1,11 @@
 package org.openforis.collect.api.query;
 
-import org.openforis.collect.api.event.Event;
+import java.util.Locale;
+
 import org.openforis.collect.api.schema.EntityDef;
 
-import java.util.List;
-
 public interface SchemaProvider {
-    public EntityDef schema(int surveyId);
+    
+	public EntityDef schema(int surveyId, Locale locale);
+	
 }

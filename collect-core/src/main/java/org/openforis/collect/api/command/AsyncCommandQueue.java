@@ -49,7 +49,7 @@ public class AsyncCommandQueue implements CommandQueue {
     }
 
     private Object queueKey(Command command) {
-        return command.surveyId + "|" + command.recordId;
+        return command.recordId;
     }
 
     public void stop() {

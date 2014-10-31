@@ -1,20 +1,21 @@
 package org.openforis.collect.js.web;
 
-import org.openforis.collect.api.command.CommandQueue;
-import org.openforis.collect.api.event.Event;
-import org.openforis.collect.api.event.EventListener;
-import org.openforis.collect.api.query.RecordEventsProvider;
-import org.openforis.collect.js.json.EventJsonSerializer;
-import org.openforis.collect.js.web.util.StreamingRequestHandler;
-
-import javax.servlet.AsyncContext;
-import javax.servlet.AsyncEvent;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.SocketException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import javax.servlet.AsyncContext;
+import javax.servlet.AsyncEvent;
+
+import org.openforis.collect.api.command.CommandQueue;
+import org.openforis.collect.api.event.Event;
+import org.openforis.collect.api.event.EventListener;
+import org.openforis.collect.api.query.RecordEventsProvider;
+import org.openforis.collect.js.json.EventJsonSerializer;
+import org.openforis.collect.js.web.util.StreamingRequestHandler;
 
 public class EventResponseWriter implements EventListener {
     private final int surveyId;
@@ -52,7 +53,7 @@ public class EventResponseWriter implements EventListener {
         try {
             ctx.addListener(asyncListener(commandQueue));
             commandQueue.addListener(this);
-            List<? extends Event> initialEvents = recordEventsProvider.eventsForRecord(surveyId, recordId);
+            List<? extends Event> initialEvents = recordEventsProvider.eventsForRecord(recordId);
             writeEvents(initialEvents);
             Event lastEvent = initialEvents.get(initialEvents.size() - 1);
             initialVersion = lastEvent.version;

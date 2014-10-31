@@ -29,7 +29,6 @@
             <version>2.2.4</version>
         </dependency>
 
-
         <!-- Provided -->
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -42,31 +41,32 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
+        
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.fao.foris.build</groupId>
-                <artifactId>asset-processor-maven-plugin</artifactId>
-                <version>1.0.4</version>
-                <executions>
-                    <execution>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+<!--     <build> -->
+<!--         <plugins> -->
+<!--             <plugin> -->
+<!--                 <groupId>org.fao.foris.build</groupId> -->
+<!--                 <artifactId>asset-processor-maven-plugin</artifactId> -->
+<!--                 <version>1.0.4</version> -->
+<!--                 <executions> -->
+<!--                     <execution> -->
+<!--                         <phase>prepare-package</phase> -->
+<!--                         <goals> -->
+<!--                             <goal>process</goal> -->
+<!--                         </goals> -->
+<!--                     </execution> -->
+<!--                 </executions> -->
+<!--             </plugin> -->
 
-            <plugin>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.3</version>
-                <configuration>
-                    <warSourceExcludes>**</warSourceExcludes>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+<!--             <plugin> -->
+<!--                 <artifactId>maven-war-plugin</artifactId> -->
+<!--                 <version>2.3</version> -->
+<!--                 <configuration> -->
+<!--                     <warSourceExcludes>**</warSourceExcludes> -->
+<!--                 </configuration> -->
+<!--             </plugin> -->
+<!--         </plugins> -->
+<!--     </build> -->
 </project>

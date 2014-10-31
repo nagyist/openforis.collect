@@ -17,7 +17,7 @@ public class UpdateAttributeValueCommand extends Command {
 	public final int attributeId;
 
 	public UpdateAttributeValueCommand(int surveyId, int recordId, User user, int attributeId, Value value) {
-		super(surveyId, recordId, user);
+		super(recordId, user);
 		this.attributeId = attributeId;
 		this.value = value;
 	}
