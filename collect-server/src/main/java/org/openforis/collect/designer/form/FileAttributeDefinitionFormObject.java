@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.FileAttributeDefinition;
 
 /**
@@ -25,10 +24,6 @@ public class FileAttributeDefinitionFormObject<T extends FileAttributeDefinition
 	*/
 	private Integer maxSize;
 	private String extensions;
-	
-	FileAttributeDefinitionFormObject(EntityDefinition parentDefn) {
-		super(parentDefn);
-	}
 	
 	@Override
 	public void saveTo(T dest, String languageCode) {

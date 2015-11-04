@@ -8,7 +8,6 @@ import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.CoordinateAttributeFieldsOrder;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CoordinateAttributeDefinition;
-import org.openforis.idm.metamodel.EntityDefinition;
 
 /**
  * @author S. Ricci
@@ -21,10 +20,6 @@ public class CoordinateAttributeDefinitionFormObject<T extends CoordinateAttribu
 	private String yFieldLabel;
 	private String srsFieldLabel;
 	
-	CoordinateAttributeDefinitionFormObject(EntityDefinition parentDefn) {
-		super(parentDefn);
-	}
-
 	@Override
 	public void saveTo(T dest, String languageCode) {
 		super.saveTo(dest, languageCode);

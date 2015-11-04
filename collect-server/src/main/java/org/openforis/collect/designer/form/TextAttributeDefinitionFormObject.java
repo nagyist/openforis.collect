@@ -5,7 +5,6 @@ package org.openforis.collect.designer.form;
 
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UIOptions;
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition;
 import org.openforis.idm.metamodel.TextAttributeDefinition.Type;
 
@@ -19,8 +18,7 @@ public class TextAttributeDefinitionFormObject<T extends TextAttributeDefinition
 	private String autocompleteGroup;
 	private boolean autoUppercase;
 	
-	TextAttributeDefinitionFormObject(EntityDefinition parentDefn) {
-		super(parentDefn);
+	TextAttributeDefinitionFormObject() {
 		Type.SHORT.name();
 	}
 	

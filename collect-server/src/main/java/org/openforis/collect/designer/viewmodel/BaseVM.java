@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.ServiceLoader;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.openforis.collect.concurrency.CollectJobManager;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.PopUpUtil;
@@ -19,7 +20,8 @@ import org.openforis.collect.model.User;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.zkoss.bind.BindUtils;
-import org.zkoss.bind.Form;
+import org.zkoss.bind.proxy.FormProxyObject;
+import org.zkoss.bind.proxy.MapProxy;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
@@ -109,15 +111,28 @@ public abstract class BaseVM {
 		return webApp.getInitParameter(name);
 	}
 	
-	protected void setValueOnFormField(Form form, String field,
+	@SuppressWarnings("unchecked")
+	protected void setValueOnFormField(FormProxyObject form, String field,
 			Object value) {
-		form.setField(field, value);
+		try {
+			if (form instanceof MapProxy) {
+				((MapProxy<Object, Object>) form).put(field, value);
+			} else {
+				FieldUtils.writeField(form, field, value);
+			}
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
 		BindUtils.postNotifyChange(null, null, form, field);
 	}
 	
 	@SuppressWarnings("unchecked")
-	protected <T> T getFormFieldValue(Form form, String field) {
-		return (T) form.getField(field);	
+	protected <T> T getFormFieldValue(FormProxyObject form, String field) {
+		try {
+			return (T) FieldUtils.readField(form, field);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	protected String adjustInternalName(String name) {

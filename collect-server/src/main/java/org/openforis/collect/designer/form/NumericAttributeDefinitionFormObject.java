@@ -3,7 +3,6 @@
  */
 package org.openforis.collect.designer.form;
 
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition;
 import org.openforis.idm.metamodel.NumericAttributeDefinition.Type;
 
@@ -15,8 +14,8 @@ public class NumericAttributeDefinitionFormObject<T extends NumericAttributeDefi
 	
 	private String type;
 	
-	NumericAttributeDefinitionFormObject(EntityDefinition parentDefn) {
-		super(parentDefn);
+	NumericAttributeDefinitionFormObject() {
+		super();
 		type = NumericAttributeDefinition.Type.INTEGER.name();
 	}
 	

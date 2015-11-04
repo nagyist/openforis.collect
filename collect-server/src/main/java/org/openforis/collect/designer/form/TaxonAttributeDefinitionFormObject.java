@@ -6,7 +6,6 @@ package org.openforis.collect.designer.form;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.TaxonAttributeDefinition;
 import org.openforis.idm.model.species.Taxon.TaxonRank;
 
@@ -20,10 +19,6 @@ public class TaxonAttributeDefinitionFormObject extends AttributeDefinitionFormO
 	private String highestRank;
 	private List<String> qualifiers;
 	
-	TaxonAttributeDefinitionFormObject(EntityDefinition parentDefn) {
-		super(parentDefn);
-	}
-
 	@Override
 	public void loadFrom(TaxonAttributeDefinition source, String languageCode) {
 		super.loadFrom(source, languageCode);

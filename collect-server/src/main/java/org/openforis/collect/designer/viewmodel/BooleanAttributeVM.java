@@ -10,12 +10,12 @@ import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
-import org.zkoss.bind.Form;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
+import org.zkoss.bind.proxy.FormProxyObject;
 
 /**
  * @author S. Ricci
@@ -52,7 +52,7 @@ public class BooleanAttributeVM extends AttributeVM<BooleanAttributeDefinition> 
 	}
 	
 	protected Type getCurrentType() {
-		Form tempFormObject = getTempFormObject();
+		FormProxyObject tempFormObject = getTempFormObject();
 		String typeValue = getFormFieldValue(tempFormObject, BooleanAttributeDefinitionFormObject.TYPE_FIELD);
 		Type type = null;
 		if ( typeValue != null ) {

@@ -24,14 +24,14 @@ import org.openforis.idm.metamodel.NodeDefinition;
 import org.openforis.idm.metamodel.NodeLabel.Type;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
-import org.zkoss.bind.Form;
-import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.GlobalCommand;
+import org.zkoss.bind.proxy.FormProxyObject;
+import org.zkoss.bind.proxy.MapProxy;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.IdSpace;
 import org.zkoss.zk.ui.Path;
@@ -45,7 +45,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 
 	protected static final String FORM_CONTAINER_ID = "nodeFormContainer";
 
-	protected Form tempFormObject;
+	protected FormProxyObject tempFormObject;
 	protected EntityDefinition parentEntity;
 
 	public NodeDefinitionVM() {
@@ -55,7 +55,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	
 	protected void initInternal(EntityDefinition parentEntity, T nodeDefn, Boolean newItem) {
 		super.init();
-		tempFormObject = new SimpleForm();
+		tempFormObject = new MapProxy<Object, Object>(new HashMap<Object, Object>(), null);
 		if ( nodeDefn != null ) {
 			this.parentEntity = parentEntity;
 			this.newItem = newItem;
@@ -185,7 +185,7 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	}
 	
 	// GETTERS AND SETTERS
-	public Form getTempFormObject() {
+	public FormProxyObject getTempFormObject() {
 		return tempFormObject;
 	}
 	

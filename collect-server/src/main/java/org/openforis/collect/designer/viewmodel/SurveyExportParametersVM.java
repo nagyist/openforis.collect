@@ -10,11 +10,12 @@ import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.relational.print.RDBPrintJob.RdbDialect;
 import org.zkoss.bind.BindUtils;
-import org.zkoss.bind.SimpleForm;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.DependsOn;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.Init;
+import org.zkoss.bind.proxy.FormProxyObject;
+import org.zkoss.bind.proxy.MapProxy;
 
 /**
  * 
@@ -27,10 +28,10 @@ public class SurveyExportParametersVM extends BaseVM {
 	
 	private SurveySummary survey;
 	private SurveyExportParametersFormObject formObject;
-	private SimpleForm tempForm;
+	private FormProxyObject tempForm;
 	
 	public SurveyExportParametersVM() {
-		this.tempForm = new SimpleForm();
+		this.tempForm = new MapProxy<Object, Object>(null, null);
 	}
 
 	@Init
@@ -92,11 +93,11 @@ public class SurveyExportParametersVM extends BaseVM {
 		return survey;
 	}
 	
-	public SimpleForm getTempForm() {
+	public FormProxyObject getTempForm() {
 		return tempForm;
 	}
 	
-	public void setTempForm(SimpleForm tempForm) {
+	public void setTempForm(FormProxyObject tempForm) {
 		this.tempForm = tempForm;
 	}
 	

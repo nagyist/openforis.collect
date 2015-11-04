@@ -9,7 +9,6 @@ import org.openforis.collect.metamodel.ui.UIOptions.CodeAttributeLayoutType;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
 import org.openforis.idm.metamodel.CodeList;
-import org.openforis.idm.metamodel.EntityDefinition;
 
 /**
  * @author S. Ricci
@@ -27,8 +26,8 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	private boolean showCode;
 	private String hierarchicalLevel;
 	
-	CodeAttributeDefinitionFormObject(EntityDefinition parentDefn) {
-		super(parentDefn);
+	CodeAttributeDefinitionFormObject() {
+		super();
 		strict = true;
 		allowValuesSorting = false;
 		showAllowedValuesPreview = (Boolean) Annotation.SHOW_ALLOWED_VALUES_PREVIEW.getDefaultValue();

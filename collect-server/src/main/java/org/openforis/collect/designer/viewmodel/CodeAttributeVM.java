@@ -24,7 +24,6 @@ import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.SurveyObject;
 import org.zkoss.bind.BindUtils;
 import org.zkoss.bind.Binder;
-import org.zkoss.bind.Form;
 import org.zkoss.bind.annotation.BindingParam;
 import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
@@ -32,6 +31,7 @@ import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
+import org.zkoss.bind.proxy.FormProxyObject;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.EventListener;
@@ -96,7 +96,7 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 			}
 			@Override
 			public void onCancel() {
-				Form form = getForm(binder);
+				FormProxyObject form = getForm(binder);
 				CodeList oldList = editedItem.getList();
 				setValueOnFormField(form, "list", oldList);
 			}
@@ -117,7 +117,7 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 		CodeList oldList = fo.getList();
 		fo.setParentCodeAttributeDefinition(null);
 		fo.setList(list);
-		Form form = getForm(binder);
+		FormProxyObject form = getForm(binder);
 		setValueOnFormField(form, "list", list);
 		setValueOnFormField(form, "list.hierarchical", list != null && list.isHierarchical());
 		setValueOnFormField(form, "parentCodeAttributeDefinition.path", null);
@@ -152,9 +152,9 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 		}
 	}
 
-	protected Form getForm(Binder binder) {
+	protected FormProxyObject getForm(Binder binder) {
 		Component view = binder.getView();
-		return (Form) view.getAttribute(FORM_ID);
+		return (FormProxyObject) view.getAttribute(FORM_ID);
 	}
 
 	@Command

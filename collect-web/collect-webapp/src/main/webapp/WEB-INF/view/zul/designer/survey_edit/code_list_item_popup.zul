@@ -83,7 +83,7 @@
 									visible="@load(empty vm.image)">
 									<label value="${labels.survey.code_list.no_image_uploaded}" />
 								</vlayout>
-								<image content="@bind(vm.image)" 
+								<image content="@load(vm.image)" 
 									width="150px" 
 									visible="@load(not empty vm.image)" />
 								<vlayout spacing="20px">

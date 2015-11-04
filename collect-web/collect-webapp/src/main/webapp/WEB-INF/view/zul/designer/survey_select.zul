@@ -33,7 +33,7 @@
 				sort="auto(name)" />
 			<listheader label="${labels.survey.project_name}"
 				sort="auto(projectName)" />
-			<listheader label="${labels.survey.last_change}" width="100px"
+			<listheader label="${labels.survey.last_change}" width="120px"
 				sort="auto(modifiedDate)" />
 			<listheader label="${labels.survey.target.$}" width="50px"
 				sort="auto(target)" />
@@ -78,6 +78,7 @@
 						<image src="/assets/images/tick-small.png" />
 					</box>
 				</listcell>
+				<!--
 				<listcell>
 					<hlayout hflex="1"
 						visible="@load(each.recordValidationInProgress)">
@@ -85,9 +86,10 @@
 							value="@load(each.recordValidationProgressPercent)" />
 						%
 						<progressmeter
-							value="@load(each.recordValidationProgressPercent)" hflex="1" />
+							value="@load(each.recordValidationProgressPercent)" hflex="min" />
 					</hlayout>
 				</listcell>
+				-->
 			</listitem>
 		</template>
 	</listbox>
@@ -100,7 +102,7 @@
 		<button label="${labels.survey.import_survey.$}"
 			image="/assets/images/upload-small.png"
 			onClick="@command('openSurveyImportPopUp')" />
-		
+
 		<hlayout hflex="true">
 			<hlayout visible="@load(vm.surveySelected)" hflex="true" spacing="80px">
 				<button label="${labels.survey.export.$}"
@@ -112,8 +114,8 @@
 					image="/assets/images/edit-small.png"
 					onClick="@command('editSelectedSurvey')"
 					disabled="@load(vm.editingDisabled)" />
-		
-				<!-- Advanced options -->
+
+				<!-- ADVANCED FUNCTIONS -->
 				<combobutton label="${labels.survey.advanced_functions}" 
 							image="/assets/images/settings-small.png">
 					<menupopup>
@@ -122,11 +124,12 @@
 							
 						<menuitem label="${labels.survey.publish_latest_changes}"
 							onClick="@command('publishSelectedSurvey')"
-							visible="@load(not vm.publishDisabled and vm.selectedSurvey.temporary and not vm.selectedSurvey.notLinkedToPublishedSurvey)" />
+							visible="@load(not vm.publishDisabled and not empty vm.selectedSurvey and 
+								vm.selectedSurvey.temporary and not vm.selectedSurvey.notLinkedToPublishedSurvey)" />
 							
 						<menuitem label="${labels.survey.publish.$}"
 							onClick="@command('publishSelectedSurvey')"
-							visible="@load(not vm.publishDisabled and vm.selectedSurvey.notLinkedToPublishedSurvey)" />
+							visible="@load(not vm.publishDisabled and not empty vm.selectedSurvey and vm.selectedSurvey.notLinkedToPublishedSurvey)" />
 				
 						<menuseparator visible="@load(not vm.publishDisabled)" />
 						
@@ -137,12 +140,17 @@
 						<menuseparator visible="@load(not vm.unpublishDisabled)" />
 						
 						<menuitem
-							visible="@load(vm.selectedSurvey.published and not vm.selectedSurvey.recordValidationInProgress)"
+							visible="@load(not empty vm.selectedSurvey and vm.selectedSurvey.published and not vm.selectedSurvey.recordValidationInProgress)"
 							label="${labels.survey.validateAllRecords}"
 							onClick="@command('validateAllRecords')" />
-				
+
 						<menuitem
-							visible="@load(vm.selectedSurvey.recordValidationInProgress)"
+							visible="@load(not empty vm.selectedSurvey and vm.selectedSurvey.recordValidationInProgress)"
+							label="${labels.survey.cancelRecordValidation}"
+							onClick="@command('cancelRecordValidation')" />
+							
+						<menuitem
+							visible="@load(not empty vm.selectedSurvey and vm.selectedSurvey.recordValidationInProgress)"
 							label="${labels.survey.cancelRecordValidation}"
 							onClick="@command('cancelRecordValidation')" />
 							
@@ -151,12 +159,12 @@
 						<menuitem label="${labels.survey.delete.$}"
 							image="/assets/images/delete-small.png"
 							onClick="@command('deleteSelectedSurvey')" />
+							
 					</menupopup>
 				</combobutton>
 				
 			</hlayout>
 		</hlayout>
-
 	</hlayout>
 	
 	<space height="10px" />

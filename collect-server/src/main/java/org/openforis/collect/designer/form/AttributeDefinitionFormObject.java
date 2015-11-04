@@ -9,11 +9,10 @@ import java.util.List;
 import org.openforis.collect.metamodel.CollectAnnotations;
 import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UIOptions;
-import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.CollectRecord.Step;
+import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefault;
 import org.openforis.idm.metamodel.AttributeDefinition;
-import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.validation.Check;
 
 /**
@@ -33,10 +32,6 @@ public class AttributeDefinitionFormObject<T extends AttributeDefinition> extend
 	private List<Check<?>> checks;
 	private String[] visibleFields;
 	
-	AttributeDefinitionFormObject(EntityDefinition parentDefn) {
-		super(parentDefn);
-	}
-
 	@Override
 	public void saveTo(T dest, String languageCode) {
 		super.saveTo(dest, languageCode);

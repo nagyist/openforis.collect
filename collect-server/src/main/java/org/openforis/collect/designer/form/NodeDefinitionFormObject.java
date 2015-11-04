@@ -31,9 +31,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		ALWAYS_RELEVANT, RELEVANT_WHEN
 	}
 	
-	@SuppressWarnings("unused")
-	private EntityDefinition parentDefinition;
-	
 	//generic
 	private String name;
 	protected boolean key; //only for AttributeDefinition
@@ -68,9 +65,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 	private Integer labelWidth;
 	private String labelOrientation;
 
-
-	NodeDefinitionFormObject(EntityDefinition parentDefn) {
-		this.parentDefinition = parentDefn;
+	NodeDefinitionFormObject() {
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -80,7 +75,7 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		} else {
 			switch ( nodeType) {
 			case ENTITY:
-				return new EntityDefinitionFormObject(parentDefn);
+				return new EntityDefinitionFormObject();
 			case ATTRIBUTE:
 				return (NodeDefinitionFormObject<NodeDefinition>) newInstance(parentDefn, attributeType);
 			default:
@@ -94,25 +89,25 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		if ( attributeType != null ) {
 			switch (attributeType) {
 			case BOOLEAN:
-				return new BooleanAttributeDefinitionFormObject(parentDefn);
+				return new BooleanAttributeDefinitionFormObject();
 			case CODE:
-				return new CodeAttributeDefinitionFormObject(parentDefn);
+				return new CodeAttributeDefinitionFormObject();
 			case COORDINATE:
-				return new CoordinateAttributeDefinitionFormObject(parentDefn);
+				return new CoordinateAttributeDefinitionFormObject();
 			case DATE:
-				return new DateAttributeDefinitionFormObject(parentDefn);
+				return new DateAttributeDefinitionFormObject();
 			case FILE:
-				return new FileAttributeDefinitionFormObject(parentDefn);
+				return new FileAttributeDefinitionFormObject();
 			case NUMBER:
-				return new NumberAttributeDefinitionFormObject(parentDefn);
+				return new NumberAttributeDefinitionFormObject();
 			case RANGE:
-				return new RangeAttributeDefinitionFormObject(parentDefn);
+				return new RangeAttributeDefinitionFormObject();
 			case TAXON:
-				return new TaxonAttributeDefinitionFormObject(parentDefn);
+				return new TaxonAttributeDefinitionFormObject();
 			case TEXT:
-				return new TextAttributeDefinitionFormObject(parentDefn);
+				return new TextAttributeDefinitionFormObject();
 			case TIME:
-				return new TimeAttributeDefinitionFormObject(parentDefn);
+				return new TimeAttributeDefinitionFormObject();
 			default:
 				throw new IllegalStateException("Attribute type not supported");
 			}
@@ -271,10 +266,6 @@ public abstract class NodeDefinitionFormObject<T extends NodeDefinition> extends
 		return uiOptions;
 	}
 	
-	public void setParentDefinition(EntityDefinition parentDefinition) {
-		this.parentDefinition = parentDefinition;
-	}
-
 	public String getName() {
 		return name;
 	}

@@ -21,10 +21,6 @@ public class EntityDefinitionFormObject<T extends EntityDefinition> extends Node
 	//layout
 	private String layoutType;
 
-	EntityDefinitionFormObject(EntityDefinition parentDefn) {
-		super(parentDefn);
-	}
-
 	@Override
 	public void saveTo(T dest, String languageCode) {
 		super.saveTo(dest, languageCode);
