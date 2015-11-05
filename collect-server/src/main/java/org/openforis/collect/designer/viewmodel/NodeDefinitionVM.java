@@ -55,12 +55,16 @@ public abstract class NodeDefinitionVM<T extends NodeDefinition> extends SurveyO
 	
 	protected void initInternal(EntityDefinition parentEntity, T nodeDefn, Boolean newItem) {
 		super.init();
-		tempFormObject = new MapProxy<Object, Object>(new HashMap<Object, Object>(), null);
+		tempFormObject = createTemporaryFormObject();
 		if ( nodeDefn != null ) {
 			this.parentEntity = parentEntity;
 			this.newItem = newItem;
 			setEditedItem(nodeDefn);
 		}
+	}
+
+	protected FormProxyObject createTemporaryFormObject() {
+		return new MapProxy<Object, Object>(new HashMap<Object, Object>(), null);
 	}
 
 	@Override

@@ -32,6 +32,7 @@ import org.zkoss.bind.annotation.ExecutionArgParam;
 import org.zkoss.bind.annotation.GlobalCommand;
 import org.zkoss.bind.annotation.Init;
 import org.zkoss.bind.proxy.FormProxyObject;
+import org.zkoss.bind.proxy.MapProxy;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.EventListener;
@@ -48,18 +49,36 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 	private static final String CODE_LIST_ASSIGNED_COMMAND = "codeListAssigned";
 	private static final String FORM_ID = "fx";
 
+	private CodeList selectedList;
+	
 	@Init(superclass=false)
 	public void init(@ExecutionArgParam("parentEntity") EntityDefinition parentEntity, 
 			@ExecutionArgParam("item") CodeAttributeDefinition attributeDefn, 
 			@ExecutionArgParam("newItem") Boolean newItem) {
 		super.initInternal(parentEntity, attributeDefn, newItem);
 	}
+	
+	@Override
+	public void setEditedItem(CodeAttributeDefinition editedItem) {
+		super.setEditedItem(editedItem);
+		this.selectedList = editedItem.getList();
+		setValueOnFormField(tempFormObject, "codeListId", selectedList == null ? null : selectedList.getId());
+		notifyChange("selectedList");
+	}
 
+	@Override
+	protected FormProxyObject createTemporaryFormObject() {
+		@SuppressWarnings("serial")
+		FormProxyObject formObject = new MapProxy<String, Object>(new HashMap<String, Object>(){{
+			put("codeListId", -1);
+		}}, null);
+		return formObject;
+	}
+	
 	@Command
 	public void onListChanged(@ContextParam(ContextType.BINDER) final Binder binder,
-			@BindingParam("list") final CodeList list) {
-		CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
-		CodeList oldList = fo.getList();
+			@BindingParam("list") CodeList list) {
+		CodeList oldList = selectedList;
 		boolean listChanged = oldList != null && ! oldList.equals(list);
 		if (oldList == null) {
 			performListChange(binder, list);
@@ -83,7 +102,7 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 		confirmParams.setCancelLabelKey("global.leave_original_value");
 		
 		CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
-		CodeList oldList = fo.getList();
+		CodeList oldList = fo.getCodeListId() == null ? null : survey.getCodeListById(fo.getCodeListId());
 		confirmParams.setMessageArgs(new String[] {oldList.getName(), list.getName()});
 		MessageUtil.showConfirm(confirmParams);
 	}
@@ -114,14 +133,16 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 	private void performListChange(final Binder binder,
 			final CodeList list) {
 		CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
-		CodeList oldList = fo.getList();
-		fo.setParentCodeAttributeDefinition(null);
-		fo.setList(list);
+		CodeList oldList = selectedList;
+		fo.setParentCodeAttributeDefinitionId(null);
+		fo.setCodeListId(list == null ? null : list.getId());
 		FormProxyObject form = getForm(binder);
-		setValueOnFormField(form, "list", list);
+		setValueOnFormField(form, "codeListId", fo.getCodeListId());
 		setValueOnFormField(form, "list.hierarchical", list != null && list.isHierarchical());
 		setValueOnFormField(form, "parentCodeAttributeDefinition.path", null);
 		setValueOnFormField(form, "hierarchicalLevel", null);
+		selectedList = list;
+		notifyChange("selectedList");
 		dispatchApplyChangesCommand(binder);
 		notifyChange("dependentCodePaths");
 		
@@ -141,8 +162,7 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 			@BindingParam(CodeListsVM.EDITING_ATTRIBUTE_PARAM) Boolean editingAttribute, 
 			@BindingParam(CodeListsVM.SELECTED_CODE_LIST_PARAM) CodeList selectedCodeList) {
 		if ( editingAttribute ) {
-			CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) getFormObject();
-			CodeList oldList = fo.getList();
+			CodeList oldList = selectedList;
 			if (oldList != null && ! oldList.equals(selectedCodeList)) {
 				confirmCodeListChange(binder, selectedCodeList);
 			} else if ( selectedCodeList != null ) {
@@ -165,7 +185,9 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 		if ( assignableParentAttributes.isEmpty() ) {
 			MessageUtil.showWarning("survey.schema.attribute.code.no_assignable_parent_available");
 		} else {
-			CodeAttributeDefinition parentCodeAttributeDefinition = ((CodeAttributeDefinitionFormObject) formObject).getParentCodeAttributeDefinition();
+			Integer parentCodeDefId = ((CodeAttributeDefinitionFormObject) formObject).getParentCodeAttributeDefinitionId();
+			CodeAttributeDefinition parentCodeAttributeDefinition = parentCodeDefId == null ? null : 
+				(CodeAttributeDefinition) survey.getSchema().getDefinitionById(parentCodeDefId);
 			Predicate<SurveyObject> includedNodePredicate = new Predicate<SurveyObject>() {
 				@Override
 				public boolean evaluate(SurveyObject item) {
@@ -187,7 +209,7 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 				public void onEvent(NodeSelectedEvent event) throws Exception {
 					CodeAttributeDefinition parentAttrDefn = (CodeAttributeDefinition) event.getSelectedItem();
 					CodeAttributeDefinitionFormObject fo = (CodeAttributeDefinitionFormObject) formObject;
-					fo.setParentCodeAttributeDefinition(parentAttrDefn);
+					fo.setParentCodeAttributeDefinitionId(parentAttrDefn == null ? null : parentAttrDefn.getId());
 					String hierarchicalLevel = getHierarchicalLevelName(parentAttrDefn);
 					fo.setHierarchicalLevel(hierarchicalLevel);
 					notifyChange("formObject");
@@ -239,5 +261,9 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 			return sb.toString();
 		}
 	}
-
+	
+	public CodeList getSelectedList() {
+		return selectedList;
+	}
+	
 }

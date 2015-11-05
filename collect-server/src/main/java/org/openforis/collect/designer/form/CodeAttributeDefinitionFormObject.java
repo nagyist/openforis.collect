@@ -16,8 +16,8 @@ import org.openforis.idm.metamodel.CodeList;
  */
 public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormObject<CodeAttributeDefinition> {
 	
-	private CodeList list;
-	private CodeAttributeDefinition parentCodeAttributeDefinition;
+	private Integer codeListId;
+	private Integer parentCodeAttributeDefinitionId;
 	private boolean strict;
 	private boolean allowValuesSorting;
 	private String layoutType;
@@ -39,9 +39,12 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	@Override
 	public void saveTo(CodeAttributeDefinition dest, String languageCode) {
 		super.saveTo(dest, languageCode);
-		dest.setList(list);
+		CodeList codeList = codeListId == null ? null : dest.getSurvey().getCodeListById(codeListId);
+		dest.setList(codeList);
 		dest.setAllowUnlisted(! strict);
-		dest.setParentCodeAttributeDefinition(parentCodeAttributeDefinition);
+		CodeAttributeDefinition parentCodeAttributeDef = parentCodeAttributeDefinitionId == null ? null : 
+			(CodeAttributeDefinition) dest.getSurvey().getSchema().getDefinitionById(parentCodeAttributeDefinitionId);
+		dest.setParentCodeAttributeDefinition(parentCodeAttributeDef);
 		dest.setAllowValuesSorting(dest.isMultiple() && allowValuesSorting);
 		
 		CollectSurvey survey = (CollectSurvey) dest.getSurvey();
@@ -56,9 +59,9 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	@Override
 	public void loadFrom(CodeAttributeDefinition source, String languageCode) {
 		super.loadFrom(source, languageCode);
-		list = source.getList();
-		parentCodeAttributeDefinition = source.getParentCodeAttributeDefinition();
-		hierarchicalLevel = list == null ? null : source.getHierarchicalLevel();
+		codeListId = source.getList() == null ? null : source.getList().getId();
+		parentCodeAttributeDefinitionId = source.getParentCodeAttributeDefinition() == null ? null :source.getParentCodeAttributeDefinition().getId();
+		hierarchicalLevel = codeListId == null ? null : source.getHierarchicalLevel();
 		strict = ! source.isAllowUnlisted();
 		allowValuesSorting = source.isMultiple() && source.isAllowValuesSorting();
 		
@@ -71,12 +74,12 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		showCode = uiOptions.getShowCode(source);
 	}
 	
-	public CodeList getList() {
-		return list;
+	public Integer getCodeListId() {
+		return codeListId;
 	}
-
-	public void setList(CodeList list) {
-		this.list = list;
+	
+	public void setCodeListId(Integer codeListId) {
+		this.codeListId = codeListId;
 	}
 
 	public boolean isStrict() {
@@ -95,12 +98,12 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		this.allowValuesSorting = allowValuesSorting;
 	}
 	
-	public CodeAttributeDefinition getParentCodeAttributeDefinition() {
-		return parentCodeAttributeDefinition;
+	public Integer getParentCodeAttributeDefinitionId() {
+		return parentCodeAttributeDefinitionId;
 	}
 	
-	public void setParentCodeAttributeDefinition(CodeAttributeDefinition parentCodeAttributeDefinition) {
-		this.parentCodeAttributeDefinition = parentCodeAttributeDefinition;
+	public void setParentCodeAttributeDefinitionId(Integer parentCodeAttributeDefinitionId) {
+		this.parentCodeAttributeDefinitionId = parentCodeAttributeDefinitionId;
 	}
 	
 	public String getHierarchicalLevel() {

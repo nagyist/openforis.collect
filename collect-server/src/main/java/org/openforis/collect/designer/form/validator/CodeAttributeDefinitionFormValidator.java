@@ -9,12 +9,12 @@ import org.zkoss.bind.ValidationContext;
  */
 public class CodeAttributeDefinitionFormValidator extends AttributeDefinitionFormValidator {
 	
-	protected static final String LIST_FIELD = "list";
+	protected static final String LIST_ID_FIELD = "codeListId";
 	
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
 		super.internalValidate(ctx);
-		validateRequired(ctx, LIST_FIELD);
+		validateRequired(ctx, LIST_ID_FIELD);
 	}
 
 }
