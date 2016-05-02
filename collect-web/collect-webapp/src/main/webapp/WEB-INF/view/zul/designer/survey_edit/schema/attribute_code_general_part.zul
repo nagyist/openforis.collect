@@ -25,7 +25,7 @@
     					tooltiptext="${labels.survey.code_list.manager.title}"
     					onClick="@global-command('openCodeListsManagerPopUp', 
 		              		editingAttribute=true, 
-		              		selectedCodeList=vm.selectedList)"
+		              		selectedCodeList=fx.list)"
     					image="/assets/images/edit-small.png" />
     			</hlayout>
     		</cell>
@@ -43,7 +43,7 @@
     		<cell>
     			<hlayout>
     				<textbox width="150px"
-    					value="@load(fx.parentCodeAttributeDefinition.path)"
+    					value="@load(empty fx.parentCodeAttributeDefinition ? '' : fx.parentCodeAttributeDefinition.path)"
     					readonly="true" />
     				<button sclass="icon"
     					tooltiptext="${labels.survey.schema.attribute.code.select_parent}"

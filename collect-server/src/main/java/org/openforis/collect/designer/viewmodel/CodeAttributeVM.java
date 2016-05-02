@@ -70,10 +70,14 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 	}
 
 	private void confirmCodeListChange(final Binder binder, final CodeList list) {
-		ConfirmParams confirmParams = new ConfirmParams(new MessageUtil.ConfirmHandler() {
-			@Override
+		ConfirmParams confirmParams = new ConfirmParams(new MessageUtil.CompleteConfirmHandler() {
 			public void onOk() {
 				performListChange(binder, list);
+			}
+			public void onCancel() {
+				CodeList oldList = editedItem.getList();
+				setFormFieldValue(binder, "list", oldList);
+				setTempFormObjectFieldValue("list", oldList);
 			}
 		}, "survey.schema.attribute.code.confirm_change_list.message");
 		confirmParams.setOkLabelKey("global.change");
@@ -89,11 +93,9 @@ public class CodeAttributeVM extends AttributeVM<CodeAttributeDefinition> {
 
 	private void confirmParentCodeListChange(final Binder binder, final CodeList list) {
 		ConfirmParams confirmParams = new ConfirmParams(new MessageUtil.CompleteConfirmHandler() {
-			@Override
 			public void onOk() {
 				performListChange(binder, list);
 			}
-			@Override
 			public void onCancel() {
 				CodeList oldList = editedItem.getList();
 				setFormFieldValue(binder, "list", oldList);

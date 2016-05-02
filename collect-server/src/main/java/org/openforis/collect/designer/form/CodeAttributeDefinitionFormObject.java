@@ -7,10 +7,11 @@ import org.openforis.collect.metamodel.CollectAnnotations.Annotation;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UIOptions.CodeAttributeLayoutType;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.commons.lang.Objects;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
-import org.openforis.idm.metamodel.CodeList;
 import org.openforis.idm.metamodel.EntityDefinition;
-import org.zkoss.bind.annotation.Immutable;
+import org.openforis.idm.metamodel.NodeDefinition;
+import org.openforis.idm.metamodel.Survey;
 
 /**
  * @author S. Ricci
@@ -18,8 +19,8 @@ import org.zkoss.bind.annotation.Immutable;
  */
 public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormObject<CodeAttributeDefinition> {
 	
-	private CodeList list;
-	private CodeAttributeDefinition parentCodeAttributeDefinition;
+	private Integer listId;
+	private Integer parentCodeAttributeDefinitionId;
 	private boolean strict;
 	private boolean allowValuesSorting;
 	private String layoutType;
@@ -44,9 +45,9 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 	@Override
 	public void saveTo(CodeAttributeDefinition dest, String languageCode) {
 		super.saveTo(dest, languageCode);
-		dest.setList(list);
+		dest.setList(listId == null ? null : dest.getSurvey().getCodeListById(listId));
 		dest.setAllowUnlisted(! strict);
-		dest.setParentCodeAttributeDefinition(parentCodeAttributeDefinition);
+		dest.setParentCodeAttributeDefinition((CodeAttributeDefinition) getDefinition(dest.getSurvey(), parentCodeAttributeDefinitionId));
 		dest.setAllowValuesSorting(dest.isMultiple() && allowValuesSorting);
 		
 		CollectSurvey survey = (CollectSurvey) dest.getSurvey();
@@ -57,12 +58,16 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		uiOptions.setLayoutDirection(dest, layoutDirection);
 		uiOptions.setShowCode(dest, showCode);
 	}
+
+	private NodeDefinition getDefinition(Survey survey, Integer defId) {
+		return defId == null ? null : survey.getSchema().getDefinitionById(defId);
+	}
 	
 	@Override
 	public void loadFrom(CodeAttributeDefinition source, String languageCode) {
 		super.loadFrom(source, languageCode);
-		list = source.getList();
-		parentCodeAttributeDefinition = source.getParentCodeAttributeDefinition();
+		listId = Objects.getPropertyValue(source.getList(), "id");
+		parentCodeAttributeDefinitionId = Objects.getPropertyValue(source.getParentCodeAttributeDefinition(), "id");
 		hierarchicalLevel = source.getList() == null ? null : source.getHierarchicalLevel();
 		strict = ! source.isAllowUnlisted();
 		allowValuesSorting = source.isMultiple() && source.isAllowValuesSorting();
@@ -76,14 +81,12 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		showCode = uiOptions.getShowCode(source);
 	}
 	
-	@Immutable
-	public CodeList getList() {
-		return list;
+	public Integer getListId() {
+		return listId;
 	}
 	
-	@Immutable
-	public void setList(CodeList list) {
-		this.list = list;
+	public void setListId(Integer listId) {
+		this.listId = listId;
 	}
 	
 	public boolean isStrict() {
@@ -102,13 +105,12 @@ public class CodeAttributeDefinitionFormObject extends AttributeDefinitionFormOb
 		this.allowValuesSorting = allowValuesSorting;
 	}
 	
-	@Immutable
-	public CodeAttributeDefinition getParentCodeAttributeDefinition() {
-		return parentCodeAttributeDefinition;
+	public Integer getParentCodeAttributeDefinitionId() {
+		return parentCodeAttributeDefinitionId;
 	}
 	
-	public void setParentCodeAttributeDefinition(CodeAttributeDefinition parentCodeAttributeDefinition) {
-		this.parentCodeAttributeDefinition = parentCodeAttributeDefinition;
+	public void setParentCodeAttributeDefinitionId(Integer parentCodeAttributeDefinitionId) {
+		this.parentCodeAttributeDefinitionId = parentCodeAttributeDefinitionId;
 	}
 	
 	public String getHierarchicalLevel() {
