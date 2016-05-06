@@ -1,5 +1,7 @@
 package org.openforis.collect.io.metadata.collectearth;
 
+import static org.openforis.collect.utils.ZipFiles.SEPARATOR;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -28,6 +30,7 @@ import org.openforis.collect.model.SurveyFile.SurveyFileType;
 import org.openforis.collect.persistence.xml.CollectSurveyIdmlBinder;
 import org.openforis.collect.utils.Files;
 import org.openforis.collect.utils.Zip4jFiles;
+import org.openforis.collect.utils.ZipFiles;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.BooleanAttributeDefinition;
 import org.openforis.idm.metamodel.CodeAttributeDefinition;
@@ -74,6 +77,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 	private static final String README_FILE = "README.txt";
 //	private static final String SAIKU_SCHEMA_PLACEHOLDER = "${saikuDbSchema}";
 	private static final String GRID_FOLDER_NAME = "grid";
+	private static final String EARTH_FILES_IMAGES_PATH = EARTH_FILES_FOLDER_NAME + SEPARATOR + "img" + SEPARATOR;
 	
 	private Logger logger = LoggerFactory.getLogger( CollectEarthProjectFileCreatorImpl.class);
 		
@@ -460,7 +464,7 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 		CodeList codeList = item.getCodeList();
 		@SuppressWarnings("unchecked")
 		String zipImageFileName = StringUtils.join(Arrays.asList(
-				EARTH_FILES_FOLDER_NAME, "img", "code_list", codeList.getId(), item.getId(), item.getImageFileName()), "/");
+				EARTH_FILES_FOLDER_NAME, EARTH_FILES_IMAGES_PATH, "code_list", codeList.getId(), item.getId(), item.getImageFileName()), "/");
 		return zipImageFileName;
 	}
 	
@@ -472,7 +476,10 @@ public class CollectEarthProjectFileCreatorImpl implements CollectEarthProjectFi
 			String namePrefix;
 			switch(surveyFile.getType()) {
 			case COLLECT_EARTH_GRID:
-				namePrefix = GRID_FOLDER_NAME + "/";
+				namePrefix = GRID_FOLDER_NAME + ZipFiles.SEPARATOR;
+				break;
+			case COLLECT_EARTH_BOTTOM_BANNER:
+				namePrefix = EARTH_FILES_IMAGES_PATH;
 				break;
 			default:
 				namePrefix = "";

@@ -256,11 +256,10 @@ div.content{
 	padding-left:12px !important;
 }
 
-div.actions.clearfix{
-	background-image: url("../img/bottombanner.png");
-	background-repeat: no-repeat;
-}
-
 .boolean-group {
   padding-left: 10px;
+}
+
+div.steps div.actions {
+	background: url("../img/bottombanner.png") left no-repeat;
 }

@@ -35,6 +35,8 @@ public class SurveyFileFormValidator extends FormValidator {
 			"project_definition.properties", "README.txt", "test_plots.ced", "earthFiles",
 			"data", "files", "sampling_design", "species", "idml.xml", "info.properties")));
 
+//	private static final String[] SUPPORTED_CE_BOTTOM_BANNER_LOGO_FILE_EXTENSIONS = new String[]{"jpg", "jpeg"};
+
 	@Override
 	protected void internalValidate(ValidationContext ctx) {
 		if (validateTypeUniqueness(ctx)) {
@@ -51,6 +53,7 @@ public class SurveyFileFormValidator extends FormValidator {
 		switch (type) {
 		case COLLECT_EARTH_AREA_PER_ATTRIBUTE:
 		case COLLECT_EARTH_EE_SCRIPT:
+		case COLLECT_EARTH_BOTTOM_BANNER:
 			if (containsFileWithType(otherSurveyFiles, type)) {
 				addInvalidMessage(ctx, TYPE_FIELD_NAME, Labels.getLabel("survey.file.error.type_already_defined"));
 				return false;
@@ -65,15 +68,31 @@ public class SurveyFileFormValidator extends FormValidator {
 	private boolean validateFilename(ValidationContext ctx) {
 		if (validateRequired(ctx, FILENAME_FIELD_NAME)) { 
 			if (validateFilenamePattern(ctx)) {
-				return validateFilenameUniqueness(ctx);
-			} else {
-				return false;
+				if (validateFilenameUniqueness(ctx)) {
+//					String typeStr = getValue(ctx, SurveyFileFormObject.TYPE_FIELD_NAME);
+//					SurveyFileType type = SurveyFileType.valueOf(typeStr);
+//					if (type == SurveyFileType.COLLECT_EARTH_BOTTOM_BANNER_LOGO) {
+//						return validateImageFilename(ctx);
+//					} else {
+						return true;
+//					}
+				}
 			}
-		} else {
-			return false;
 		}
+		return false;
 	}
 	
+//	private boolean validateImageFilename(ValidationContext ctx) {
+//		String filename = getValue(ctx, SurveyFileFormObject.UPLOADED_FILE_NAME_FIELD);
+//		String extension = FilenameUtils.getExtension(filename);
+//		if (extension != null && Arrays.asList(SUPPORTED_CE_BOTTOM_BANNER_LOGO_FILE_EXTENSIONS).contains(extension.toLowerCase(Locale.ENGLISH))) {
+//			return true;
+//		} else {
+//			addInvalidMessage(ctx, "survey.file.error.only_jpg_images_supported");
+//			return false;
+//		}
+//	}
+
 	private boolean validateFilenamePattern(ValidationContext ctx) {
 		if (validateRegEx(ctx, VALID_FILENAME_PATTERN, FILENAME_FIELD_NAME, "survey.file.error.invalid_filename")) {
 			String filename = getValue(ctx, FILENAME_FIELD_NAME);

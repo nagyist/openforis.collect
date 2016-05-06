@@ -23,6 +23,8 @@ import org.openforis.concurrency.ProgressListener;
  */
 public class ZipFiles {
 
+	public static final String SEPARATOR = "/";
+
 	public static void writeFile(ZipOutputStream zipOutputStream, File file, String zipEntryName) {
 		try {
 			zipOutputStream.putNextEntry(new ZipEntry(zipEntryName));

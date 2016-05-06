@@ -118,13 +118,11 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 			@ContextParam(ContextType.BINDER) Binder binder) {
  		Media media = event.getMedia();
 		String fileName = media.getName();
-		File tempFile;
 		if (media.isBinary()) {
-			tempFile = OpenForisIOUtils.copyToTempFile(media.getStreamData(), FilenameUtils.getExtension(fileName));
+			this.uploadedFile = OpenForisIOUtils.copyToTempFile(media.getStreamData(), FilenameUtils.getExtension(fileName));
 		} else {
-			tempFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), FilenameUtils.getExtension(fileName));
+			this.uploadedFile = OpenForisIOUtils.copyToTempFile(media.getReaderData(), FilenameUtils.getExtension(fileName));
 		}
-		this.uploadedFile = tempFile;
 		this.uploadedFileName = normalizeFilename(fileName);
 		notifyChange(SurveyFileFormObject.UPLOADED_FILE_NAME_FIELD);
 		updateForm(binder);
@@ -136,10 +134,12 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 	}
 	
 	private void updateForm(Binder binder) {
-		String typeName = getFormFieldValue(binder, "type");
+		String typeName = getFormFieldValue(binder, SurveyFileFormObject.TYPE_FIELD_NAME);
 		SurveyFileType type = SurveyFileType.valueOf(typeName);
-		String filename = type.getFixedFilename();
-		if (filename == null) {
+		String filename;
+		if (type.getFixedFilename() != null) {
+			filename = type.getFixedFilename();
+		} else {
 			if (uploadedFile == null) {
 				filename = getFormFieldValue(binder, SurveyFileFormObject.FILENAME_FIELD_NAME);
 			} else {
@@ -147,6 +147,7 @@ public class SurveyFileVM extends SurveyObjectBaseVM<SurveyFile> {
 			}
 		}
 		setFormFieldValue(binder, SurveyFileFormObject.FILENAME_FIELD_NAME, filename);
+		setFormFieldValue(binder, SurveyFileFormObject.UPLOADED_FILE_NAME_FIELD, uploadedFileName == null ? "" : uploadedFileName);
 		dispatchApplyChangesCommand(binder);
 	}
 
