@@ -1,25 +1,24 @@
-import { Component }        from '@angular/core';
+import { Component, OnInit }    from '@angular/core';
 
-import { SurveySummary } from './../metamodel/survey-summary';
-import { SurveyService } from './../metamodel/survey.service';
+import { SurveySummary }        from './../metamodel/survey-summary';
+import { SurveyService }        from './../metamodel/survey.service';
+//import { SurveyTable }          from './../survey_designer/survey-table.component';
 
 @Component({
     templateUrl: 'app/survey_designer/survey-designer-home.component.html',
-    providers: [SurveyService]
+    styleUrls: ['app/survey_designer/survey-designer-home.component.css']
 })
 export class SurveyDesignerHomeComponent implements OnInit {
     title = 'Survey Designer';
-    surveySummaries: SurveySummary[];
-    selectedSurvey: SurveySummary;
-    
-    constructor(private surveyService: SurveyService) { }
-    
-    getSurveySummaries(): void {
-        this.surveyService.getSurveySummaries().then(surveySummaries => this.surveySummaries = surveySummaries);
-    }
-    
+   
+    constructor() { }
+
     ngOnInit(): void {
-        this.getSurveySummaries();
+//        this.getSurveySummaries();
+    }
+
+    gotoDetail(): void {
+//        this.router.navigate(['/detail', this.selectedSurvey.id]);
     }
 
 }
