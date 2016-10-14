@@ -9,8 +9,6 @@ import { NAV_DROPDOWN_DIRECTIVES }      from './shared/nav-dropdown.directive';
 
 import { DataTableModule, SharedModule } from 'primeng/primeng';
 
-import { DataTableModule, SharedModule } from 'primeng/primeng';
-
 //import { ChartsModule }                 from 'ng2-charts/ng2-charts';
 import { SIDEBAR_TOGGLE_DIRECTIVES }    from './shared/sidebar.directive';
 import { AsideToggleDirective }         from './shared/aside.directive';
@@ -26,8 +24,8 @@ import { DashboardComponent }           from './dashboard/dashboard.component';
 
 //Data Management
 import { DataManagementComponent }      from './data-management/data-management.component';
-import { DataEntryComponent }           from './data-entry/data-entry.component';
-import { RecordTableComponent }         from './data-entry/record-table.component';
+import { RecordTableComponent }         from './data-management/record-table.component';
+import { DataEntryComponent }           from './data-management/data-entry/data-entry.component';
 
 //Survey Designer
 import { SurveyDesignerHomeComponent }  from './survey-designer/survey-designer-home.component';
@@ -50,10 +48,10 @@ import { SimpleLineIconsComponent }     from './icons/simple-line-icons.componen
 //import { ChartsComponent }              from './charts/charts.component';
 
 //Pages
-//import { p404Component }                from './pages/404.component';
-//import { p500Component }                from './pages/500.component';
-//import { LoginComponent }               from './pages/login.component';
-//import { RegisterComponent }            from './pages/register.component';
+import { p404Component }                from './pages/404.component';
+import { p500Component }                from './pages/500.component';
+import { LoginComponent }               from './pages/login.component';
+import { RegisterComponent }            from './pages/register.component';
 
 @NgModule({
   imports: [
@@ -70,6 +68,17 @@ import { SimpleLineIconsComponent }     from './icons/simple-line-icons.componen
     AppComponent,
     FullLayoutComponent,
     SimpleLayoutComponent,
+    
+    NAV_DROPDOWN_DIRECTIVES,
+    BreadcrumbsComponent,
+    SIDEBAR_TOGGLE_DIRECTIVES,
+    AsideToggleDirective,
+    
+    p404Component,
+    p500Component,
+    LoginComponent,
+    RegisterComponent,
+
     DashboardComponent,
     
     SurveyDesignerHomeComponent,
@@ -77,12 +86,7 @@ import { SimpleLineIconsComponent }     from './icons/simple-line-icons.componen
     
     DataManagementComponent,
     DataEntryComponent,
-    RecordTableComponent,
-
-    NAV_DROPDOWN_DIRECTIVES,
-    BreadcrumbsComponent,
-    SIDEBAR_TOGGLE_DIRECTIVES,
-    AsideToggleDirective,
+    RecordTableComponent
   ],
   bootstrap: [ AppComponent ]
 })

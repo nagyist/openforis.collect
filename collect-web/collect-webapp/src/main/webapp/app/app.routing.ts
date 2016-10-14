@@ -9,7 +9,7 @@ import { DashboardComponent }           from './dashboard/dashboard.component';
 
 //Data Management
 import { DataManagementComponent }      from './data-management/data-management.component';
-import { DataEntryComponent }           from './data-entry/data-entry.component';
+import { DataEntryComponent }           from './data-management/data-entry/data-entry.component';
 
 //Survey Designer
 import { SurveyDesignerHomeComponent }  from './survey-designer/survey-designer-home.component';
@@ -42,11 +42,15 @@ const appRoutes: Routes = [
             },
             {
                 path: 'data-management',
-                component: DataManagementComponent,
+                redirectTo: 'data-management/data-entry',
+                pathMatch: 'full',
+            },
+            {
+                path: 'data-management',
                 data: {
                     title: 'Data Management'
                 },
-                children : [
+                children: [
                     {
                         path: 'data-entry',
                         component: DataEntryComponent,

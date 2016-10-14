@@ -1,0 +1,14 @@
+<p-dataTable [value]="records" [(selection)]="selectedRecords" selectionMode="multiple" 
+		[lazy]="true" [rows]="20" [paginator]="true" [rowsPerPageOptions]="[10, 20, 50, 100]" [pageLinks]="10"
+        [totalRecords]="totalRecords" (onLazyLoad)="loadRecordsLazy($event)">
+<!--     <header>Records</header> -->
+	<footer>There are {{totalRecords}} records</footer>
+    <p-column field="id" header="ID" [sortable]="true"></p-column>
+    <p-column field="creationDate" header="Created on" [sortable]="true">
+    	<template let-col let-data="rowData">
+            <span>{{data.creationDate | date: 'dd/MM/yy HH:mm:ss'}}</span>
+            <span>{{data}}</span>
+        </template>
+   	</p-column>
+    <p-column field="modifiedDate" header="Last modified" [sortable]="true"></p-column>
+</p-dataTable>

@@ -4,8 +4,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
@@ -17,6 +19,8 @@ import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.RecordFilter;
+import org.openforis.collect.model.RecordSummarySortField;
+import org.openforis.collect.model.RecordSummarySortField.Sortable;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.RecordPersistenceException;
 import org.openforis.collect.utils.Proxies;
@@ -79,13 +83,27 @@ public class RecordController extends BasicController implements Serializable {
 	
 	@RequestMapping(value = "/surveys/{survey_id}/records/list.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	List<RecordProxy> getCount(@PathVariable(value="survey_id") int surveyId,
-			@RequestParam(value="rootEntityDefinitionId") int rootEntityDefinitionId) throws Exception {
+	List<RecordProxy> getList(@PathVariable(value="survey_id") int surveyId,
+			@RequestParam(value="rootEntityDefinitionId") int rootEntityDefinitionId,
+			@RequestParam(value="offset") int offset,
+			@RequestParam(value="maxNumberOfRecords") int maxNumberOfRecords,
+			@RequestParam(value="sortField") String sortField,
+			@RequestParam(value="sortOrder") int sortOrder
+			) throws Exception {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		RecordFilter filter = new RecordFilter(survey);
+		filter.setOffset(offset);
+		filter.setMaxNumberOfRecords(maxNumberOfRecords);
 		filter.setRootEntityId(rootEntityDefinitionId);
-		List<CollectRecord> records = recordManager.loadSummaries(filter);
-		return Proxies.fromList(records, RecordProxy.class);
+		
+		if (sortField == null) {
+			sortField = RecordSummarySortField.Sortable.KEY1.name();
+		}
+		Sortable sortableField = determineSortableField(sortField);
+		RecordSummarySortField recordSummarySortField = new RecordSummarySortField(sortableField, sortOrder < 0);
+		
+		List<CollectRecord> records = recordManager.loadSummaries(filter, Arrays.asList(recordSummarySortField));
+		return Proxies.fromList(records, RecordProxy.class, Locale.ENGLISH);
 	}
 
 	@RequestMapping(value = "/surveys/{survey_id}/records/{record_id}/edit.htm", method=GET)
@@ -111,5 +129,15 @@ public class RecordController extends BasicController implements Serializable {
 		CollectRecord record = recordManager.checkout(survey, sessionState.getUser(), recordId, Step.valueOf(stepNumber), sessionState.getSessionId(), true);
 		return new RecordProxy(record, sessionState.getLocale());
 	}
-	
+
+	private Sortable determineSortableField(String sortField) {
+		if ("creationDate".equals(sortField)) {
+			return Sortable.DATE_CREATED;
+		} else if ("lastModified".equals(sortField)) {
+			return Sortable.DATE_MODIFIED;
+		} else {
+			return Sortable.KEY1;
+		}
+	}
+
 }
