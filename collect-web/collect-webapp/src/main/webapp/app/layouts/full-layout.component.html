@@ -28,9 +28,9 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-right" dropdownMenu aria-labelledby="simple-dropdown">
 
-                    <div class="dropdown-header text-xs-center">
-                        <strong>Settings</strong>
-                    </div>
+<!--                     <div class="dropdown-header text-xs-center"> -->
+<!--                         <strong>Settings</strong> -->
+<!--                     </div> -->
 
                     <a class="dropdown-item" href="#"><i class="fa fa-user"></i> Profile</a>
                     <a class="dropdown-item" href="#"><i class="fa fa-wrench"></i> Setting</a>
@@ -48,6 +48,23 @@
         <ul class="nav">
             <li class="nav-item">
                 <a class="nav-link" routerLinkActive="active" [routerLink]="['/home']">Home</a>
+            </li>
+            <li class="nav-item nav-dropdown" routerLinkActive="open">
+                <a class="nav-link nav-dropdown-toggle" href="#"><i class="icon-star"></i> Data Management</a>
+                <ul class="nav-dropdown-items">
+                    <li class="nav-item">
+                        <a class="nav-link" routerLinkActive="active" [routerLink]="['/data-management/data-entry']"><i class="icon-star"></i> Data Entry</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" routerLinkActive="active" [routerLink]="['/data-management/data-cleansing']"><i class="icon-star"></i> Data Cleansing</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" routerLinkActive="active" [routerLink]="['/data-management/data-import']"><i class="icon-star"></i> Import</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" routerLinkActive="active" [routerLink]="['/data-management/data-export']"><i class="icon-star"></i> Export</a>
+                    </li>
+                </ul>
             </li>
             <li class="nav-item">
                 <a class="nav-link" routerLinkActive="active" [routerLink]="['/pages/backup-restore']"><i class="icon-puzzle"></i> Backup/Restore</a>

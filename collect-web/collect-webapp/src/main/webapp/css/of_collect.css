@@ -1,0 +1,12 @@
+header.navbar a.navbar-brand {
+	display: inline-block;
+	width: 155px;
+	height: 55px;
+	padding: 0.5rem 1rem;
+	background-color: #fff;
+	background-image: url("../assets/images/of_logo_210x60.png");
+	background-size: 155px 45px;
+	background-repeat: no-repeat;
+	background-position: center center;
+	border-bottom: 1px solid #cfd8dc;
+}

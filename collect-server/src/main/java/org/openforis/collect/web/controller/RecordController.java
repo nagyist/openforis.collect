@@ -1,7 +1,11 @@
 package org.openforis.collect.web.controller;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
@@ -12,18 +16,17 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectRecord;
 import org.openforis.collect.model.CollectRecord.Step;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.RecordFilter;
 import org.openforis.collect.model.proxy.RecordProxy;
 import org.openforis.collect.persistence.RecordPersistenceException;
+import org.openforis.collect.utils.Proxies;
 import org.openforis.collect.web.session.SessionState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import static org.springframework.http.MediaType.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import static org.springframework.web.bind.annotation.RequestMethod.*;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
@@ -72,6 +75,17 @@ public class RecordController extends BasicController implements Serializable {
 		CollectSurvey survey = surveyManager.getById(surveyId);
 		int count = recordManager.countRecords(survey, rootEntityDefinitionId, stepNumber);
 		return count;
+	}
+	
+	@RequestMapping(value = "/surveys/{survey_id}/records/list.json", method=GET, produces=APPLICATION_JSON_VALUE)
+	public @ResponseBody
+	List<RecordProxy> getCount(@PathVariable(value="survey_id") int surveyId,
+			@RequestParam(value="rootEntityDefinitionId") int rootEntityDefinitionId) throws Exception {
+		CollectSurvey survey = surveyManager.getById(surveyId);
+		RecordFilter filter = new RecordFilter(survey);
+		filter.setRootEntityId(rootEntityDefinitionId);
+		List<CollectRecord> records = recordManager.loadSummaries(filter);
+		return Proxies.fromList(records, RecordProxy.class);
 	}
 
 	@RequestMapping(value = "/surveys/{survey_id}/records/{record_id}/edit.htm", method=GET)

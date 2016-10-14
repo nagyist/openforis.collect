@@ -1,9 +1,13 @@
 import { NgModule }                     from '@angular/core';
 import { BrowserModule }                from '@angular/platform-browser';
+import { HttpModule }                   from '@angular/http';
 
 import { AppComponent }                 from './app.component';
 import { Ng2BootstrapModule }           from 'ng2-bootstrap/ng2-bootstrap';
 import { NAV_DROPDOWN_DIRECTIVES }      from './shared/nav-dropdown.directive';
+//import { NgaModule }                    from './theme/nga.module';
+
+import { DataTableModule, SharedModule } from 'primeng/primeng';
 
 //import { ChartsModule }                 from 'ng2-charts/ng2-charts';
 import { SIDEBAR_TOGGLE_DIRECTIVES }    from './shared/sidebar.directive';
@@ -19,10 +23,13 @@ import { SimpleLayoutComponent }        from './layouts/simple-layout.component'
 import { DashboardComponent }           from './dashboard/dashboard.component';
 
 //Data Management
-import { DataManagementComponent }      from './data_management/data-management.component';
+import { DataManagementComponent }      from './data-management/data-management.component';
+import { DataEntryComponent }           from './data-entry/data-entry.component';
+import { RecordTableComponent }         from './data-entry/record-table.component';
 
 //Survey Designer
-import { SurveyDesignerHomeComponent }  from './survey_designer/survey-designer-home.component';
+import { SurveyDesignerHomeComponent }  from './survey-designer/survey-designer-home.component';
+import { SurveyTableComponent }         from './survey-designer/survey-table.component';
 
 //import { CardsComponent }               from './components/cards.component';
 //import { FormsComponent }               from './components/forms.component';
@@ -50,7 +57,12 @@ import { SimpleLineIconsComponent }     from './icons/simple-line-icons.componen
   imports: [
     BrowserModule,
     routing,
-    Ng2BootstrapModule
+    Ng2BootstrapModule,
+    HttpModule,
+//    NgaModule.forRoot(),
+    
+    DataTableModule,
+    SharedModule
 //    ChartsModule
   ],
   declarations: [
@@ -58,8 +70,13 @@ import { SimpleLineIconsComponent }     from './icons/simple-line-icons.componen
     FullLayoutComponent,
     SimpleLayoutComponent,
     DashboardComponent,
-    DataManagementComponent,
+    
     SurveyDesignerHomeComponent,
+    SurveyTableComponent,
+    
+    DataManagementComponent,
+    DataEntryComponent,
+    RecordTableComponent,
 //    CardsComponent,
 //    FormsComponent,
 //    SocialButtonsComponent,
@@ -76,7 +93,7 @@ import { SimpleLineIconsComponent }     from './icons/simple-line-icons.componen
     NAV_DROPDOWN_DIRECTIVES,
     BreadcrumbsComponent,
     SIDEBAR_TOGGLE_DIRECTIVES,
-    AsideToggleDirective
+    AsideToggleDirective,
   ],
   bootstrap: [ AppComponent ]
 })
