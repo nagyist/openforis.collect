@@ -9,6 +9,8 @@ import { NAV_DROPDOWN_DIRECTIVES }      from './shared/nav-dropdown.directive';
 
 import { DataTableModule, SharedModule } from 'primeng/primeng';
 
+import { DataTableModule, SharedModule } from 'primeng/primeng';
+
 //import { ChartsModule }                 from 'ng2-charts/ng2-charts';
 import { SIDEBAR_TOGGLE_DIRECTIVES }    from './shared/sidebar.directive';
 import { AsideToggleDirective }         from './shared/aside.directive';
@@ -63,7 +65,6 @@ import { SimpleLineIconsComponent }     from './icons/simple-line-icons.componen
     
     DataTableModule,
     SharedModule
-//    ChartsModule
   ],
   declarations: [
     AppComponent,
@@ -77,19 +78,7 @@ import { SimpleLineIconsComponent }     from './icons/simple-line-icons.componen
     DataManagementComponent,
     DataEntryComponent,
     RecordTableComponent,
-//    CardsComponent,
-//    FormsComponent,
-//    SocialButtonsComponent,
-//    SwitchesComponent,
-//    TablesComponent,
-//    FontAwesomeComponent,
-//    SimpleLineIconsComponent,
-//    WidgetsComponent,
-//    ChartsComponent,
-//    p404Component,
-//    p500Component,
-//    LoginComponent,
-//    RegisterComponent,
+
     NAV_DROPDOWN_DIRECTIVES,
     BreadcrumbsComponent,
     SIDEBAR_TOGGLE_DIRECTIVES,
