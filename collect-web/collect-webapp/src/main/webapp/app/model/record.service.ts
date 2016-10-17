@@ -29,17 +29,17 @@ export class RecordService {
 
         let params = new URLSearchParams();
         params.set('rootEntityDefinitionId', rootEntityDefId.toString());
-        params.set('offset', offset);
-        params.set('maxNumberOfRecords', maxNumberOfRecords);
+        params.set('offset', offset.toString());
+        params.set('maxNumberOfRecords', maxNumberOfRecords.toString());
         params.set('sortField', sortField);
-        params.set('sortOrder', sortOrder);
+        params.set('sortOrder', sortOrder.toString());
         
         return this.http.get(url, { search : params })
                     .map(this.extractData)
                     .catch(this.handleError);
     }
     
-    private extractData(res: Response) {
+    private extractData(res: Response):RecordSummary[] {
         return res.json() as RecordSummary[];
     }
     

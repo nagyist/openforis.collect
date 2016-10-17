@@ -131,7 +131,13 @@ public class RecordController extends BasicController implements Serializable {
 	}
 
 	private Sortable determineSortableField(String sortField) {
-		if ("creationDate".equals(sortField)) {
+		if ("rootEnityKey1".equals(sortField)) {
+			return Sortable.KEY1;
+		} else if ("rootEnityKey2".equals(sortField)) {
+			return Sortable.KEY2;
+		} else if ("rootEnityKey3".equals(sortField)) {
+			return Sortable.KEY3;
+		} else if ("creationDate".equals(sortField)) {
 			return Sortable.DATE_CREATED;
 		} else if ("lastModified".equals(sortField)) {
 			return Sortable.DATE_MODIFIED;

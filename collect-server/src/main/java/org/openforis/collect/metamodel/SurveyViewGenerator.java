@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.designer.metamodel.NodeType;
+import org.openforis.collect.metamodel.ui.UIConfiguration;
+import org.openforis.collect.metamodel.ui.UIFormSet;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -57,8 +59,22 @@ public class SurveyViewGenerator {
 			}
 
 		});
+		surveyView.uiConfigurationView = generateUIView(surveyView, survey.getUIConfiguration());
 		return surveyView;
 	}
+	
+	private UIConfigurationView generateUIView(SurveyView survey, UIConfiguration configuration) {
+		UIConfigurationView result = new UIConfigurationView();
+		result.formSets = new ArrayList<UIFormSetView>();
+		List<UIFormSet> formSets = configuration.getFormSets();
+		for (UIFormSet uiFormSet : formSets) {
+			UIFormSetView formSetView = new UIFormSetView();
+			formSetView.rootEntityDefinitionId = uiFormSet.getRootEntityDefinitionId();
+			
+		}
+		return result;
+	}
+	
 	
 	private String getLabel(NodeDefinition def, String langCode) {
 		String label = def.getLabel(Type.INSTANCE, langCode);
@@ -175,6 +191,7 @@ public class SurveyViewGenerator {
 		private boolean temporary;
 		private SurveyTarget target;
 		private List<EntityDefView> rootEntities;
+		private UIConfigurationView uiConfigurationView;
 		
 		public SurveyView(Integer id, String name, boolean temporary, SurveyTarget target) {
 			this.id = id;
@@ -215,6 +232,24 @@ public class SurveyViewGenerator {
 		public List<EntityDefView> getRootEntities() {
 			return rootEntities;
 		}
+		
+		public UIConfigurationView getUiConfigurationView() {
+			return uiConfigurationView;
+		}
+		
+	}
+	
+	private class UIConfigurationView {
+		private List<UIFormSetView> formSets;
+		
+		public List<UIFormSetView> getFormSets() {
+			return formSets;
+		}
+	}
+	
+	private class UIFormSetView {
+		private Integer rootEntityDefinitionId;
+		
 		
 	}
 }

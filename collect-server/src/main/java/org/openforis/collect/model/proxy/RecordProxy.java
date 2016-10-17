@@ -115,6 +115,26 @@ public class RecordProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
+	public String getRootEntityKey1() {
+		return getRootEntityKey(0);
+	}
+
+	@ExternalizedProperty
+	public String getRootEntityKey2() {
+		return getRootEntityKey(1);
+	}
+
+	@ExternalizedProperty
+	public String getRootEntityKey3() {
+		return getRootEntityKey(2);
+	}
+	
+	private String getRootEntityKey(int index) {
+		return record.getRootEntityKeyValues().size() > index ? 
+				record.getRootEntityKeyValues().get(index) : null;
+	}
+	
+	@ExternalizedProperty
 	public List<Integer> getEntityCounts() {
 		return record.getEntityCounts();
 	}

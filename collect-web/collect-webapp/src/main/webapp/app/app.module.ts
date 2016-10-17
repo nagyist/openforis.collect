@@ -31,22 +31,6 @@ import { DataEntryComponent }           from './data-management/data-entry/data-
 import { SurveyDesignerHomeComponent }  from './survey-designer/survey-designer-home.component';
 import { SurveyTableComponent }         from './survey-designer/survey-table.component';
 
-//import { CardsComponent }               from './components/cards.component';
-//import { FormsComponent }               from './components/forms.component';
-//import { SocialButtonsComponent }       from './components/social-buttons.component';
-//import { SwitchesComponent }            from './components/switches.component';
-//import { TablesComponent }              from './components/tables.component';
-
-//Icons
-import { FontAwesomeComponent }         from './icons/font-awesome.component';
-import { SimpleLineIconsComponent }     from './icons/simple-line-icons.component';
-
-//Widgets
-//import { WidgetsComponent }             from './widgets/widgets.component';
-
-//Charts
-//import { ChartsComponent }              from './charts/charts.component';
-
 //Pages
 import { p404Component }                from './pages/404.component';
 import { p500Component }                from './pages/500.component';
@@ -78,7 +62,7 @@ import { RegisterComponent }            from './pages/register.component';
     p500Component,
     LoginComponent,
     RegisterComponent,
-
+    
     DashboardComponent,
     
     SurveyDesignerHomeComponent,

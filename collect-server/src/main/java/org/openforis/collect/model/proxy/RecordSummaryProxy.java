@@ -96,6 +96,26 @@ public class RecordSummaryProxy implements Proxy {
 	}
 
 	@ExternalizedProperty
+	public String getRootEntityKey1() {
+		return getRootEntityKey(0);
+	}
+
+	@ExternalizedProperty
+	public String getRootEntityKey2() {
+		return getRootEntityKey(1);
+	}
+
+	@ExternalizedProperty
+	public String getRootEntityKey3() {
+		return getRootEntityKey(2);
+	}
+	
+	private String getRootEntityKey(int index) {
+		return summary.getRootEntityKeyValues().size() > index ? 
+				summary.getRootEntityKeyValues().get(index) : null;
+	}
+
+	@ExternalizedProperty
 	public List<Integer> getEntityCounts() {
 		return summary.getEntityCounts();
 	}

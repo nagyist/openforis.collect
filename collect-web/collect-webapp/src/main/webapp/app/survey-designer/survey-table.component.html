@@ -2,5 +2,9 @@
 <!--     <header>Surveys</header> -->
     <p-column field="name" header="Name" [sortable]="true"></p-column>
     <p-column field="projectName" header="Project Name" [sortable]="true"></p-column>
-    <p-column field="modifiedDate" header="Last modified" [sortable]="true"></p-column>
+    <p-column field="modifiedDate" header="Last modified" [sortable]="true">
+    	<template let-data="rowData" pTemplate type="body">
+            <span>{{data.modifiedDate | date: 'dd/MM/yyyy HH:mm:ss'}}</span>
+        </template>
+    </p-column>
 </p-dataTable>

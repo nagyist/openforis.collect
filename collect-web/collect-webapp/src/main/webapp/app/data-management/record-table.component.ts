@@ -1,4 +1,6 @@
-import { Component, ViewChild, OnInit, LazyLoadEvent } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
+
+import { LazyLoadEvent } from './../..//node_modules/primeng/components/common/api';
 
 import { RecordSummary } from './../model/record-summary';
 import { RecordService } from './../model/record.service';
@@ -11,28 +13,20 @@ import { RecordService } from './../model/record.service';
 export class RecordTableComponent implements OnInit {
     
     records: RecordSummary[]; 
-//    cols: any[];
     displayDialog: boolean;    
     selectedRecords: RecordSummary[];    
     newRecord: boolean;
     totalRecords: number = 0;
+    keyColumns: any[];
     
     constructor(private recordService: RecordService) { }  
     
     ngOnInit() {
-        let surveyId = 1;
-        let rootEntityDefId = 1;
-        let offset = 0;
-        let maxNumberOfRecords = 20;
-        
-//        this.recordService.getRecordsCount(surveyId, rootEntityDefId)
-//            .subscribe(totalRecords => this.totalRecords = totalRecords);
-//        
-//        this.recordService.getRecordSummaries(surveyId, rootEntityDefId, offset, maxNumberOfRecords)
-//            .subscribe(records => this.records = records);
-//        this.cols = [            
-//            { field: 'name',   header: 'Name' }        
-//        ]; 
+        this.keyColumns = [
+            {field: 'rootEntityKey1', header: 'Key 1', sortable: true},
+            {field: 'rootEntityKey2', header: 'Key 2', sortable: true},
+            {field: 'rootEntityKey3', header: 'Key 3', sortable: true}
+        ];
     } 
     
     loadRecordsLazy(event: LazyLoadEvent) {
@@ -43,8 +37,8 @@ export class RecordTableComponent implements OnInit {
             .subscribe(totalRecords => this.totalRecords = totalRecords);
         
         this.recordService.getRecordSummaries(surveyId, rootEntityDefId, 
-            event.first, event.rows, 
-            event.sortField ? event.sortField : "key1", event.sortOrder)
+                event.first, event.rows, 
+                event.sortField ? event.sortField : "rootEnityKey1", event.sortOrder)
             .subscribe(records => this.records = records);
     }
     
