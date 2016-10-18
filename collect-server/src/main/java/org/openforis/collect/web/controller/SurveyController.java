@@ -55,8 +55,8 @@ public class SurveyController extends BasicController {
 	public @ResponseBody
 	SurveyView loadSurvey(@PathVariable int id) throws Exception {
 		CollectSurvey survey = surveyManager.getOrLoadSurveyById(id);
-		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(Locale.ENGLISH);
-		SurveyView view = viewGenerator.generateView(survey);
+		SurveyViewGenerator viewGenerator = new SurveyViewGenerator(survey, Locale.ENGLISH);
+		SurveyView view = viewGenerator.generate();
 		return view;
 	}
 	

@@ -8,8 +8,7 @@ import java.util.Map;
 
 import org.openforis.collect.designer.metamodel.AttributeType;
 import org.openforis.collect.designer.metamodel.NodeType;
-import org.openforis.collect.metamodel.ui.UIConfiguration;
-import org.openforis.collect.metamodel.ui.UIFormSet;
+import org.openforis.collect.metamodel.UIConfigurationViewGenerator.UIConfigurationView;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.idm.metamodel.AttributeDefinition;
 import org.openforis.idm.metamodel.EntityDefinition;
@@ -25,21 +24,23 @@ import org.openforis.idm.metamodel.NodeLabel.Type;
 public class SurveyViewGenerator {
 
 	private Locale locale;
+	private CollectSurvey survey;
+	private SurveyView result;
 	
-	public SurveyViewGenerator(Locale locale) {
+	public SurveyViewGenerator(CollectSurvey survey, Locale locale) {
 		super();
+		this.survey = survey;
 		this.locale = locale;
 	}
 
-	public SurveyView generateView(CollectSurvey survey) {
-		final SurveyView surveyView = new SurveyView(survey.getId(), survey.getName(), survey.isTemporary(), survey.getTarget());
-		final String langCode = locale.getLanguage();
+	public SurveyView generate() {
+		this.result = new SurveyView(survey.getId(), survey.getName(), survey.isTemporary(), survey.getTarget());
 		final Map<Integer, NodeDefView> viewById = new HashMap<Integer, NodeDefView>();;
 		survey.getSchema().traverse(new NodeDefinitionVisitor() {
 			public void visit(NodeDefinition def) {
 				int id = def.getId();
 				String name = def.getName();
-				String label = getLabel(def, langCode);
+				String label = getLabel(def);
 				NodeDefView view;
 				if (def instanceof EntityDefinition) {
 					view = new EntityDefView(((EntityDefinition) def).isRoot(), id, name, label, def.isMultiple());
@@ -50,7 +51,7 @@ public class SurveyViewGenerator {
 				}
 				NodeDefinition parentDef = def.getParentDefinition();
 				if (parentDef == null) {
-					surveyView.addRootEntity((EntityDefView) view);
+					result.addRootEntity((EntityDefView) view);
 				} else {
 					EntityDefView parentView = (EntityDefView) viewById.get(parentDef.getId());
 					parentView.addChild(view);
@@ -59,27 +60,15 @@ public class SurveyViewGenerator {
 			}
 
 		});
-		surveyView.uiConfigurationView = generateUIView(surveyView, survey.getUIConfiguration());
-		return surveyView;
-	}
-	
-	private UIConfigurationView generateUIView(SurveyView survey, UIConfiguration configuration) {
-		UIConfigurationView result = new UIConfigurationView();
-		result.formSets = new ArrayList<UIFormSetView>();
-		List<UIFormSet> formSets = configuration.getFormSets();
-		for (UIFormSet uiFormSet : formSets) {
-			UIFormSetView formSetView = new UIFormSetView();
-			formSetView.rootEntityDefinitionId = uiFormSet.getRootEntityDefinitionId();
-			
-		}
+		result.uiConfigurationView = new UIConfigurationViewGenerator(survey, result, locale).generate();
 		return result;
 	}
 	
-	
-	private String getLabel(NodeDefinition def, String langCode) {
-		String label = def.getLabel(Type.INSTANCE, langCode);
-		if (label == null && ! def.getSurvey().isDefaultLanguage(langCode)) {
-			label = def.getLabel(Type.INSTANCE);
+	private String getLabel(NodeDefinition def) {
+		Type type = Type.INSTANCE;
+		String label = def.getLabel(type, locale.getLanguage());
+		if (label == null && ! def.getSurvey().isDefaultLanguage(locale.getLanguage())) {
+			label = def.getLabel(type);
 		}
 		return label;
 	}
@@ -239,17 +228,4 @@ public class SurveyViewGenerator {
 		
 	}
 	
-	private class UIConfigurationView {
-		private List<UIFormSetView> formSets;
-		
-		public List<UIFormSetView> getFormSets() {
-			return formSets;
-		}
-	}
-	
-	private class UIFormSetView {
-		private Integer rootEntityDefinitionId;
-		
-		
-	}
 }

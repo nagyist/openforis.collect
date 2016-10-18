@@ -61,8 +61,8 @@ public class SessionController {
 			if (locale == null) {
 				locale = Locale.ENGLISH;
 			}
-			SurveyViewGenerator viewGenerator = new SurveyViewGenerator(locale);
-			SurveyView view = viewGenerator.generateView(survey);
+			SurveyViewGenerator viewGenerator = new SurveyViewGenerator(survey, locale);
+			SurveyView view = viewGenerator.generate();
 			return view;
 		}
 	}
