@@ -5,7 +5,8 @@ import { SurveyService }        from './../metamodel/survey.service';
 
 @Component({
     templateUrl: 'app/survey-designer/survey-designer-home.component.html',
-    styleUrls: ['app/survey-designer/survey-designer-home.component.css']
+    styleUrls: ['app/survey-designer/survey-designer-home.component.css'],
+    providers: [SurveyService]
 })
 export class SurveyDesignerHomeComponent implements OnInit {
     title = 'Survey Designer';

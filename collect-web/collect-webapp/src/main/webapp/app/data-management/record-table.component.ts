@@ -5,6 +5,8 @@ import { LazyLoadEvent } from './../..//node_modules/primeng/components/common/a
 import { RecordSummary } from './../model/record-summary';
 import { RecordService } from './../model/record.service';
 
+import { DataTableModule } from 'primeng/primeng';
+
 @Component({
     selector: 'record-table',
     templateUrl: './app/data-management/record-table.component.html',

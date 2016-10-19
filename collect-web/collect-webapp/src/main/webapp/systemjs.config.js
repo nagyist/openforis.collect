@@ -26,9 +26,10 @@
       '@angular/upgrade': 'npm:@angular/upgrade/bundles/upgrade.umd.js',
 
       // other libraries
+      '@ng-bootstrap/ng-bootstrap': 'node_modules/@ng-bootstrap/ng-bootstrap/bundles/ng-bootstrap.js',
       'rxjs':                      'npm:rxjs',
       'angular-in-memory-web-api': 'npm:angular-in-memory-web-api',
-      'primeng':                    'node_modules/primeng'
+      'primeng':                   'node_modules/primeng'
     },
     // packages tells the System loader how to load when no filename and/or no extension
     packages: {

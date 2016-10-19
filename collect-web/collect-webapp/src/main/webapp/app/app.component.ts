@@ -8,7 +8,7 @@ import { RecordService } from './model/record.service';
 @Component({
     selector: 'collect-app',
     template: '<router-outlet></router-outlet>',
-    providers: [CollectGlobals, SurveyService, RecordService]
+    providers: [CollectGlobals, RecordService]
 })
 export class AppComponent {
     

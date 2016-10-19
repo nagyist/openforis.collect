@@ -4,16 +4,6 @@ import { Routes, RouterModule }         from '@angular/router';
 import { FullLayoutComponent }          from './layouts/full-layout.component';
 import { SimpleLayoutComponent }        from './layouts/simple-layout.component';
 
-//Main view
-import { DashboardComponent }           from './dashboard/dashboard.component';
-
-//Data Management
-import { DataManagementComponent }      from './data-management/data-management.component';
-import { DataEntryComponent }           from './data-management/data-entry/data-entry.component';
-
-//Survey Designer
-import { SurveyDesignerHomeComponent }  from './survey-designer/survey-designer-home.component';
-
 //Pages
 import { p404Component }                from './pages/404.component';
 import { p500Component }                from './pages/500.component';
@@ -35,37 +25,15 @@ const appRoutes: Routes = [
         children: [
             {
                 path: 'dashboard',
-                component: DashboardComponent,
-                data: {
-                    title: 'Dashboard'
-                }
+                loadChildren: 'app/dashboard/dashboard.module#DashboardModule'
             },
             {
                 path: 'data-management',
-                redirectTo: 'data-management/data-entry',
-                pathMatch: 'full',
+                loadChildren: 'app/data-management/data-management.module#DataManagementModule'
             },
             {
-                path: 'data-management',
-                data: {
-                    title: 'Data Management'
-                },
-                children: [
-                    {
-                        path: 'data-entry',
-                        component: DataEntryComponent,
-                        data: {
-                            title: 'Data Entry'
-                        }
-                    }
-                ]
-            },
-            {
-                path: 'survey-designer-home',
-                component: SurveyDesignerHomeComponent,
-                data: {
-                    title: 'Survey Designer'
-                }
+                path: 'survey-designer',
+                loadChildren: 'app/survey-designer/survey-designer.module#SurveyDesignerModule'
             },
 //            {
 //                path: 'components',
@@ -165,43 +133,43 @@ const appRoutes: Routes = [
 //            }
         ]
     },
-    {
-        path: 'pages',
-        component: SimpleLayoutComponent,
-        data: {
-            title: 'Pages'
-        },
-        children: [
-            {
-                path: '404',
-                component: p404Component,
-                data: {
-                    title: 'Page 404'
-                }
-            },
-            {
-                path: '500',
-                component: p500Component,
-                data: {
-                    title: 'Page 500'
-                }
-            },
-            {
-                path: 'login',
-                component: LoginComponent,
-                data: {
-                    title: 'Login Page'
-                }
-            },
-            {
-                path: 'register',
-                component: RegisterComponent,
-                data: {
-                    title: 'Register Page'
-                }
-            }
-        ]
-    }
+//    {
+//        path: 'pages',
+//        component: SimpleLayoutComponent,
+//        data: {
+//            title: 'Pages'
+//        },
+//        children: [
+//            {
+//                path: '404',
+//                component: p404Component,
+//                data: {
+//                    title: 'Page 404'
+//                }
+//            },
+//            {
+//                path: '500',
+//                component: p500Component,
+//                data: {
+//                    title: 'Page 500'
+//                }
+//            },
+//            {
+//                path: 'login',
+//                component: LoginComponent,
+//                data: {
+//                    title: 'Login Page'
+//                }
+//            },
+//            {
+//                path: 'register',
+//                component: RegisterComponent,
+//                data: {
+//                    title: 'Register Page'
+//                }
+//            }
+//        ]
+//    }
 ];
 
 export const routing = RouterModule.forRoot(appRoutes);

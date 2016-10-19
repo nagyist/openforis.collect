@@ -107,9 +107,9 @@ public class UIConfigurationViewGenerator {
 			v.attributeDefinitionId = attrDef.getId();
 			view = (V) v;
 		} else if (component instanceof UIFormSection) {
-			UIFormSectionView v = new UIFormSectionView(component.getId());
-			UIFormSection uiFormSection = (UIFormSection) component;
-			EntityDefinition entityDef = uiFormSection.getEntityDefinition();
+			UIFormSection formSection = (UIFormSection) component;
+			UIFormSectionView v = generateUIFormContentContainerView(UIFormSectionView.class, formSection);
+			EntityDefinition entityDef = formSection.getEntityDefinition();
 			v.multiple = entityDef.isMultiple();
 			v.entityDefinitionId = entityDef.getId();
 			view = (V) v;
@@ -204,13 +204,10 @@ public class UIConfigurationViewGenerator {
 		}
 	}
 	
-	public static abstract class UIFormComponentView extends UIModelObjectView {
-		public UIFormComponentView(int id, String type) {
-			super(id, type);
-		}
+	public static interface UIFormComponentView {
 	}
 	
-	public static class UIFieldView extends UIFormComponentView {
+	public static class UIFieldView extends UIModelObjectView implements UIFormComponentView {
 		private int attributeDefinitionId;
 		private String attributeType;
 		
@@ -228,7 +225,7 @@ public class UIConfigurationViewGenerator {
 		
 	}
 	
-	public static class UIFormSectionView extends UIFormComponentView {
+	public static class UIFormSectionView extends UIFormContentContainerView implements UIFormComponentView {
 		private int entityDefinitionId;
 		private boolean multiple = false;
 		
@@ -245,7 +242,7 @@ public class UIConfigurationViewGenerator {
 		}
 	}
 	
-	public static class UITableView extends UIFormComponentView {
+	public static class UITableView extends UIModelObjectView implements UIFormComponentView {
 		private int entityDefinitionId;
 		
 		public UITableView(int id) {
