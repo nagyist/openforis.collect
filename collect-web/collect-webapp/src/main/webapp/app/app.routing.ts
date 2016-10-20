@@ -1,4 +1,6 @@
-import { Routes, RouterModule }         from '@angular/router';
+import { NgModule }                 from '@angular/core';
+import { Routes,
+         RouterModule }             from '@angular/router';
 
 //Layouts
 import { FullLayoutComponent }          from './layouts/full-layout.component';
@@ -10,7 +12,7 @@ import { p500Component }                from './pages/500.component';
 import { LoginComponent }               from './pages/login.component';
 import { RegisterComponent }            from './pages/register.component';
 
-const appRoutes: Routes = [
+const routes: Routes = [
     {
         path: '',
         redirectTo: 'dashboard',
@@ -172,4 +174,8 @@ const appRoutes: Routes = [
 //    }
 ];
 
-export const routing = RouterModule.forRoot(appRoutes);
+@NgModule({
+    imports: [ RouterModule.forRoot(routes) ],
+    exports: [ RouterModule ]
+})
+export class AppRoutingModule {}

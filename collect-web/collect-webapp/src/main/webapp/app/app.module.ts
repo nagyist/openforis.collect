@@ -9,7 +9,9 @@ import { NAV_DROPDOWN_DIRECTIVES }      from './shared/nav-dropdown.directive';
 import { SIDEBAR_TOGGLE_DIRECTIVES }    from './shared/sidebar.directive';
 import { AsideToggleDirective }         from './shared/aside.directive';
 import { BreadcrumbsComponent }         from './shared/breadcrumb.component';
-import { routing }                      from './app.routing';
+
+/* Routing Module */
+import { AppRoutingModule }             from './app.routing';
 
 //Layouts
 import { FullLayoutComponent }          from './layouts/full-layout.component';
@@ -18,7 +20,7 @@ import { SimpleLayoutComponent }        from './layouts/simple-layout.component'
 @NgModule({
   imports: [
     BrowserModule,
-    routing,
+    AppRoutingModule,
     NgbModule.forRoot(),
     HttpModule
   ],

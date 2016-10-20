@@ -2,7 +2,7 @@
 		[lazy]="true" (onLazyLoad)="loadRecordsLazy($event)" [rows]="20" 
 		[paginator]="true" [rowsPerPageOptions]="[10, 20, 50, 100]" [pageLinks]="10"
         [totalRecords]="totalRecords"
-        sortField="modifiedDate" sortOrder="-1"
+        sortField="modifiedDate" sortOrder="1"
         [responsive]="true">
 <!--     <header>Records</header> -->
 	<footer>There are {{totalRecords}} records</footer>
