@@ -139,7 +139,7 @@
 		    </bean>
 		</constructor-arg>
 		<!-- Event Queue DISABLED by default -->
-		<property name="enabled" value="false" />
+		<property name="enabled" value="true" />
 	</bean>
 	
 	<bean id="reportingRepositories" class="org.openforis.collect.relational.RDBReportingRepositories"
