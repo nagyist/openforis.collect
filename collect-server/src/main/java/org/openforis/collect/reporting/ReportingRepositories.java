@@ -18,9 +18,9 @@ public interface ReportingRepositories {
 
 	void process(RecordTransaction recordTransaction);
 
-	List<String> getRepositoryPaths(String surveyName);
+	List<String> getRepositoryDescriptions(String surveyName);
 
-	String getRepositoryPath(String surveyName, RecordStep recordStep);
+	String getRepositoryDescription(String surveyName, RecordStep recordStep);
 	
 	ReportingRepositoryInfo getInfo(String surveyName);
 

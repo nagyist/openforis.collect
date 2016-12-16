@@ -28,7 +28,7 @@ public class CollectRDBMonitor {
 	@Autowired
 	private SurveyManager surveyManager;
 	@Autowired
-	private CollectLocalRDBStorageManager localRDBStorageManager;
+	private RdbStorageManager localRDBStorageManager;
 
 	public void init() {
 		if (eventQueue.isEnabled()) {
@@ -59,7 +59,7 @@ public class CollectRDBMonitor {
 	}
 
 	private boolean rdbMissing(CollectSurvey survey, RecordStep step) {
-		return ! localRDBStorageManager.existsRDBFile(survey.getName(), step);
+		return ! localRDBStorageManager.existsRDB(survey.getName(), step);
 	}
 
 }

@@ -84,7 +84,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 
 	private SurveyManager surveyManager;
 	private RecordManager recordManager;
-	private CollectLocalRDBStorageManager localRDBStorageManager;
+	private RdbStorageManager localRDBStorageManager;
 	private MondrianSchemaStorageManager mondrianSchemaStorageManager;
 	private SaikuDatasourceStorageManager saikuDatasourceStorageManager;
 	
@@ -93,7 +93,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	private Map<String, String> mondrianSchemaDefinitionBySurvey;
 	
 	public RDBReportingRepositories(SurveyManager surveyManager, RecordManager recordManager, 
-			CollectLocalRDBStorageManager localRDBStorageManager, MondrianSchemaStorageManager mondrianSchemaStorageManager,
+			RdbStorageManager localRDBStorageManager, MondrianSchemaStorageManager mondrianSchemaStorageManager,
 			SaikuDatasourceStorageManager saikuDatasourceStorageManager) {
 		this.surveyManager = surveyManager;
 		this.recordManager = recordManager;
@@ -134,7 +134,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 
 	@Override
 	public void createRepository(final String surveyName, final RecordStep recordStep, final String preferredLanguage, final ProgressListener progressListener) {
-		localRDBStorageManager.deleteRDBFile(surveyName, recordStep);
+		localRDBStorageManager.deleteRDB(surveyName, recordStep);
 		
 		updateMondrianSchemaFile(surveyName, preferredLanguage);
 		if (saikuDatasourceStorageManager.isSaikuAvailable()) {
@@ -228,7 +228,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	@Override
 	public void deleteRepositories(String surveyName) {
 		for (RecordStep step : RecordStep.values()) {
-			localRDBStorageManager.deleteRDBFile(surveyName, step);
+			localRDBStorageManager.deleteRDB(surveyName, step);
 		}
 		relationalSchemaDefinitionBySurvey.remove(surveyName);
 		mondrianSchemaStorageManager.deleteSchemaFile(surveyName);
@@ -253,24 +253,22 @@ public class RDBReportingRepositories implements ReportingRepositories {
 	}
 	
 	@Override
-	public List<String> getRepositoryPaths(String surveyName) {
+	public List<String> getRepositoryDescriptions(String surveyName) {
 		List<String> result = new ArrayList<String>();
 		for (RecordStep recordStep : RecordStep.values()) {
-			result.add(getRepositoryPath(surveyName, recordStep));
+			result.add(getRepositoryDescription(surveyName, recordStep));
 		}
 		return result;
 	}
 
 	@Override
-	public String getRepositoryPath(String surveyName, RecordStep recordStep) {
-		File rdbFile = localRDBStorageManager.getRDBFile(surveyName, recordStep);
-		String path = rdbFile.getAbsolutePath();
-		return path;
+	public String getRepositoryDescription(String surveyName, RecordStep recordStep) {
+		return localRDBStorageManager.getRDBDescription(surveyName, recordStep);
 	}
 	
 	@Override
 	public ReportingRepositoryInfo getInfo(String surveyName) {
-		Date rdbFileDate = localRDBStorageManager.getRDBFileDate(surveyName, RecordStep.ENTRY);
+		Date rdbFileDate = localRDBStorageManager.getRDBLastUpdateDate(surveyName, RecordStep.ENTRY);
 		if (rdbFileDate == null) {
 			return null;
 		} else {
@@ -317,7 +315,7 @@ public class RDBReportingRepositories implements ReportingRepositories {
 
 	private Connection createTargetConnection(String surveyName, RecordStep step) throws CollectRdbException {
 		try {
-			String pathToDbFile = getRepositoryPath(surveyName, step);
+			String pathToDbFile = getRepositoryDescription(surveyName, step);
 			String connectionUrl = "jdbc:sqlite:" + pathToDbFile;
 			Class.forName(SQLITE_DRIVER_CLASS_NAME);
 			Connection c = DriverManager.getConnection(connectionUrl);

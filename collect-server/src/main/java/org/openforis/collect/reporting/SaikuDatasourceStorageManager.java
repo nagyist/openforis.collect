@@ -9,7 +9,7 @@ import org.apache.commons.io.FileUtils;
 import org.openforis.collect.event.RecordStep;
 import org.openforis.collect.manager.BaseStorageManager;
 import org.openforis.collect.model.Configuration.ConfigurationItem;
-import org.openforis.collect.relational.CollectLocalRDBStorageManager;
+import org.openforis.collect.relational.RdbStorageManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,9 +30,9 @@ public class SaikuDatasourceStorageManager extends BaseStorageManager {
 			  "type=OLAP\r\n"
 			+ "name=%s_%s\r\n"
 			+ "driver=mondrian.olap4j.MondrianOlap4jDriver\r\n"
-			+ "location=jdbc:mondrian:Jdbc=%s;Catalog=%s;JdbcDrivers=org.sqlite.JDBC\r\n"
-			+ "username=dbuser\r\n"
-			+ "password=password";
+			+ "location=jdbc:mondrian:Jdbc=%s;Catalog=%s;JdbcDrivers=%s\r\n"
+			+ "username=%s\r\n"
+			+ "password=%s";
 	
 	@Autowired
 	private SaikuConfiguration saikuConfiguration;
@@ -40,7 +40,7 @@ public class SaikuDatasourceStorageManager extends BaseStorageManager {
 	@Autowired
 	private MondrianSchemaStorageManager mondrianSchemaStorageManager;
 	@Autowired
-	private CollectLocalRDBStorageManager rdbStorageManager;
+	private RdbStorageManager rdbStorageManager;
 	
 	@PostConstruct
 	public void init() {
@@ -63,13 +63,15 @@ public class SaikuDatasourceStorageManager extends BaseStorageManager {
 	
 	public void writeDatasourceFile(String surveyName, RecordStep recordStep) {
 		try {
-			File rdbFile = rdbStorageManager.getRDBFile(surveyName, recordStep);
 			File mondrianSchemaFile = mondrianSchemaStorageManager.getSchemaFile(surveyName);
 			String content = String.format(DATASOURCE_CONTENT_FORMAT
 					, surveyName
 					, recordStep.name().toLowerCase(Locale.ENGLISH)
-					, "jdbc:sqlite:" + formatPath(rdbFile.getAbsolutePath())
+					, rdbStorageManager.getJdbcUrl(surveyName, recordStep)
+					, rdbStorageManager.getJdbcDriver(surveyName, recordStep)
 					, formatPath(mondrianSchemaFile.getAbsolutePath())
+					, ""
+					, ""
 			);
 			File file = getDatasourceFile(surveyName, recordStep);
 			FileUtils.write(file, content);

@@ -132,14 +132,14 @@ public class RepositoryEventHandler implements KeepAliveMessageHandler<Object> {
 	}
 
 	private void logEventIgnored(String surveyName) {
-		List<String> rdbFileNames = repositories.getRepositoryPaths(surveyName);
+		List<String> rdbFileNames = repositories.getRepositoryDescriptions(surveyName);
 		LOG.error(String.format("Survey event ignored for survey '%s'; reporting repository is in a inconsistent state;"
 				+ " delete the reporting repository to force its recreation: %s", 
 				surveyName, rdbFileNames));
 	}
 
 	private void logEventProcessFailed(SurveyEvent event, Exception e) {
-		List<String> rdbFileNames = repositories.getRepositoryPaths(event.getSurveyName());
+		List<String> rdbFileNames = repositories.getRepositoryDescriptions(event.getSurveyName());
 		LOG.error(String.format("Failed to process survey event %s; reporting repository is in a inconsistent state;"
 				+ " delete the reporting repository to force its recreation: %s", 
 				event, rdbFileNames), e);

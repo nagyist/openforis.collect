@@ -7,6 +7,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -27,6 +30,7 @@ import org.openforis.rmb.monitor.Monitor;
 import org.openforis.rmb.slf4j.Slf4jLoggingMonitor;
 import org.openforis.rmb.spring.SpringJdbcMessageBroker;
 import org.openforis.rmb.xstream.XStreamMessageSerializer;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 import com.codahale.metrics.ConsoleReporter;
 import com.codahale.metrics.Counter;
@@ -47,6 +51,7 @@ import com.codahale.metrics.Timer;
 public class ConfiguredMessageBroker implements MessageBroker {
 
 	private static final Logger LOG = Logger.getLogger(ConfiguredMessageBroker.class);
+	private static final String COLLECT_DEFAULT_SCHEMA_NAME = "collect";
 	private static final String TABLE_PREFIX = "ofc_";
 	
 	private final SpringJdbcMessageBroker messageBroker;
@@ -55,8 +60,11 @@ public class ConfiguredMessageBroker implements MessageBroker {
 	public ConfiguredMessageBroker(DataSource dataSource) throws Exception {
 		messageBroker = new SpringJdbcMessageBroker(dataSource);
 		messageBroker.setMessageSerializer(new XStreamMessageSerializer());
-		messageBroker.setTablePrefix(TABLE_PREFIX);
-		
+		if (isSchemaLess(dataSource)) {
+			messageBroker.setTablePrefix(TABLE_PREFIX);
+		} else {
+			messageBroker.setTablePrefix(COLLECT_DEFAULT_SCHEMA_NAME + "." + TABLE_PREFIX);
+		}
 		initMonitors();
 		messageBroker.afterPropertiesSet();
 	}
@@ -104,6 +112,23 @@ public class ConfiguredMessageBroker implements MessageBroker {
 	public void stop() {
 		messageBroker.stop();
 		fileReporter.stop();
+	}
+	
+	private boolean isSchemaLess(DataSource dataSource) {
+		Connection conn = null;
+		try {
+			conn = dataSource.getConnection();
+			DatabaseMetaData metaData = conn.getMetaData();
+			return "SQLite".equals(metaData.getDatabaseProductName());
+		} catch (SQLException e) {
+			throw new RuntimeException("Error creating MessageBroker", e);
+		} finally {
+			if (! (conn == null || dataSource instanceof SingleConnectionDataSource)) {
+				try {
+					conn.close();
+				} catch (SQLException e) {}
+			}
+		}
 	}
 	
 	private static class FileReporter extends ScheduledReporter {
