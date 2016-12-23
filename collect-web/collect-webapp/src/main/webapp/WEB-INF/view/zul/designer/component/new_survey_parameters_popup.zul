@@ -43,6 +43,16 @@
 						</template>
 					</radiogroup>
 				</row>
+				<row>
+					<label value="${labels.survey.template.user_group.$}:" />
+					<radiogroup model="@load(vm.groupModel)" 
+						selectedItem="@bind(fx.userGroup)"
+						orient="vertical">
+						<template name="model">
+							<radio label="${each.label}" value="${each.label}" />
+						</template>
+					</radiogroup>
+				</row>
 			</rows>
 		</grid>
 

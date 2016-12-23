@@ -62,6 +62,8 @@
 							<inputSchema>collect</inputSchema>
 						</database>
 						<generate>
+							<daos>true</daos>
+							<pojos>true</pojos>
 							<relations>true</relations>
 							<deprecated>false</deprecated>
 						</generate>
@@ -259,6 +261,11 @@
 	</build>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.jooq</groupId>
+			<artifactId>jooq-codegen-maven</artifactId>
+			<version>${jooq-codegen.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.openforis.commons</groupId>
 			<artifactId>commons-lang</artifactId>

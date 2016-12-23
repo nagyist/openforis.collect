@@ -35,6 +35,8 @@ public class UserManager {
 	private UserDao userDao;
 	@Autowired
 	private RecordDao recordDao;
+	@Autowired
+	private UserGroupManager userGroupManager;
 	
 	//cache
 	private Map<Integer, User> userById = new TreeMap<Integer, User>();
@@ -98,6 +100,7 @@ public class UserManager {
 		}
 		if (userId == null) {
 			userDao.insert(user);
+			userGroupManager.createDefaultPrivateUserGroup(user);
 		} else {
 			userDao.update(user);
 		}

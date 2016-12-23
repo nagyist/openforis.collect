@@ -31,7 +31,9 @@ import org.openforis.collect.persistence.jooq.tables.OfcTaxon;
 import org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName;
 import org.openforis.collect.persistence.jooq.tables.OfcTaxonomy;
 import org.openforis.collect.persistence.jooq.tables.OfcUser;
+import org.openforis.collect.persistence.jooq.tables.OfcUserGroup;
 import org.openforis.collect.persistence.jooq.tables.OfcUserRole;
+import org.openforis.collect.persistence.jooq.tables.OfcUserUserGroup;
 
 
 /**
@@ -173,7 +175,17 @@ public class Tables {
 	public static final OfcUser OFC_USER = org.openforis.collect.persistence.jooq.tables.OfcUser.OFC_USER;
 
 	/**
+	 * The table collect.ofc_user_group
+	 */
+	public static final OfcUserGroup OFC_USER_GROUP = org.openforis.collect.persistence.jooq.tables.OfcUserGroup.OFC_USER_GROUP;
+
+	/**
 	 * The table collect.ofc_user_role
 	 */
 	public static final OfcUserRole OFC_USER_ROLE = org.openforis.collect.persistence.jooq.tables.OfcUserRole.OFC_USER_ROLE;
+
+	/**
+	 * The table collect.ofc_user_user_group
+	 */
+	public static final OfcUserUserGroup OFC_USER_USER_GROUP = org.openforis.collect.persistence.jooq.tables.OfcUserUserGroup.OFC_USER_USER_GROUP;
 }

@@ -33,7 +33,7 @@
 			<column name="creation_date" type="DATETIME">
 				<constraints nullable="false" />
 			</column>
-			<column name="visibility" type="CHAR(1)"
+			<column name="visibility_code" type="CHAR(1)"
 				remarks="P=Public, N=Private">
 				<constraints nullable="false" />
 			</column> 
@@ -52,11 +52,11 @@
 					foreignKeyName="ofc_user_user_group_user_group_fkey" 
 					references="ofc_user_group(id)" />
 			</column>
-			<column name="role" type="CHAR(1)" 
+			<column name="role_code" type="CHAR(1)" 
 				remarks="Role in the user group: O=Owner, A=Administrator, D=Data analyzer, U=User/Operator, V=Viewer">
 				<constraints nullable="false" />
 			</column>
-			<column name="status" type="CHAR(1)"
+			<column name="status_code" type="CHAR(1)"
 				remarks="P=Pending,A=Accepted,R=Rejected">
 				<constraints nullable="false" />
 			</column>
@@ -80,20 +80,45 @@
 	
 	<changeSet id="user-groups-default-values" author="ricci" dbms="postgresql">
 		<sql>
+    		-- Create a default public user group named default_group
+	    	
+    		INSERT INTO collect.ofc_user_group(id, name, label, created_by, creation_date, visibility_code) 
+	    		VALUES (
+	    			nextval('collect.ofc_user_group_id_seq'), 
+		    		'default_group',
+		    		'Default Group',
+		    		(SELECT u.id FROM collect.ofc_user u WHERE u.username = 'admin'),
+		    		CURRENT_TIMESTAMP,
+		    		'P'
+		    	);
+		    
+		    -- make the admin user owner of the Default Group
+		    	
+		    INSERT INTO collect.ofc_user_user_group (user_id, group_id, role_code, status_code, request_date, member_since)
+		    	VALUES (
+   		 			(SELECT u.id FROM collect.ofc_user u WHERE u.username = 'admin'),
+    		 		(SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'default_group'),
+    		 		'O',
+    		 		'A',
+    		 		CURRENT_TIMESTAMP,
+    		 		CURRENT_TIMESTAMP
+    		 	);
+    		 
     		-- Create a user group named USERNAME_default_group per each user
 	    	
-    		INSERT INTO collect.ofc_user_group(id, name, label, creation_date, visibility) 
+    		INSERT INTO collect.ofc_user_group(id, name, label, created_by, creation_date, visibility_code) 
 	    		SELECT nextval('collect.ofc_user_group_id_seq'), 
 		    		CONCAT(u.username, '_default_group'),
 		    		CONCAT('Default Group of ', u.username),
+		    		u.id,
 		    		CURRENT_TIMESTAMP,
 		    		'N'
 		    	FROM collect.ofc_user u
   		 	;
-    		 	
-    		-- Make each user owner of his default group
+  		 	
+  		 	-- Make each user owner of his default group
 	    	
-    		INSERT INTO collect.ofc_user_user_group (user_id, group_id, role, status, request_date, member_since)
+    		INSERT INTO collect.ofc_user_user_group (user_id, group_id, role_code, status_code, request_date, member_since)
    		 		SELECT 
    		 			u.id, 
     		 		(SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = CONCAT(u.username, '_default_group')),
@@ -104,12 +129,12 @@
 	 			FROM collect.ofc_user u
   		 	;
     		 	
-    		 -- Make each user with administrator role be even administrator of the admin_default_group (backwards compatibility)
+    		 -- Make each user with administrator role be even administrator of the default_group (backwards compatibility)
     		 
-    		 INSERT INTO collect.ofc_user_user_group (user_id, group_id, role, status, request_date, member_since)
+    		 INSERT INTO collect.ofc_user_user_group (user_id, group_id, role_code, status_code, request_date, member_since)
    		 		SELECT 
    		 			u.id, 
-    		 		(SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'admin_default_group'),
+    		 		(SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'default_group'),
     		 		'A',
     		 		'A',
     		 		CURRENT_TIMESTAMP,
@@ -120,12 +145,12 @@
 	 				AND ur.role = 'ROLE_ADMIN'
   		 	;
     		 	
-    		-- Users with role ROLE_ANALYSIS will be Analyzers in admin_default_group
+    		-- Users with role ROLE_ANALYSIS will be Analyzers in default_group
     		 
-    		 INSERT INTO collect.ofc_user_user_group (user_id, group_id, role, status, request_date, member_since)
+    		 INSERT INTO collect.ofc_user_user_group (user_id, group_id, role_code, status_code, request_date, member_since)
    		 		SELECT 
    		 			u.id, 
-    		 		(SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'admin_default_group'),
+    		 		(SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'default_group'),
     		 		'D',
     		 		'A',
     		 		CURRENT_TIMESTAMP,
@@ -134,19 +159,19 @@
   		 			WHERE 
   		 				u.id NOT IN (
 		 					SELECT uug.user_id FROM collect.ofc_user_user_group uug WHERE uug.group_id = (
-		 						SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'admin_default_group')
+		 						SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'default_group')
   		 				) 
   		 				AND ur.user_id = u.id 
   		 				AND u.username != 'admin'
   		 				AND ur.role = 'ROLE_ANALYSIS'
   		 	;
     		 	
-    		-- Users with role ROLE_CLEANSING will be only Analyzers in admin_default_group
+    		-- Users with role ROLE_CLEANSING will be only Analyzers in default_group
     		 
-    		 INSERT INTO collect.ofc_user_user_group (user_id, group_id, role, status, request_date, member_since)
+    		 INSERT INTO collect.ofc_user_user_group (user_id, group_id, role_code, status_code, request_date, member_since)
    		 		SELECT 
    		 			u.id, 
-    		 		(SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'admin_default_group'),
+    		 		(SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'default_group'),
     		 		'D',
     		 		'A',
     		 		CURRENT_TIMESTAMP,
@@ -155,19 +180,19 @@
   		 			WHERE 
   		 				u.id NOT IN (
 		 					SELECT uug.user_id FROM collect.ofc_user_user_group uug WHERE uug.group_id = (
-		 						SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'admin_default_group')
+		 						SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'default_group')
   		 				) 
   		 				AND ur.user_id = u.id 
   		 				AND u.username != 'admin'
   		 				AND ur.role = 'ROLE_CLEANSING'
   		 	;
     		 	
-    		-- Users with role ROLE_ENTRY will be only (data entry) Operators in admin_default_group
+    		-- Users with role ROLE_ENTRY will be only (data entry) Operators in default_group
     		 
-    		 INSERT INTO collect.ofc_user_user_group (user_id, group_id, role, status, request_date, member_since)
+    		 INSERT INTO collect.ofc_user_user_group (user_id, group_id, role_code, status_code, request_date, member_since)
    		 		SELECT 
    		 			u.id, 
-    		 		(SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'admin_default_group'),
+    		 		(SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'default_group'),
     		 		'U',
     		 		'A',
     		 		CURRENT_TIMESTAMP,
@@ -176,19 +201,19 @@
   		 			WHERE 
   		 				u.id NOT IN (
 		 					SELECT uug.user_id FROM collect.ofc_user_user_group uug WHERE uug.group_id = (
-		 						SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'admin_default_group')
+		 						SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'default_group')
   		 				) 
   		 				AND ur.user_id = u.id 
   		 				AND u.username != 'admin'
   		 				AND ur.role = 'ROLE_ENTRY'
   		 	;
     		 	
-    		 -- Users with role ROLE_VIEW will be only Viewers in admin_default_group
+    		 -- Users with role ROLE_VIEW will be only Viewers in default_group
     		 
-    		 INSERT INTO collect.ofc_user_user_group (user_id, group_id, role, status, request_date, member_since)
+    		 INSERT INTO collect.ofc_user_user_group (user_id, group_id, role_code, status_code, request_date, member_since)
    		 		SELECT 
    		 			u.id, 
-    		 		(SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'admin_default_group'),
+    		 		(SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'default_group'),
     		 		'V',
     		 		'A',
     		 		CURRENT_TIMESTAMP,
@@ -197,12 +222,17 @@
   		 			WHERE 
   		 				u.id NOT IN (
 		 					SELECT uug.user_id FROM collect.ofc_user_user_group uug WHERE uug.group_id = (
-		 						SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'admin_default_group')
+		 						SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'default_group')
   		 				) 
   		 				AND ur.user_id = u.id 
   		 				AND u.username != 'admin'
   		 				AND ur.role = 'ROLE_VIEW'
   		 	;
+  		 	
+  		 	-- Assign all existing survey to the Default Group
+  		 	
+  		 	UPDATE collect.ofc_survey SET user_group_id = (SELECT ug.id FROM collect.ofc_user_group ug WHERE ug.name = 'default_group');
+  		 	
    		 </sql>
     	
 	</changeSet>

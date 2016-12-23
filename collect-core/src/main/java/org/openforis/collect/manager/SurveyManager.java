@@ -748,6 +748,9 @@ public class SurveyManager {
 
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public void save(CollectSurvey survey) throws SurveyStoreException {
+		if (survey.getUserGroupId() == null) {
+			throw new IllegalStateException("User group not set for survey " + survey.getName());
+		}
 		survey.setModifiedDate(new Date());
 		survey.setCollectVersion(Collect.VERSION);
 		Integer id = survey.getId();
