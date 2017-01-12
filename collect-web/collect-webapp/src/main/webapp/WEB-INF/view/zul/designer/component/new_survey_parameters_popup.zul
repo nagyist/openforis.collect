@@ -44,9 +44,9 @@
 					</radiogroup>
 				</row>
 				<row>
-					<label value="${labels.survey.template.user_group.$}:" />
-					<radiogroup model="@load(vm.groupModel)" 
-						selectedItem="@bind(fx.userGroup)"
+					<label value="${labels.survey.template.institution.$}:" />
+					<radiogroup model="@load(vm.institutionModel)" 
+						selectedItem="@bind(fx.institution)"
 						orient="vertical">
 						<template name="model">
 							<radio label="${each.label}" value="${each.label}" />

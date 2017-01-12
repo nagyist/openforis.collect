@@ -33,7 +33,7 @@ import org.openforis.collect.persistence.jooq.tables.records.OfcSurveyRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcSurvey extends TableImpl<OfcSurveyRecord> {
 
-	private static final long serialVersionUID = -2034044195;
+	private static final long serialVersionUID = 1490691616;
 
 	/**
 	 * The reference instance of <code>collect.ofc_survey</code>
@@ -99,9 +99,9 @@ public class OfcSurvey extends TableImpl<OfcSurveyRecord> {
 	public final TableField<OfcSurveyRecord, Integer> PUBLISHED_ID = createField("published_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
-	 * The column <code>collect.ofc_survey.user_group_id</code>.
+	 * The column <code>collect.ofc_survey.institution_id</code>.
 	 */
-	public final TableField<OfcSurveyRecord, Integer> USER_GROUP_ID = createField("user_group_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
+	public final TableField<OfcSurveyRecord, Integer> INSTITUTION_ID = createField("institution_id", org.jooq.impl.SQLDataType.INTEGER, this, "");
 
 	/**
 	 * Create a <code>collect.ofc_survey</code> table reference

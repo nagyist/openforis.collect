@@ -235,6 +235,7 @@ public class SurveyDao extends JooqDaoSupport {
 		storeQuery.addValue(OFC_SURVEY.COLLECT_VERSION, survey.getCollectVersion().toString());
 		storeQuery.addValue(OFC_SURVEY.DATE_CREATED, toTimestamp(survey.getCreationDate()));
 		storeQuery.addValue(OFC_SURVEY.DATE_MODIFIED, toTimestamp(survey.getModifiedDate()));
+		storeQuery.addValue(OFC_SURVEY.INSTITUTION_ID, survey.getInstitutionId());
 	}
 
 	private void addNewSurveyValues(StoreQuery<OfcSurveyRecord> storeQuery,
@@ -261,6 +262,7 @@ public class SurveyDao extends JooqDaoSupport {
 			survey.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
 			survey.setTemporary(row.getValue(OFC_SURVEY.TEMPORARY));
 			survey.setUri(row.getValue(OFC_SURVEY.URI));
+			survey.setInstitutionId(row.getValue(OFC_SURVEY.INSTITUTION_ID));
 			return survey;
 		} catch (IdmlParseException e) {
 			throw new RuntimeException("Error deserializing IDML from database", e);
@@ -280,6 +282,7 @@ public class SurveyDao extends JooqDaoSupport {
 		summary.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
 		summary.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
 		summary.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
+		summary.setInstitutionId(row.getValue(OFC_SURVEY.INSTITUTION_ID));
 		return summary;
 	}
 	

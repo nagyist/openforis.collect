@@ -40,7 +40,7 @@ public class CollectSurvey extends Survey {
 	private Version collectVersion;
 	private SurveyTarget target;
 	private Integer publishedId;
-	private Integer userGroupId;
+	private Integer institutionId;
 	
 	private CollectAnnotations annotations;
 	private UIConfiguration uiConfiguration;
@@ -186,12 +186,12 @@ public class CollectSurvey extends Survey {
 		this.publishedId = publishedId;
 	}
 	
-	public Integer getUserGroupId() {
-		return userGroupId;
+	public Integer getInstitutionId() {
+		return institutionId;
 	}
 	
-	public void setUserGroupId(Integer userGroupId) {
-		this.userGroupId = userGroupId;
+	public void setInstitutionId(Integer institutionId) {
+		this.institutionId = institutionId;
 	}
 	
 	public Version getCollectVersion() {

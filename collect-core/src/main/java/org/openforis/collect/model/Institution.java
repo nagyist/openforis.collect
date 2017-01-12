@@ -1,9 +1,9 @@
 package org.openforis.collect.model;
 
 import org.apache.commons.lang3.StringUtils;
-import org.openforis.collect.persistence.jooq.tables.pojos.OfcUserGroup;
+import org.openforis.collect.persistence.jooq.tables.pojos.OfcInstitution;
 
-public class UserGroup extends OfcUserGroup {
+public class Institution extends OfcInstitution {
 
 	private static final long serialVersionUID = 1L;
 
@@ -22,7 +22,7 @@ public class UserGroup extends OfcUserGroup {
 					return value;
 				}
 			}
-			throw new IllegalArgumentException("Invalid UserGroup Visibility code: " + code);
+			throw new IllegalArgumentException("Invalid Institution Visibility code: " + code);
 		}
 		
 		public char getCode() {
@@ -30,22 +30,22 @@ public class UserGroup extends OfcUserGroup {
 		}
 	}
 	
-	public enum UserGroupRequestStatus {
+	public enum InstitutionJoinRequestStatus {
 		ACCEPTED('A'), REJECTED('R'), PENDING('P');
 		
 		private char code;
 		
-		UserGroupRequestStatus(char code) {
+		InstitutionJoinRequestStatus(char code) {
 			this.code = code;
 		}
 		
-		public static UserGroupRequestStatus fromCode(char code) {
-			for (UserGroupRequestStatus value : values()) {
+		public static InstitutionJoinRequestStatus fromCode(char code) {
+			for (InstitutionJoinRequestStatus value : values()) {
 				if (value.code == code) {
 					return value;
 				}
 			}
-			throw new IllegalArgumentException("Invalid UserGroupRequestStatus Visibility code: " + code);
+			throw new IllegalArgumentException("Invalid InstitutionJoinRequestStatus Visibility code: " + code);
 		}
 		
 		public char getCode() {
@@ -53,22 +53,22 @@ public class UserGroup extends OfcUserGroup {
 		}
 	}
 	
-	public enum UserGroupRole {
+	public enum InstitutionRole {
 		OWNER('O'), ADMINISTRATOR('A'), DATA_ANALYZER('D'), OPERATOR('U'), VIEWER('V');
 		
 		private char code;
 		
-		UserGroupRole(char code) {
+		InstitutionRole(char code) {
 			this.code = code;
 		}
 		
-		public static UserGroupRole fromCode(char code) {
-			for (UserGroupRole value : values()) {
+		public static InstitutionRole fromCode(char code) {
+			for (InstitutionRole value : values()) {
 				if (value.code == code) {
 					return value;
 				}
 			}
-			throw new IllegalArgumentException("Invalid UserGroupRole Visibility code: " + code);
+			throw new IllegalArgumentException("Invalid InstitutionRole Visibility code: " + code);
 		}
 		
 		public char getCode() {

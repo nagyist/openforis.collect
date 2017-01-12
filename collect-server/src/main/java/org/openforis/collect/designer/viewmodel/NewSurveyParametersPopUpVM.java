@@ -13,17 +13,17 @@ import org.openforis.collect.designer.model.LabelledItem;
 import org.openforis.collect.designer.model.LabelledItem.LabelComparator;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.Resources.Page;
+import org.openforis.collect.manager.InstitutionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyObjectsGenerator;
-import org.openforis.collect.manager.UserGroupManager;
 import org.openforis.collect.manager.exception.SurveyValidationException;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.metamodel.ui.UIOptions;
 import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.Institution;
 import org.openforis.collect.model.User;
-import org.openforis.collect.model.UserGroup;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Languages;
@@ -50,7 +50,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 	private static final String SURVEY_NAME_FIELD = "name";
 	private static final String TEMPLATE_FIELD_NAME = "template";
 	private static final String LANGUAGE_FIELD_NAME = "language";
-	private static final String USER_GROUP_FIELD_NAME = "userGroup";
+	private static final String INSTITUTION_FIELD_NAME = "institution";
 
 	private enum TemplateType {
 		BLANK,
@@ -63,12 +63,12 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 	@WireVariable 
 	private SurveyManager surveyManager;
 	@WireVariable 
-	private UserGroupManager userGroupManager;
+	private InstitutionManager institutionManager;
 	
 	private Map<String, Object> form;
 	
 	private BindingListModelListModel<LabelledItem> templateModel;
-	private BindingListModelListModel<LabelledItem> groupModel;
+	private BindingListModelListModel<LabelledItem> institutionModel;
 	private BindingListModelListModel<LabelledItem> languageModel;
 
 	private Validator nameValidator;
@@ -79,7 +79,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		nameValidator = new SurveyNameValidator(surveyManager, SURVEY_NAME_FIELD, true);
 		initLanguageModel();
 		initTemplatesModel();
-		initUserGroupsModel();
+		initInstitutionsModel();
 	}
 
 	private void initTemplatesModel() {
@@ -94,25 +94,25 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		form.put(TEMPLATE_FIELD_NAME, defaultTemplate);
 	}
 	
-	private void initUserGroupsModel() {
-		List<LabelledItem> groupItems = new ArrayList<LabelledItem>();
+	private void initInstitutionsModel() {
+		List<LabelledItem> items = new ArrayList<LabelledItem>();
 		User loggedUser = getLoggedUser();
-		List<UserGroup> groups = userGroupManager.findGroupsByUser(loggedUser);
-		String defaultPrivateGroupName = userGroupManager.getDefaultPrivateGroupName(loggedUser);
-		String defaultPublicGroupName = userGroupManager.getDefaultPublicGroupName();
-		for (UserGroup group : groups) {
-			String label = group.getLabel();
-			if (group.getName().equals(defaultPrivateGroupName)) {
-				label = Labels.getLabel("survey.template.user_group.private");
-			} else if (group.getName().equals(defaultPublicGroupName)) {
-				label = Labels.getLabel("survey.template.user_group.public");
+		List<Institution> institutions = institutionManager.findInstitutionsByUser(loggedUser);
+		String defaultPrivateInstitutionName = institutionManager.getDefaultPrivateInstitutionName(loggedUser);
+		String defaultPublicInstitutionName = institutionManager.getDefaultPublicInstitutionName();
+		for (Institution institution : institutions) {
+			String label = institution.getLabel();
+			if (institution.getName().equals(defaultPrivateInstitutionName)) {
+				label = Labels.getLabel("survey.template.institution.private");
+			} else if (institution.getName().equals(defaultPublicInstitutionName)) {
+				label = Labels.getLabel("survey.template.institution.public");
 			}
-			groupItems.add(new LabelledItem(group.getName(), label));
+			items.add(new LabelledItem(institution.getName(), label));
 		}
-		LabelledItem privateGroup = LabelledItem.getByCode(groupItems, defaultPrivateGroupName);
-		groupModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(groupItems));
-		groupModel.setMultiple(false);
-		form.put(USER_GROUP_FIELD_NAME, privateGroup);
+		LabelledItem privateInstitution = LabelledItem.getByCode(items, defaultPrivateInstitutionName);
+		institutionModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(items));
+		institutionModel.setMultiple(false);
+		form.put(INSTITUTION_FIELD_NAME, privateInstitution);
 	}
 
 	private void initLanguageModel() {
@@ -133,7 +133,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		String name = (String) form.get(SURVEY_NAME_FIELD);
 		String langCode = ((LabelledItem) form.get(LANGUAGE_FIELD_NAME)).getCode();
 		String templateCode = ((LabelledItem) form.get(TEMPLATE_FIELD_NAME)).getCode();
-		String userGroupName = ((LabelledItem) form.get(USER_GROUP_FIELD_NAME)).getCode();
+		String institutionName = ((LabelledItem) form.get(INSTITUTION_FIELD_NAME)).getCode();
 		
 		TemplateType templateType = TemplateType.valueOf(templateCode);
 		
@@ -145,8 +145,8 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		default:
 			survey = createNewSurveyFromTemplate(name, langCode, templateType);
 		}
-		UserGroup userGroup = userGroupManager.loadGroupByName(userGroupName);
-		survey.setUserGroupId(userGroup.getId());
+		Institution institution = institutionManager.loadInstitutionByName(institutionName);
+		survey.setInstitutionId(institution.getId());
 		surveyManager.save(survey);
 		//put survey in session and redirect into survey edit page
 		SessionStatus sessionStatus = getSessionStatus();
@@ -214,8 +214,8 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		return languageModel;
 	}
 	
-	public BindingListModelListModel<LabelledItem> getGroupModel() {
-		return groupModel;
+	public BindingListModelListModel<LabelledItem> getInstitutionModel() {
+		return institutionModel;
 	}
 
 	public Map<String, Object> getForm() {

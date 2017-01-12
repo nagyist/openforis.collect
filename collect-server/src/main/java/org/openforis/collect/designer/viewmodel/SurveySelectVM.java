@@ -465,7 +465,7 @@ public class SurveySelectVM extends BaseVM {
 	}
 
 	private List<SurveySummary> loadSurveySummaries(List<SurveySummarySortField> sortFields) {
-		return surveyManager.loadCombinedSummaries(null, true, sortFields);
+		return surveyManager.loadCombinedSummaries(null, true, getLoggedUser(), sortFields);
 	}
 	
 	private SurveySummary findSummary(Integer id, boolean published, boolean work) {

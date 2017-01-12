@@ -23,6 +23,7 @@ public class SurveySummary {
 	private String projectName;
 	private boolean temporary;
 	private boolean published;
+	private Integer institutionId;
 	private Date creationDate;
 	private Date modifiedDate;
 	private SurveyTarget target;
@@ -60,6 +61,7 @@ public class SurveySummary {
 		summary.setTarget(survey.getTarget());
 		summary.setDefaultLanguage(survey.getDefaultLanguage());
 		summary.setLanguages(survey.getLanguages());
+		summary.setInstitutionId(survey.getInstitutionId());
 		return summary;
 	}
 	
@@ -168,4 +170,11 @@ public class SurveySummary {
 		this.languages = languages;
 	}
 
+	public Integer getInstitutionId() {
+		return institutionId;
+	}
+	
+	public void setInstitutionId(Integer institutionId) {
+		this.institutionId = institutionId;
+	}
 }

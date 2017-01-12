@@ -29,7 +29,7 @@ import org.openforis.collect.persistence.jooq.tables.OfcSurvey;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcSurveyRecord extends UpdatableRecordImpl<OfcSurveyRecord> implements Record11<Integer, String, String, String, String, Timestamp, Timestamp, String, Boolean, Integer, Integer> {
 
-	private static final long serialVersionUID = 562998637;
+	private static final long serialVersionUID = 36517530;
 
 	/**
 	 * Setter for <code>collect.ofc_survey.id</code>.
@@ -172,16 +172,16 @@ public class OfcSurveyRecord extends UpdatableRecordImpl<OfcSurveyRecord> implem
 	}
 
 	/**
-	 * Setter for <code>collect.ofc_survey.user_group_id</code>.
+	 * Setter for <code>collect.ofc_survey.institution_id</code>.
 	 */
-	public void setUserGroupId(Integer value) {
+	public void setInstitutionId(Integer value) {
 		setValue(10, value);
 	}
 
 	/**
-	 * Getter for <code>collect.ofc_survey.user_group_id</code>.
+	 * Getter for <code>collect.ofc_survey.institution_id</code>.
 	 */
-	public Integer getUserGroupId() {
+	public Integer getInstitutionId() {
 		return (Integer) getValue(10);
 	}
 
@@ -302,7 +302,7 @@ public class OfcSurveyRecord extends UpdatableRecordImpl<OfcSurveyRecord> implem
 	 */
 	@Override
 	public Field<Integer> field11() {
-		return OfcSurvey.OFC_SURVEY.USER_GROUP_ID;
+		return OfcSurvey.OFC_SURVEY.INSTITUTION_ID;
 	}
 
 	/**
@@ -390,7 +390,7 @@ public class OfcSurveyRecord extends UpdatableRecordImpl<OfcSurveyRecord> implem
 	 */
 	@Override
 	public Integer value11() {
-		return getUserGroupId();
+		return getInstitutionId();
 	}
 
 	/**
@@ -488,7 +488,7 @@ public class OfcSurveyRecord extends UpdatableRecordImpl<OfcSurveyRecord> implem
 	 */
 	@Override
 	public OfcSurveyRecord value11(Integer value) {
-		setUserGroupId(value);
+		setInstitutionId(value);
 		return this;
 	}
 
@@ -525,7 +525,7 @@ public class OfcSurveyRecord extends UpdatableRecordImpl<OfcSurveyRecord> implem
 	/**
 	 * Create a detached, initialised OfcSurveyRecord
 	 */
-	public OfcSurveyRecord(Integer id, String name, String uri, String idml, String target, Timestamp dateCreated, Timestamp dateModified, String collectVersion, Boolean temporary, Integer publishedId, Integer userGroupId) {
+	public OfcSurveyRecord(Integer id, String name, String uri, String idml, String target, Timestamp dateCreated, Timestamp dateModified, String collectVersion, Boolean temporary, Integer publishedId, Integer institutionId) {
 		super(OfcSurvey.OFC_SURVEY);
 
 		setValue(0, id);
@@ -538,6 +538,6 @@ public class OfcSurveyRecord extends UpdatableRecordImpl<OfcSurveyRecord> implem
 		setValue(7, collectVersion);
 		setValue(8, temporary);
 		setValue(9, publishedId);
-		setValue(10, userGroupId);
+		setValue(10, institutionId);
 	}
 }

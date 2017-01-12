@@ -117,7 +117,7 @@
   		<property name="dsl" ref="dsl" />
 	</bean>
 	
-	<bean id="userGroupDao" class="org.openforis.collect.persistence.UserGroupDao">
+	<bean id="institutionDao" class="org.openforis.collect.persistence.InstitutionDao">
   		<constructor-arg ref="jooqConfiguration" />
 	</bean>
 	
@@ -142,7 +142,7 @@
 	<bean id="surveyManager"	 		class="org.openforis.collect.manager.SurveyManager" 
 		init-method="init" />
 	<bean id="userManager" 				class="org.openforis.collect.manager.UserManager" />
-	<bean id="userGroupManager" 		class="org.openforis.collect.manager.UserGroupManager" />
+	<bean id="institutionManager" 		class="org.openforis.collect.manager.InstitutionManager" />
 	
 	<!--  Services -->
 	<bean id="codeListService"	 		class="org.openforis.collect.service.CollectCodeListService" />

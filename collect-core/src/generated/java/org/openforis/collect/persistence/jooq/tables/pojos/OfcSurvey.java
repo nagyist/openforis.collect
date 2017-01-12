@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class OfcSurvey implements Serializable {
 
-	private static final long serialVersionUID = 341820475;
+	private static final long serialVersionUID = -564952693;
 
 	private Integer   id;
 	private String    name;
@@ -35,7 +35,7 @@ public class OfcSurvey implements Serializable {
 	private String    collectVersion;
 	private Boolean   temporary;
 	private Integer   publishedId;
-	private Integer   userGroupId;
+	private Integer   institutionId;
 
 	public OfcSurvey() {}
 
@@ -50,7 +50,7 @@ public class OfcSurvey implements Serializable {
 		this.collectVersion = value.collectVersion;
 		this.temporary = value.temporary;
 		this.publishedId = value.publishedId;
-		this.userGroupId = value.userGroupId;
+		this.institutionId = value.institutionId;
 	}
 
 	public OfcSurvey(
@@ -64,7 +64,7 @@ public class OfcSurvey implements Serializable {
 		String    collectVersion,
 		Boolean   temporary,
 		Integer   publishedId,
-		Integer   userGroupId
+		Integer   institutionId
 	) {
 		this.id = id;
 		this.name = name;
@@ -76,7 +76,7 @@ public class OfcSurvey implements Serializable {
 		this.collectVersion = collectVersion;
 		this.temporary = temporary;
 		this.publishedId = publishedId;
-		this.userGroupId = userGroupId;
+		this.institutionId = institutionId;
 	}
 
 	public Integer getId() {
@@ -159,11 +159,11 @@ public class OfcSurvey implements Serializable {
 		this.publishedId = publishedId;
 	}
 
-	public Integer getUserGroupId() {
-		return this.userGroupId;
+	public Integer getInstitutionId() {
+		return this.institutionId;
 	}
 
-	public void setUserGroupId(Integer userGroupId) {
-		this.userGroupId = userGroupId;
+	public void setInstitutionId(Integer institutionId) {
+		this.institutionId = institutionId;
 	}
 }

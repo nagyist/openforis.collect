@@ -28,6 +28,7 @@ import org.openforis.collect.persistence.jooq.tables.OfcDataQueryGroupQuery;
 import org.openforis.collect.persistence.jooq.tables.OfcDataQueryType;
 import org.openforis.collect.persistence.jooq.tables.OfcDataReport;
 import org.openforis.collect.persistence.jooq.tables.OfcDataReportItem;
+import org.openforis.collect.persistence.jooq.tables.OfcInstitution;
 import org.openforis.collect.persistence.jooq.tables.OfcLogo;
 import org.openforis.collect.persistence.jooq.tables.OfcMessage;
 import org.openforis.collect.persistence.jooq.tables.OfcMessageProcessing;
@@ -39,9 +40,8 @@ import org.openforis.collect.persistence.jooq.tables.OfcTaxon;
 import org.openforis.collect.persistence.jooq.tables.OfcTaxonVernacularName;
 import org.openforis.collect.persistence.jooq.tables.OfcTaxonomy;
 import org.openforis.collect.persistence.jooq.tables.OfcUser;
-import org.openforis.collect.persistence.jooq.tables.OfcUserGroup;
+import org.openforis.collect.persistence.jooq.tables.OfcUserInstitution;
 import org.openforis.collect.persistence.jooq.tables.OfcUserRole;
-import org.openforis.collect.persistence.jooq.tables.OfcUserUserGroup;
 
 
 /**
@@ -57,7 +57,7 @@ import org.openforis.collect.persistence.jooq.tables.OfcUserUserGroup;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Collect extends SchemaImpl {
 
-	private static final long serialVersionUID = -969880179;
+	private static final long serialVersionUID = 914190982;
 
 	/**
 	 * The reference instance of <code>collect</code>
@@ -89,15 +89,15 @@ public class Collect extends SchemaImpl {
 			Sequences.OFC_DATA_QUERY_TYPE_ID_SEQ,
 			Sequences.OFC_DATA_REPORT_ID_SEQ,
 			Sequences.OFC_DATA_REPORT_ITEM_ID_SEQ,
+			Sequences.OFC_INSTITUTION_ID_SEQ,
 			Sequences.OFC_MESSAGE_SEQUENCE_NO_SEQ,
 			Sequences.OFC_RECORD_ID_SEQ,
 			Sequences.OFC_SAMPLING_DESIGN_ID_SEQ,
 			Sequences.OFC_SURVEY_FILE_ID_SEQ,
 			Sequences.OFC_SURVEY_ID_SEQ,
 			Sequences.OFC_TAXON_ID_SEQ,
-			Sequences.OFC_TAXONOMY_ID_SEQ,
 			Sequences.OFC_TAXON_VERNACULAR_NAME_ID_SEQ,
-			Sequences.OFC_USER_GROUP_ID_SEQ,
+			Sequences.OFC_TAXONOMY_ID_SEQ,
 			Sequences.OFC_USER_ID_SEQ,
 			Sequences.OFC_USER_ROLE_ID_SEQ);
 	}
@@ -125,6 +125,7 @@ public class Collect extends SchemaImpl {
 			OfcDataQueryType.OFC_DATA_QUERY_TYPE,
 			OfcDataReport.OFC_DATA_REPORT,
 			OfcDataReportItem.OFC_DATA_REPORT_ITEM,
+			OfcInstitution.OFC_INSTITUTION,
 			OfcLogo.OFC_LOGO,
 			OfcMessage.OFC_MESSAGE,
 			OfcMessageProcessing.OFC_MESSAGE_PROCESSING,
@@ -133,11 +134,10 @@ public class Collect extends SchemaImpl {
 			OfcSurvey.OFC_SURVEY,
 			OfcSurveyFile.OFC_SURVEY_FILE,
 			OfcTaxon.OFC_TAXON,
-			OfcTaxonomy.OFC_TAXONOMY,
 			OfcTaxonVernacularName.OFC_TAXON_VERNACULAR_NAME,
+			OfcTaxonomy.OFC_TAXONOMY,
 			OfcUser.OFC_USER,
-			OfcUserGroup.OFC_USER_GROUP,
-			OfcUserRole.OFC_USER_ROLE,
-			OfcUserUserGroup.OFC_USER_USER_GROUP);
+			OfcUserInstitution.OFC_USER_INSTITUTION,
+			OfcUserRole.OFC_USER_ROLE);
 	}
 }
