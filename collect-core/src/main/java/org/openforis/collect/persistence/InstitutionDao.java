@@ -73,6 +73,13 @@ public class InstitutionDao extends OfcInstitutionDao {
 			.fetchOneInto(Institution.class);
 	}
 
+	public Institution loadById(int id) {
+		return dsl()
+			.selectFrom(OFC_INSTITUTION)
+			.where(OFC_INSTITUTION.ID.eq(id))
+			.fetchOneInto(Institution.class);
+	}
+	
 	public void insertRelation(User user, Institution institution, InstitutionJoinRequestStatus joinStatus, Date memberSince) {
 		DSL.insertInto(OFC_USER_INSTITUTION, OFC_USER_INSTITUTION.INSTITUTION_ID, OFC_USER_INSTITUTION.USER_ID, 
 				OFC_USER_INSTITUTION.REQUEST_DATE, OFC_USER_INSTITUTION.MEMBER_SINCE, 

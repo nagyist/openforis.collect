@@ -97,7 +97,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 	private void initInstitutionsModel() {
 		List<LabelledItem> items = new ArrayList<LabelledItem>();
 		User loggedUser = getLoggedUser();
-		List<Institution> institutions = institutionManager.findInstitutionsByUser(loggedUser);
+		List<Institution> institutions = institutionManager.findByUser(loggedUser);
 		String defaultPrivateInstitutionName = institutionManager.getDefaultPrivateInstitutionName(loggedUser);
 		String defaultPublicInstitutionName = institutionManager.getDefaultPublicInstitutionName();
 		for (Institution institution : institutions) {
@@ -145,7 +145,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		default:
 			survey = createNewSurveyFromTemplate(name, langCode, templateType);
 		}
-		Institution institution = institutionManager.loadInstitutionByName(institutionName);
+		Institution institution = institutionManager.loadByName(institutionName);
 		survey.setInstitutionId(institution.getId());
 		surveyManager.save(survey);
 		//put survey in session and redirect into survey edit page

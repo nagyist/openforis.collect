@@ -1110,7 +1110,7 @@ public class SurveyManager {
 	private List<Integer> loadUserInstitutionIds(User user) {
 		List<Integer> userInstitutionIds = null;
 		if (user != null) {
-			List<Institution> userInstitutions = institutionManager.findInstitutionsByUser(user);
+			List<Institution> userInstitutions = institutionManager.findByUser(user);
 			userInstitutionIds = CollectionUtils.project(userInstitutions, "id");
 		}
 		return userInstitutionIds;

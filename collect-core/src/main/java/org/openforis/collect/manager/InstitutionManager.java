@@ -60,15 +60,19 @@ public class InstitutionManager {
 		return dao.loadAll();
 	}
 
-	public Institution loadInstitutionByName(String institutionName) {
+	public Institution loadByName(String institutionName) {
 		return dao.loadByName(institutionName);
+	}
+
+	public Institution loadById(int id) {
+		return dao.loadById(id);
 	}
 
 	public Collection<User> findUsersByInstitution(Institution institution) {
 		return dao.findUsersByInstitution(institution);
 	}
 	
-	public List<Institution> findInstitutionsByUser(User user) {
+	public List<Institution> findByUser(User user) {
 		return dao.findInstitutionsByUser(user);
 	}
 	
@@ -84,6 +88,11 @@ public class InstitutionManager {
 	@Transactional(propagation=Propagation.REQUIRED)
 	public void acceptJoinRequest(User user, Institution institution) {
 		dao.acceptJoinRequest(user, institution);
+	}
+
+	@Transactional(propagation=Propagation.REQUIRED)
+	public void delete(int id) {
+		dao.deleteById(id);
 	}
 
 }
