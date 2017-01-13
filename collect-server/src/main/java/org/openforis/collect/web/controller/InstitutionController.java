@@ -35,18 +35,18 @@ public class InstitutionController extends BasicController {
 	@Autowired
 	private UserManager userManager;
 	
-	@RequestMapping(method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="summaries.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	List<Institution> loadAll(@RequestParam(required=false) Integer userID) throws Exception {
-		if (userID == null) {
+	List<Institution> loadAll(@RequestParam(required=false) Integer userId) throws Exception {
+		if (userId == null) {
 			return institutionManager.loadAll();
 		} else {
-			User user = userManager.loadById(userID);
+			User user = userManager.loadById(userId);
 			return institutionManager.findByUser(user);
 		}
 	}
 	
-	@RequestMapping(value="/{id}", method=GET, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="/{institutionId}.json", method=GET, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
 	Institution loadById(@PathVariable Integer institutionId) throws Exception {
 		return institutionManager.loadById(institutionId);
@@ -60,10 +60,11 @@ public class InstitutionController extends BasicController {
 		return institution;
 	}
 	
-	@RequestMapping(value="/{id}", method=DELETE, produces=APPLICATION_JSON_VALUE)
+	@RequestMapping(value="/{institutionId}.json", method=DELETE, produces=APPLICATION_JSON_VALUE)
 	public @ResponseBody
-	void delete(@PathVariable Integer institutionId) throws Exception {
+	boolean delete(@PathVariable Integer institutionId) throws Exception {
 		institutionManager.delete(institutionId);
+		return true;
 	}
 	
 }
