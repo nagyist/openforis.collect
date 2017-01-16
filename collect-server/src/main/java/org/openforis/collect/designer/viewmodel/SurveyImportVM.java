@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openforis.collect.designer.form.validator.SurveyNameValidator;
+import org.openforis.collect.designer.model.LabelledItem;
 import org.openforis.collect.designer.util.MessageUtil;
 import org.openforis.collect.io.AbstractSurveyRestoreJob;
 import org.openforis.collect.io.SurveyBackupInfo;
@@ -27,6 +28,7 @@ import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.validation.SurveyValidator;
 import org.openforis.collect.manager.validation.SurveyValidator.SurveyValidationResults;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.Institution;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.commons.io.OpenForisIOUtils;
 import org.openforis.commons.versioning.Version;
@@ -40,6 +42,7 @@ import org.zkoss.bind.annotation.Command;
 import org.zkoss.bind.annotation.ContextParam;
 import org.zkoss.bind.annotation.ContextType;
 import org.zkoss.bind.annotation.GlobalCommand;
+import org.zkoss.bind.annotation.Init;
 import org.zkoss.util.media.Media;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.event.UploadEvent;
@@ -54,6 +57,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 
 	private static final Significance VERSION_SIGNIFICANCE = Significance.MINOR;
 	private static final String XML_FILE_EXTENSION = "xml";
+	private static final String INSTITUTION_FIELD_NAME = "institution";
 
 	private static final String[] ALLOWED_FILE_EXTENSIONS = ArrayUtils.addAll(
 			SurveyRestoreJob.COMPLETE_BACKUP_FILE_EXTENSIONS,
@@ -69,7 +73,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 	@WireVariable
 	private SurveyValidator surveyValidator;
 
-	private Map<String,String> form;
+	private Map<String,Object> form;
 	
 	private String uploadedSurveyUri;
 	private String uploadedSurveyName;
@@ -87,7 +91,12 @@ public class SurveyImportVM extends SurveyBaseVM {
 	private Window jobStatusPopUp;
 	
 	public SurveyImportVM() {
-		form = new HashMap<String, String>();
+		form = new HashMap<String, Object>();
+	}
+	
+	@Init
+	public void init() {
+		initInstitutionsModel();
 		reset();
 	}
 	
@@ -326,11 +335,14 @@ public class SurveyImportVM extends SurveyBaseVM {
 			}
 		}
 		form.put(SURVEY_NAME_FIELD, surveyName);
+		form.put(INSTITUTION_FIELD_NAME, getDefaultPublicInstitutionItem().getCode());
 		notifyChange("updatingPublishedSurvey","updatingExistingSurvey","form");
 	}
 
 	protected void startSurveyImport() {
 		String surveyName = getFormSurveyName();
+		LabelledItem institutionItem = (LabelledItem) form.get(INSTITUTION_FIELD_NAME);
+		Institution institution = institutionManager.loadByName(institutionItem.getCode());
 		
 		if ( xmlFileUploaded ) {
 			restoreJob = jobManager.createJob(XMLSurveyRestoreJob.class);
@@ -415,11 +427,11 @@ public class SurveyImportVM extends SurveyBaseVM {
 		return uploadedSurveyUri;
 	}
 	
-	public Map<String, String> getForm() {
+	public Map<String, Object> getForm() {
 		return form;
 	}
 	
-	public void setForm(Map<String, String> form) {
+	public void setForm(Map<String, Object> form) {
 		this.form = form;
 	}
 	

@@ -84,6 +84,9 @@ public class Institution extends OfcInstitution {
 
 	public void setCreatedByUser(User createdByUser) {
 		this.createdByUser = createdByUser;
+		if (createdByUser != null) {
+			this.setCreatedBy(createdByUser.getId());
+		}
 	}
 
 	public Visibility getVisibility() {

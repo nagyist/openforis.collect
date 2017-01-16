@@ -13,7 +13,6 @@ import org.openforis.collect.designer.model.LabelledItem;
 import org.openforis.collect.designer.model.LabelledItem.LabelComparator;
 import org.openforis.collect.designer.session.SessionStatus;
 import org.openforis.collect.designer.util.Resources.Page;
-import org.openforis.collect.manager.InstitutionManager;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.manager.SurveyObjectsGenerator;
 import org.openforis.collect.manager.exception.SurveyValidationException;
@@ -23,7 +22,6 @@ import org.openforis.collect.metamodel.ui.UITab;
 import org.openforis.collect.metamodel.ui.UITabSet;
 import org.openforis.collect.model.CollectSurvey;
 import org.openforis.collect.model.Institution;
-import org.openforis.collect.model.User;
 import org.openforis.collect.persistence.SurveyStoreException;
 import org.openforis.idm.metamodel.EntityDefinition;
 import org.openforis.idm.metamodel.Languages;
@@ -62,13 +60,10 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 
 	@WireVariable 
 	private SurveyManager surveyManager;
-	@WireVariable 
-	private InstitutionManager institutionManager;
 	
 	private Map<String, Object> form;
 	
 	private BindingListModelListModel<LabelledItem> templateModel;
-	private BindingListModelListModel<LabelledItem> institutionModel;
 	private BindingListModelListModel<LabelledItem> languageModel;
 
 	private Validator nameValidator;
@@ -80,6 +75,7 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		initLanguageModel();
 		initTemplatesModel();
 		initInstitutionsModel();
+		form.put(INSTITUTION_FIELD_NAME, getDefaultPublicInstitutionItem());
 	}
 
 	private void initTemplatesModel() {
@@ -94,27 +90,6 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		form.put(TEMPLATE_FIELD_NAME, defaultTemplate);
 	}
 	
-	private void initInstitutionsModel() {
-		List<LabelledItem> items = new ArrayList<LabelledItem>();
-		User loggedUser = getLoggedUser();
-		List<Institution> institutions = institutionManager.findByUser(loggedUser);
-		String defaultPrivateInstitutionName = institutionManager.getDefaultPrivateInstitutionName(loggedUser);
-		String defaultPublicInstitutionName = institutionManager.getDefaultPublicInstitutionName();
-		for (Institution institution : institutions) {
-			String label = institution.getLabel();
-			if (institution.getName().equals(defaultPrivateInstitutionName)) {
-				label = Labels.getLabel("survey.template.institution.private");
-			} else if (institution.getName().equals(defaultPublicInstitutionName)) {
-				label = Labels.getLabel("survey.template.institution.public");
-			}
-			items.add(new LabelledItem(institution.getName(), label));
-		}
-		LabelledItem privateInstitution = LabelledItem.getByCode(items, defaultPrivateInstitutionName);
-		institutionModel = new BindingListModelListModel<LabelledItem>(new ListModelList<LabelledItem>(items));
-		institutionModel.setMultiple(false);
-		form.put(INSTITUTION_FIELD_NAME, privateInstitution);
-	}
-
 	private void initLanguageModel() {
 		List<LabelledItem> languages = new ArrayList<LabelledItem>();
 		List<String> codes = Languages.getCodes(Standard.ISO_639_1);
@@ -214,10 +189,6 @@ public class NewSurveyParametersPopUpVM extends BaseVM {
 		return languageModel;
 	}
 	
-	public BindingListModelListModel<LabelledItem> getInstitutionModel() {
-		return institutionModel;
-	}
-
 	public Map<String, Object> getForm() {
 		return form;
 	}

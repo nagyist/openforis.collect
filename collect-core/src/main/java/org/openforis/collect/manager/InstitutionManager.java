@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.openforis.collect.model.User;
+import org.openforis.collect.model.UserRole;
 import org.openforis.collect.model.Institution;
 import org.openforis.collect.model.Institution.InstitutionJoinRequestStatus;
 import org.openforis.collect.model.Institution.Visibility;
@@ -24,6 +25,8 @@ public class InstitutionManager {
 	private static final String DEFAULT_PUBLIC_INSTITUTION_NAME = "default_public_institution";
 	private static final String DEFAULT_PRIVATE_INSTITUTION_SUFFIX = "_default_private_institution";
 	private static final String DEFAULT_PRIVATE_INSTITUTION_LABEL_SUFFIX = " Default Private Institution";
+	
+	private static Institution DEFAULT_PUBLIC_INSTITUTION = null;
 	
 	@Autowired
 	private InstitutionDao dao;
@@ -49,11 +52,7 @@ public class InstitutionManager {
 
 	@Transactional(propagation=Propagation.REQUIRED)
 	public void save(Institution institution) {
-		if (institution.getId() == null) {
-			dao.insert(institution);
-		} else {
-			dao.update(institution);
-		}
+		dao.save(institution);
 	}
 	
 	public List<Institution> loadAll() {
@@ -68,17 +67,29 @@ public class InstitutionManager {
 		return dao.loadById(id);
 	}
 
+	public Institution getDefaultPublicInstitution() {
+		if (DEFAULT_PUBLIC_INSTITUTION == null) {
+			DEFAULT_PUBLIC_INSTITUTION = dao.loadByName(DEFAULT_PUBLIC_INSTITUTION_NAME);
+		}
+		return DEFAULT_PUBLIC_INSTITUTION;
+	}
+	
 	public Collection<User> findUsersByInstitution(Institution institution) {
 		return dao.findUsersByInstitution(institution);
 	}
 	
 	public List<Institution> findByUser(User user) {
-		return dao.findInstitutionsByUser(user);
+		List<UserRole> userRoles = user.getRoles();
+		if (userRoles.contains(UserRole.ADMIN)) {
+			return dao.loadAll();
+		} else {
+			return dao.findInstitutionsByUser(user);
+		}
 	}
 	
 	@Transactional(propagation=Propagation.REQUIRED)
-	public void requestJoin(User user, Institution group) {
-		insertRelation(user, group, InstitutionJoinRequestStatus.PENDING, null);
+	public void requestJoin(User user, Institution institution) {
+		insertRelation(user, institution, InstitutionJoinRequestStatus.PENDING, null);
 	}
 
 	private void insertRelation(User user, Institution institution, InstitutionJoinRequestStatus joinStatus, Date memberSince) {

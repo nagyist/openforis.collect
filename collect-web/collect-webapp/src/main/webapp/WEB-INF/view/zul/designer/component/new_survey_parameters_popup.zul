@@ -45,13 +45,12 @@
 				</row>
 				<row>
 					<label value="${labels.survey.template.institution.$}:" />
-					<radiogroup model="@load(vm.institutionModel)" 
-						selectedItem="@bind(fx.institution)"
-						orient="vertical">
+					<listbox model="@load(vm.institutionModel)" mold="select"
+						selectedItem="@bind(fx.institution)">
 						<template name="model">
-							<radio label="${each.label}" value="${each.label}" />
+							<listitem label="${each.label}" value="${each.code}" />
 						</template>
-					</radiogroup>
+					</listbox>
 				</row>
 			</rows>
 		</grid>

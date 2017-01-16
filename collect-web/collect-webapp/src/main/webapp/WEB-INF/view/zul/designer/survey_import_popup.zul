@@ -43,10 +43,15 @@
             	value="@bind(fx.surveyName) @validator(vm.nameValidator)" />
           </fieldErrorHandler>
         </row>
-<!--         <row> -->
-<!--           <label value="${labels.survey.import_survey.uri}:" /> -->
-<!--           <label value="@load(vm.uploadedSurveyUri)" /> -->
-<!--         </row> -->
+        <row>
+			<label value="${labels.survey.import_survey.institution}:" />
+			<listbox model="@load(vm.institutionModel)" mold="select"
+				selectedItem="@bind(fx.institution)">
+				<template name="model">
+					<listitem label="${each.label}" value="${each.code}" />
+				</template>
+			</listbox>
+		</row>
         <row>
         	<cell />
         	<cell>

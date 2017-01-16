@@ -1,7 +1,7 @@
 package org.openforis.collect.persistence;
 
-import static org.openforis.collect.persistence.jooq.tables.OfcUser.OFC_USER;
 import static org.openforis.collect.persistence.jooq.tables.OfcInstitution.OFC_INSTITUTION;
+import static org.openforis.collect.persistence.jooq.tables.OfcUser.OFC_USER;
 import static org.openforis.collect.persistence.jooq.tables.OfcUserInstitution.OFC_USER_INSTITUTION;
 
 import java.sql.Timestamp;
@@ -10,11 +10,13 @@ import java.util.List;
 
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
+import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
-import org.openforis.collect.model.User;
 import org.openforis.collect.model.Institution;
 import org.openforis.collect.model.Institution.InstitutionJoinRequestStatus;
 import org.openforis.collect.model.Institution.InstitutionRole;
+import org.openforis.collect.model.User;
+import org.openforis.collect.persistence.jooq.Sequences;
 import org.openforis.collect.persistence.jooq.tables.daos.OfcInstitutionDao;
 
 public class InstitutionDao extends OfcInstitutionDao {
@@ -51,7 +53,11 @@ public class InstitutionDao extends OfcInstitutionDao {
 				OFC_INSTITUTION.ID.in(
 					dsl.select(OFC_USER_INSTITUTION.INSTITUTION_ID)
 						.from(OFC_USER_INSTITUTION)
-						.where(OFC_USER_INSTITUTION.USER_ID.eq(user.getId()))
+						.where(OFC_USER_INSTITUTION.USER_ID.eq(user.getId())
+							.and(
+								OFC_USER_INSTITUTION.STATUS_CODE.eq(String.valueOf(InstitutionJoinRequestStatus.ACCEPTED.getCode()))
+							)
+						)
 					)
 				)
 			.orderBy(OFC_INSTITUTION.LABEL)
@@ -80,8 +86,25 @@ public class InstitutionDao extends OfcInstitutionDao {
 			.fetchOneInto(Institution.class);
 	}
 	
+	public void save(Institution institution) {
+		DSLContext dsl = dsl();
+		if (institution.getId() == null) {
+			Integer id;
+			if (dsl.dialect() == SQLDialect.SQLITE) {
+				Integer maxId = (Integer) dsl.select(DSL.max(OFC_INSTITUTION.ID)).from(OFC_INSTITUTION).fetchOne().getValue(0);
+				id = maxId + 1;
+			} else {
+				id = ((Long) dsl.select(Sequences.OFC_INSTITUTION_ID_SEQ.nextval()).fetchOne().getValue(0)).intValue();
+			}
+			institution.setId(id);
+			insert(institution);
+		} else {
+			update(institution);
+		}
+	}
+	
 	public void insertRelation(User user, Institution institution, InstitutionJoinRequestStatus joinStatus, Date memberSince) {
-		DSL.insertInto(OFC_USER_INSTITUTION, OFC_USER_INSTITUTION.INSTITUTION_ID, OFC_USER_INSTITUTION.USER_ID, 
+		dsl().insertInto(OFC_USER_INSTITUTION, OFC_USER_INSTITUTION.INSTITUTION_ID, OFC_USER_INSTITUTION.USER_ID, 
 				OFC_USER_INSTITUTION.REQUEST_DATE, OFC_USER_INSTITUTION.MEMBER_SINCE, 
 				OFC_USER_INSTITUTION.STATUS_CODE, OFC_USER_INSTITUTION.ROLE_CODE)
 			.values(institution.getId(), user.getId(), new Timestamp(System.currentTimeMillis()),
