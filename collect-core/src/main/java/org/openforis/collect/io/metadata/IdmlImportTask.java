@@ -7,6 +7,7 @@ import java.io.File;
 
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.Institution;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.SurveyImportException;
 import org.openforis.concurrency.Task;
@@ -30,6 +31,7 @@ public class IdmlImportTask extends Task {
 	private String surveyUri;
 	private String surveyName;
 	private boolean validate;
+	private Institution institution;
 	
 	//output
 	private transient CollectSurvey survey;
@@ -43,7 +45,7 @@ public class IdmlImportTask extends Task {
 		if ( oldSurveySummary == null ) {
 			//new survey
 			if ( importInPublishedSurvey ) {
-				survey = surveyManager.importModel(file, surveyName, validate);
+				survey = surveyManager.importModel(file, surveyName, validate, false, institution);
 			} else {
 				survey = surveyManager.importTemporaryModel(file, surveyName, validate);
 			}
@@ -112,6 +114,10 @@ public class IdmlImportTask extends Task {
 	
 	public void setValidate(boolean validate) {
 		this.validate = validate;
+	}
+
+	public void setInstitution(Institution institution) {
+		this.institution = institution;
 	}
 	
 	public CollectSurvey getSurvey() {

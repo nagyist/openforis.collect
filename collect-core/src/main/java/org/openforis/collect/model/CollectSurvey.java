@@ -41,6 +41,7 @@ public class CollectSurvey extends Survey {
 	private SurveyTarget target;
 	private Integer publishedId;
 	private Integer institutionId;
+	private Institution institution;
 	
 	private CollectAnnotations annotations;
 	private UIConfiguration uiConfiguration;
@@ -192,6 +193,15 @@ public class CollectSurvey extends Survey {
 	
 	public void setInstitutionId(Integer institutionId) {
 		this.institutionId = institutionId;
+	}
+	
+	public Institution getInstitution() {
+		return institution;
+	}
+	
+	public void setInstitution(Institution institution) {
+		this.institution = institution;
+		this.institutionId = institution == null ? null: institution.getId();
 	}
 	
 	public Version getCollectVersion() {

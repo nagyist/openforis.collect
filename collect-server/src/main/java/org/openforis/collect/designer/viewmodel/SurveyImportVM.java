@@ -111,6 +111,8 @@ public class SurveyImportVM extends SurveyBaseVM {
 		xmlFileUploaded = false;
 		updatingExistingSurvey = false;
 		updatingPublishedSurvey = false;
+
+		form.put(INSTITUTION_FIELD_NAME, getDefaultPublicInstitutionItem());
 		updateForm();
 		notifyChange("uploadedFileName","uploadedSurveyUri");
 	}
@@ -335,7 +337,6 @@ public class SurveyImportVM extends SurveyBaseVM {
 			}
 		}
 		form.put(SURVEY_NAME_FIELD, surveyName);
-		form.put(INSTITUTION_FIELD_NAME, getDefaultPublicInstitutionItem().getCode());
 		notifyChange("updatingPublishedSurvey","updatingExistingSurvey","form");
 	}
 
@@ -354,6 +355,7 @@ public class SurveyImportVM extends SurveyBaseVM {
 		restoreJob.setSurveyUri(uploadedSurveyUri);
 		restoreJob.setRestoreIntoPublishedSurvey(false);
 		restoreJob.setValidateSurvey(false);
+		restoreJob.setInstitution(institution);
 		jobManager.start(restoreJob);
 		openSurveyRestoreStatusPopUp();
 	}

@@ -2,6 +2,7 @@ package org.openforis.collect.persistence;
 
 import static org.openforis.collect.persistence.jooq.Sequences.OFC_SURVEY_ID_SEQ;
 import static org.openforis.collect.persistence.jooq.tables.OfcSurvey.OFC_SURVEY;
+import static org.openforis.collect.persistence.jooq.tables.OfcInstitution.OFC_INSTITUTION;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -21,6 +22,7 @@ import org.jooq.impl.SQLDataType;
 import org.openforis.collect.manager.SurveyMigrator;
 import org.openforis.collect.metamodel.SurveyTarget;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.Institution;
 import org.openforis.collect.model.SurveySummary;
 import org.openforis.collect.persistence.jooq.CollectDSLContext;
 import org.openforis.collect.persistence.jooq.JooqDaoSupport;
@@ -252,18 +254,18 @@ public class SurveyDao extends JooqDaoSupport {
 				return null;
 			}
 			String idml = row.getValue(OFC_SURVEY.IDML);
-			CollectSurvey survey = unmarshalIdml(idml);
-			survey.setCollectVersion(new Version(row.getValue(OFC_SURVEY.COLLECT_VERSION)));
-			survey.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
-			survey.setId(row.getValue(OFC_SURVEY.ID));
-			survey.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
-			survey.setName(row.getValue(OFC_SURVEY.NAME));
-			survey.setPublishedId(row.getValue(OFC_SURVEY.PUBLISHED_ID));
-			survey.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
-			survey.setTemporary(row.getValue(OFC_SURVEY.TEMPORARY));
-			survey.setUri(row.getValue(OFC_SURVEY.URI));
-			survey.setInstitutionId(row.getValue(OFC_SURVEY.INSTITUTION_ID));
-			return survey;
+			CollectSurvey s = unmarshalIdml(idml);
+			s.setCollectVersion(new Version(row.getValue(OFC_SURVEY.COLLECT_VERSION)));
+			s.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
+			s.setId(row.getValue(OFC_SURVEY.ID));
+			s.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
+			s.setName(row.getValue(OFC_SURVEY.NAME));
+			s.setPublishedId(row.getValue(OFC_SURVEY.PUBLISHED_ID));
+			s.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
+			s.setTemporary(row.getValue(OFC_SURVEY.TEMPORARY));
+			s.setUri(row.getValue(OFC_SURVEY.URI));
+			s.setInstitution(loadInstitutionById(row.getValue(OFC_SURVEY.INSTITUTION_ID)));
+			return s;
 		} catch (IdmlParseException e) {
 			throw new RuntimeException("Error deserializing IDML from database", e);
 		}
@@ -276,14 +278,18 @@ public class SurveyDao extends JooqDaoSupport {
 		Integer id = row.getValue(OFC_SURVEY.ID);
 		String name = row.getValue(OFC_SURVEY.NAME);
 		String uri = row.getValue(OFC_SURVEY.URI);
-		SurveySummary summary = new SurveySummary(id, name, uri);
-		summary.setTemporary(row.getValue(OFC_SURVEY.TEMPORARY));
-		summary.setPublishedId(row.getValue(OFC_SURVEY.PUBLISHED_ID));
-		summary.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
-		summary.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
-		summary.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
-		summary.setInstitutionId(row.getValue(OFC_SURVEY.INSTITUTION_ID));
-		return summary;
+		SurveySummary s = new SurveySummary(id, name, uri);
+		s.setTemporary(row.getValue(OFC_SURVEY.TEMPORARY));
+		s.setPublishedId(row.getValue(OFC_SURVEY.PUBLISHED_ID));
+		s.setTarget(SurveyTarget.fromCode(row.getValue(OFC_SURVEY.TARGET)));
+		s.setCreationDate(row.getValue(OFC_SURVEY.DATE_CREATED));
+		s.setModifiedDate(row.getValue(OFC_SURVEY.DATE_MODIFIED));
+		s.setInstitution(loadInstitutionById(row.getValue(OFC_SURVEY.INSTITUTION_ID)));
+		return s;
+	}
+	
+	private Institution loadInstitutionById(int id) {
+		return dsl().selectFrom(OFC_INSTITUTION).where(OFC_INSTITUTION.ID.eq(id)).fetchOneInto(Institution.class);
 	}
 	
 	protected SurveyMigrator getSurveyMigrator() {

@@ -232,10 +232,14 @@ public class SurveyManager {
 	
 	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
 	public CollectSurvey importModel(File surveyFile, String name, boolean validate, boolean includeCodeLists) throws SurveyImportException, SurveyValidationException {
+		return importModel(surveyFile, name, validate, includeCodeLists, institutionManager.getDefaultPublicInstitution());
+	}
+	
+	@Transactional(readOnly=false, propagation=Propagation.REQUIRED)
+	public CollectSurvey importModel(File surveyFile, String name, boolean validate, boolean includeCodeLists, Institution institution) throws SurveyImportException, SurveyValidationException {
 		try {
-			Institution defaultPublicInstitution = institutionManager.getDefaultPublicInstitution();
 			CollectSurvey survey = unmarshalSurvey(surveyFile, validate, includeCodeLists);
-			survey.setInstitutionId(defaultPublicInstitution.getId());
+			survey.setInstitutionId(institution.getId());
 			survey.setName(name);
 			survey.setPublished(true);
 			surveyDao.insert(survey);

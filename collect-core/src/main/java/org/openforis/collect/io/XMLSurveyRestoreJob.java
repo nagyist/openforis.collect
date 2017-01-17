@@ -40,6 +40,7 @@ public class XMLSurveyRestoreJob extends AbstractSurveyRestoreJob {
 			t.setFile(file);
 			t.setSurveyUri(surveyUri);
 			t.setSurveyName(surveyName);
+			t.setInstitution(institution);
 			t.setImportInPublishedSurvey(restoreIntoPublishedSurvey);
 			t.setValidate(validateSurvey);
 		}

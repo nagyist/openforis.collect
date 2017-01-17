@@ -24,6 +24,7 @@ public class SurveySummary {
 	private boolean temporary;
 	private boolean published;
 	private Integer institutionId;
+	private Institution institution;
 	private Date creationDate;
 	private Date modifiedDate;
 	private SurveyTarget target;
@@ -71,6 +72,10 @@ public class SurveySummary {
 	
 	public int getRecordValidationProgressPercent() {
 		return recordValidationProcessStatus == null ? 0: recordValidationProcessStatus.getProgressPercent();
+	}
+	
+	public String getInstitutionLabel() {
+		return institution == null ? null : institution.getLabel();
 	}
 
 	public Integer getId() {
@@ -177,4 +182,14 @@ public class SurveySummary {
 	public void setInstitutionId(Integer institutionId) {
 		this.institutionId = institutionId;
 	}
+
+	public Institution getInstitution() {
+		return institution;
+	}
+	
+	public void setInstitution(Institution institution) {
+		this.institution = institution;
+		this.institutionId = institution == null ? null: institution.getId();
+	}
+	
 }

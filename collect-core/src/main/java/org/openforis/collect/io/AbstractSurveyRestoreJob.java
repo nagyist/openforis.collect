@@ -9,6 +9,7 @@ import org.openforis.collect.io.metadata.IdmlImportTask;
 import org.openforis.collect.io.metadata.IdmlUnmarshallTask;
 import org.openforis.collect.manager.SurveyManager;
 import org.openforis.collect.model.CollectSurvey;
+import org.openforis.collect.model.Institution;
 import org.openforis.concurrency.Job;
 import org.openforis.concurrency.Worker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,10 @@ public abstract class AbstractSurveyRestoreJob extends Job {
 	 * Optional: it must be the same as the one in the packaged XML file
 	 */
 	protected String surveyUri;
+	/**
+	 * Required: institution to associate survey with
+	 */
+	protected Institution institution;
 	/**
 	 * Restores the survey into a published survey.
 	 * It creates a new one with the specified survey name if it does not exist.
@@ -107,6 +112,10 @@ public abstract class AbstractSurveyRestoreJob extends Job {
 	
 	public void setValidateSurvey(boolean validateSurvey) {
 		this.validateSurvey = validateSurvey;
+	}
+	
+	public void setInstitution(Institution institution) {
+		this.institution = institution;
 	}
 	
 	public CollectSurvey getSurvey() {

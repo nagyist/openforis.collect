@@ -86,9 +86,7 @@ public abstract class BaseVM {
 	}
 	
 	protected LabelledItem getDefaultPublicInstitutionItem() {
-		String defaultPublicInstitutionName = institutionManager.getDefaultPublicInstitutionName();
-		LabelledItem publicInstitutionItem = new LabelledItem(defaultPublicInstitutionName, Labels.getLabel("survey.template.institution.public"));
-		return publicInstitutionItem;
+		return institutionModel.getElementAt(0);
 	}
 	
 	public String getComponentsPath() {
